@@ -57,6 +57,9 @@ class RoutineSlot(models.Model):
 
 class Section(models.Model):
     section_id = models.CharField(max_length=100, primary_key=True)
+#     section_no = models.Integer()
+#     section_capacity = models.Integer()
+#     total_students = models.Integer()
     instructor_id = models.ForeignKey(Faculty, on_delete=models.CASCADE)
     routine_id = models.ForeignKey(RoutineSlot, on_delete=models.CASCADE)
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
