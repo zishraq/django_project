@@ -45,9 +45,9 @@ class Student(models.Model):
 
 class TimeSlot(models.Model):
     time_slot_id = models.CharField(max_length=100, primary_key=True)
-    day = models.TextField()
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
+    day = models.CharField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
 
 
 class RoutineSlot(models.Model):
