@@ -2,15 +2,62 @@
 {% block content %}
     <h1>Welcome to Online Advising Portal</h1>
 {#    {% for post in posts %}#}
-{#        <article class="media content-section">#}
-{#            <div class="media-body">#}
-{#                <div class="article-metadata">#}
-{#                    <a class="mr-2" href="#">{{ post.author }}</a>#}
-{#                    <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>#}
-{#                </div>#}
-{#                <h2><a class="article-title" href="#">{{ post.title }}</a></h2>#}
-{#                <p class="article-content">{{ post.content }}</p>#}
-{#            </div>#}
-{#        </article>#}
-{#    {% endfor %}#}
+    {#{#        <article class="media content-section">#}
+    {#{#            <div class="media-body">#}
+    {#{#                <div class="article-metadata">#}
+    {#{#                    <a class="mr-2" href="#">{{ post.author }}</a>#}
+    {#{#                    <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>#}
+    {#{#                </div>#}
+    {#{#                <h2><a class="article-title" href="#">{{ post.title }}</a></h2>#}
+    {#{#                <p class="article-content">{{ post.content }}</p>#}
+    {#{#            </div>#}
+    {#{#        </article>#}
+{#        {% endfor %}#}
+
+    <table id="tblData" border="1" class="table table-striped grid-table" infinite-scroll-disabled="courseList.busy" infinite-scroll-distance="0" infinite-scroll-parent="">
+
+                <tbody><tr>
+                    <th>
+                        Course
+                    </th>
+                    <td><b>Section</b></td>
+
+                    <td><b>Timing</b></td>
+                    <td><b>Room No</b></td>
+                    <td><b>Dedicated department</b></td>
+                    <td><b>Capacity</b></td>
+
+                </tr>
+            {% for section in sections %}
+                <!-- ngRepeat: c in OfferedCourseList -->
+
+
+{#                <tr class="ng-scope">#}
+{#                    <td class="ng-binding">CSE101</td>#}
+{#                    <td class="ng-binding">1</td>#}
+{##}
+{#                    <td class="ng-binding">S 08:30 AM - 10:00 AM</td>#}
+{#                    <td class="ng-binding">108</td>#}
+{#                    <td class="ng-binding"></td>#}
+{#                    <td class=""> 40 / 40</td>#}
+{##}
+
+                </tr><!-- end ngRepeat: c in OfferedCourseList --><tr ng-repeat="c in OfferedCourseList" class="ng-scope">
+                    <td class="ng-binding">{{ section.course_id.course_code }}</td>
+                    <td class="ng-binding">{{ section.section_no }}</td>
+
+{#                    <td class="ng-binding">ST 03:10 PM - 04:40 PM</td>#}
+                    <td class="ng-binding">
+                        {% for routine in section.routine_id.time_slot_id_set %}
+                            {{ routine.time_slot_id }}
+                        {% endfor %}
+                    </td>
+
+                    <td class="ng-binding">AB1-401</td>
+                    <td class="ng-binding"></td>
+                    <td ng-show="c.CourseCode.indexOf('Lab') == -1" class=""> {{ section.total_students }} / {{ section.section_capacity }}</td>
+
+            {% endfor %}
+            </tbody></table>
+
 {% endblock content %}

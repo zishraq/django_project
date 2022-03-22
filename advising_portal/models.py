@@ -15,7 +15,7 @@ class Course(models.Model):
     course_code = models.CharField(max_length=10)
     course_title = models.TextField()
     department_id = models.ForeignKey(Department, on_delete=models.DO_NOTHING)
-    prerequisite_course_id = models.ForeignKey('self', on_delete=models.DO_NOTHING)
+    prerequisite_course_id = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     credit = models.FloatField()
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING)
@@ -45,21 +45,25 @@ class Student(models.Model):
 
 class TimeSlot(models.Model):
     time_slot_id = models.CharField(max_length=100, primary_key=True)
-    day = models.CharField()
+    day = models.CharField(max_length=10)
     start_time = models.TimeField()
     end_time = models.TimeField()
+
+    def __str__(self):
+        return f'{self.day} {str(self.start_time)} - {str(self.start_time)}'
 
 
 class RoutineSlot(models.Model):
     routine_id = models.CharField(max_length=100, primary_key=True)
-    time_slot_id = models.ForeignKey(TimeSlot, on_delete=models.DO_NOTHING)
+    time_slot_id = models.ForeignKey(TimeSlot, on_delete=models.DO_NOTHING, null=True)
+    # time_slot_id = models.ManyToManyField(TimeSlot)
 
 
 class Section(models.Model):
     section_id = models.CharField(max_length=100, primary_key=True)
-    section_no = models.PositiveIntegerField()
-    section_capacity = models.PositiveIntegerField()
-    total_students = models.PositiveIntegerField()
+    section_no = models.PositiveIntegerField(default=1)
+    section_capacity = models.PositiveIntegerField(default=0)
+    total_students = models.PositiveIntegerField(default=0)
     instructor_id = models.ForeignKey(Faculty, on_delete=models.CASCADE)
     routine_id = models.ForeignKey(RoutineSlot, on_delete=models.CASCADE)
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
