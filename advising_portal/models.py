@@ -50,7 +50,7 @@ class TimeSlot(models.Model):
     end_time = models.TimeField()
 
     def __str__(self):
-        return f'{self.day} {str(self.start_time)} - {str(self.start_time)}'
+        return f'{self.day} {self.start_time.strftime("%H:%M")} - {self.end_time.strftime("%H:%M")}'
 
 
 class RoutineSlot(models.Model):
