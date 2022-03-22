@@ -14,7 +14,7 @@
     {#{#        </article>#}
 {#        {% endfor %}#}
 
-    <table id="tblData" border="1" class="table table-striped grid-table" infinite-scroll-disabled="courseList.busy" infinite-scroll-distance="0" infinite-scroll-parent="">
+    <table id="tblData" border="1" class="table table-striped grid-table" infinite-scroll-disabled="sections.busy" infinite-scroll-distance="0" infinite-scroll-parent="">
 
                 <tbody><tr>
                     <th>
@@ -26,7 +26,7 @@
                     <td><b>Room No</b></td>
                     <td><b>Dedicated department</b></td>
                     <td><b>Capacity</b></td>
-
+                    <td><b>Select</b></td>
                 </tr>
             {% for section in sections %}
                 <!-- ngRepeat: c in OfferedCourseList -->
@@ -42,7 +42,8 @@
 {#                    <td class=""> 40 / 40</td>#}
 {##}
 
-                </tr><!-- end ngRepeat: c in OfferedCourseList --><tr ng-repeat="c in OfferedCourseList" class="ng-scope">
+{#                </tr><!-- end ngRepeat: c in OfferedCourseList -->#}
+                <tr class = "ng-scope" ng-repeat="c in sections">
                     <td class="ng-binding">{{ section.course_id.course_code }}</td>
                     <td class="ng-binding">{{ section.section_no }}</td>
 
@@ -54,9 +55,12 @@
                     </td>
 
                     <td class="ng-binding">AB1-401</td>
-                    <td class="ng-binding"></td>
-                    <td ng-show="c.CourseCode.indexOf('Lab') == -1" class=""> {{ section.total_students }} / {{ section.section_capacity }}</td>
-
+                    <td class="ng-binding"> {{ section.course_id.department_id.department_name }}</td>
+                    <td class=""> {{ section.total_students }} / {{ section.section_capacity }}</td>
+                    <td class="ng-binding">
+                        <button class="btn btn-outline-info" type="submit">Select</button>
+                    </td>
+                </tr>
             {% endfor %}
             </tbody></table>
 
