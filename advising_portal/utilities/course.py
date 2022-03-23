@@ -1,17 +1,9 @@
-class Department:
-    class objects:
-        @staticmethod
-        def get(pk):
-            return pk
+from django.contrib.auth.models import User
 
-class User:
-    class objects:
-        @staticmethod
-        def get(username):
-            return username
+from advising_portal.models import Department, Course
 
 
-course = [
+courses = [
     {
         'course_id': 'CSE103',
         'course_code': 'CSE103',
@@ -31,3 +23,7 @@ course = [
         'created_by': User.objects.get(username='admin')
     }
 ]
+
+for i in courses:
+    r = Course(**i)
+    r.save()

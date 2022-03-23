@@ -1,0 +1,32 @@
+{% extends "advising_portal/base.html" %}
+{% block content %}
+    <h1>Selected Courses</h1>
+    <table id="tblData" border="1" class="table table-striped grid-table" infinite-scroll-disabled="sections.busy" infinite-scroll-distance="0" infinite-scroll-parent="">
+            <tbody>
+            <tr>
+                <th>
+                    Course
+                </th>
+                <td><b>Section</b></td>
+                <td><b>Routine</b></td>
+                <td><b>Credits</b></td>
+                <td><b>Drop Course</b></td>
+
+            </tr>
+            {% for course in courses %}
+                <tr class = "ng-scope" ng-repeat="c in sections">
+                    <td class="ng-binding">{{ course.course_code }}</td>
+                    <td class="ng-binding">{{ course.section_no }}</td>
+                    <td class="ng-binding">{{ course.routine }}</td>
+                    <td class="ng-binding">{{ course.credits }}</td>
+                    <td class="ng-binding">
+                        <button class="btn btn-outline-info" type="submit">
+                            <a href="{% url 'advising-portal-drop-course' course.section_id %}">Drop</a>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+    </table>
+
+{% endblock content %}

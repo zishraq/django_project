@@ -1,8 +1,6 @@
-class User():
-    class objects:
-        @staticmethod
-        def get(username):
-            return username
+from django.contrib.auth.models import User
+from advising_portal.models import Faculty
+
 
 faculties = [
     {
@@ -18,3 +16,7 @@ faculties = [
         'user_id': User.objects.get(username='amit')
     }
 ]
+
+for i in faculties:
+    r = Faculty(**i)
+    r.save()

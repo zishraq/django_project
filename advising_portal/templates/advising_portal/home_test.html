@@ -1,75 +1,73 @@
 {% extends "advising_portal/base.html" %}
 {% block content %}
-    <h1>Welcome to Online Advising Portal</h1>
-{#    {% for post in posts %}#}
-    {#{#        <article class="media content-section">#}
-    {#{#            <div class="media-body">#}
-    {#{#                <div class="article-metadata">#}
-    {#{#                    <a class="mr-2" href="#">{{ post.author }}</a>#}
-    {#{#                    <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>#}
-    {#{#                </div>#}
-    {#{#                <h2><a class="article-title" href="#">{{ post.title }}</a></h2>#}
-    {#{#                <p class="article-content">{{ post.content }}</p>#}
-    {#{#            </div>#}
-    {#{#        </article>#}
-{#        {% endfor %}#}
+    <div class="row">
+        <div class="col-7">
+            <h2 class="sub-header">Courses</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <td class="col-md-1">Course</td>
+                            <td class="col-md-1">Section</td>
+                            <td class="col-md-1">Timing</td>
+                            <td class="col-md-1">Room No</td>
+                            <td class="col-md-1">Department</td>
+                            <td class="col-md-1">Capacity</td>
+                            <td class="col-md-1">Select</td>
+                        </tr>
 
-    <table id="tblData" border="1" class="table table-striped grid-table" infinite-scroll-disabled="sections.busy" infinite-scroll-distance="0" infinite-scroll-parent="">
-
-                <tbody><tr>
-                    <th>
-                        Course
-                    </th>
-                    <td><b>Section</b></td>
-
-                    <td><b>Timing</b></td>
-                    <td><b>Room No</b></td>
-                    <td><b>Dedicated department</b></td>
-                    <td><b>Capacity</b></td>
-                    <td><b>Select</b></td>
-                </tr>
-            {% for section in sections %}
-                <!-- ngRepeat: c in OfferedCourseList -->
-
-
-{#                <tr class="ng-scope">#}
-{#                    <td class="ng-binding">CSE101</td>#}
-{#                    <td class="ng-binding">1</td>#}
-{##}
-{#                    <td class="ng-binding">S 08:30 AM - 10:00 AM</td>#}
-{#                    <td class="ng-binding">108</td>#}
-{#                    <td class="ng-binding"></td>#}
-{#                    <td class=""> 40 / 40</td>#}
-{##}
-
-{#                </tr><!-- end ngRepeat: c in OfferedCourseList -->#}
-                <tr class = "ng-scope" ng-repeat="c in sections">
-                    <td class="ng-binding">{{ section.course_id.course_code }}</td>
-{#                    <td class="ng-binding">{{ section.course_id }}</td>#}
-                    <td class="ng-binding">{{ section.section_no }}</td>
-
-{#                    <td class="ng-binding">ST 03:10 PM - 04:40 PM</td>#}
-                    <td class="ng-binding">
-                        {% for routine in section.routine_id.timeslot_set.all %}
-                            {{ routine }}
-
+                        {% for section in sections %}
+                            <tr>
+                                <td class="col-md-1">{{ section.course_id }}</td>
+                                <td class="col-md-1">{{ section.section_no }}</td>
+                                <td class="col-md-1">{{ section.routine_id }}</td>
+                                <td class="col-md-1">AB1-401</td>
+                                <td class="col-md-1">{{ section.department_name }}</td>
+                                <td class="col-md-1">{{ section.total_students }} / {{ section.section_capacity }}</td>
+                                <td class="col-md-1">
+                                    <button class="btn btn-outline-info" type="submit">
+                                        <a href="{% url 'advising-portal-select-course' section.section_id %}">Select</a>
+                                    </button>
+                                </td>
+                            </tr>
                         {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-{#                        {{ section.routine_id }}#}
 
-                    </td>
+        <div class="col-5">
+            <h2 class="sub-header">Selected Courses</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <tbody>
+                    <tr>
+                        <td class="col-md-1">Course</td>
+                        <td class="col-md-2">Section</td>
+                        <td class="col-md-3">Routine</td>
+                        <td class="col-md-3">Credits</td>
+                        <td class="col-md-3">Drop Course</td>
+                    </tr>
 
-                    <td class="ng-binding">AB1-401</td>
-                    <td class="ng-binding"> {{ section.course_id.department_id.department_name }}</td>
-{#                    <td class="ng-binding"> {{ section.department_name }}</td>#}
-                    <td class=""> {{ section.total_students }} / {{ section.section_capacity }}</td>
-                    <td class="ng-binding">
-                        <button class="btn btn-outline-info" type="submit">
-                            <a href="{% url 'advising-portal-select-course' section.section_id %}">Select</a>
-                        </button>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody></table>
+                    {% for course in selected_courses %}
+                        <tr>
+                            <td class="col-md-1">{{ course.course_code }}</td>
+                            <td class="col-md-1">{{ course.section_no }}</td>
+                            <td class="col-md-1">{{ course.routine }}</td>
+                            <td class="col-md-1">{{ course.credits }}</td>
+                            <td class="col-md-1">
+                                <button class="btn btn-outline-info" type="submit">
+                                    <a href="{% url 'advising-portal-drop-course' course.section_id %}">Drop</a>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
 {% endblock content %}

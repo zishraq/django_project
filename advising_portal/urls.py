@@ -3,5 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='advising-portal-home'),
-    path('section/<section_id>/', views.select_course, name='advising-portal-select-course'),
+    path('select-section/<section_id>/', views.add_course, name='advising-portal-select-course'),
+    path('drop-section/<section_id>/', views.drop_course, name='advising-portal-drop-course'),
+    path('selected_courses/', views.view_selected_courses, name='advising-portal-selected-courses'),
 ]
