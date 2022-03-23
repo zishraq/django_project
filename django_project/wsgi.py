@@ -158,7 +158,7 @@ application = get_wsgi_application()
 #             'section_capacity': 30,
 #             'total_students': 0,
 #             'instructor_id': Faculty.objects.get(pk='RDA'),
-#             'routine_id': RoutineSlot.objects.get(pk='S01T01'),
+#             'routine_id': RoutineSlot.objects.get(pk='M01W01'),
 #             'course_id': Course.objects.get(pk='CSE103'),
 #         },
 #         {
@@ -176,7 +176,7 @@ application = get_wsgi_application()
 #             'section_capacity': 30,
 #             'total_students': 0,
 #             'instructor_id': Faculty.objects.get(pk='AKD'),
-#             'routine_id': RoutineSlot.objects.get(pk='S01T01'),
+#             'routine_id': RoutineSlot.objects.get(pk='M01W01'),
 #             'course_id': Course.objects.get(pk='CSE110'),
 #         }
 #     ]

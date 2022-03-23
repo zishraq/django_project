@@ -4,9 +4,12 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from advising_portal.models import Course, Section, CoursesTaken, Semester, Student
+from django.contrib.auth.decorators import login_required
+
 import datetime
 
 
+@login_required
 def home(request):
     sections = list(Section.objects.all())
     view_data = []
@@ -87,11 +90,13 @@ def home(request):
     return render(request, 'advising_portal/home.html', context)
 
 
+@login_required
 def add_course(request, section_id):
     current_semester = Semester.objects.get(advising_status=True)
     student = Student.objects.get(user_id=User.objects.get(username=request.user))
     selected_section = Section.objects.get(section_id=section_id)
     selected_course = selected_section.course_id
+    selected_routine_slot = selected_section.routine_id
 
     existence_check = CoursesTaken.objects.filter(
         student_id=student,
@@ -109,12 +114,18 @@ def add_course(request, section_id):
         ).coursestaken_set.all()
 
         courses = []
+        routine_slots = []
 
         for section in previous_selected_sections:
             courses.append(section.section_id.course_id)
+            routine_slots.append(section.section_id.routine_id)
 
         if selected_course in courses:
             messages.success(request, 'Course already added')
+            return redirect('advising-portal-home')
+
+        if selected_routine_slot in routine_slots:
+            messages.success(request, 'Conflicts')
             return redirect('advising-portal-home')
 
     if selected_section.total_students < selected_section.section_capacity:
@@ -134,6 +145,7 @@ def add_course(request, section_id):
     return redirect('advising-portal-home')
 
 
+@login_required
 def drop_course(request, section_id):
     current_semester = Semester.objects.get(advising_status=True)
     student = Student.objects.get(user_id=User.objects.get(username=request.user))
@@ -151,6 +163,7 @@ def drop_course(request, section_id):
     return redirect('advising-portal-home')
 
 
+@login_required
 def view_selected_courses(request):
     student = Student.objects.get(user_id=User.objects.get(username=request.user))
     current_semester = Semester.objects.get(advising_status=True)
