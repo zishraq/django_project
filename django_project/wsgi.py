@@ -16,114 +16,32 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_project.settings')
 application = get_wsgi_application()
 
 
-# if __name__ == '__main__':
-#     import datetime
-#     from advising_portal.models import RoutineSlot, TimeSlot, Department, Course, Faculty, Section
-#     from django.contrib.auth.models import User
-#
-#     import uuid
-#
-#     # str(uuid.uuid4())
-#
-#     routine_slot = [
-#         {
-#             'routine_id': 'S01T01',
-#             'time_slot_id': TimeSlot.objects.get(pk='S01')
-#         },
-#         {
-#             'routine_id': 'S01T01',
-#             'time_slot_id': TimeSlot.objects.get(pk='T01')
-#         },
-#         {
-#             'routine_id': 'S02T02',
-#             'time_slot_id': TimeSlot.objects.get(pk='S02')
-#         },
-#         {
-#             'routine_id': 'S02T02',
-#             'time_slot_id': TimeSlot.objects.get(pk='T02')
-#         },
-#         {
-#             'routine_id': 'S03T03',
-#             'time_slot_id': TimeSlot.objects.get(pk='S03')
-#         },
-#         {
-#             'routine_id': 'S03T03',
-#             'time_slot_id': TimeSlot.objects.get(pk='T03')
-#         },
-#         {
-#             'routine_id': 'S04T04',
-#             'time_slot_id': TimeSlot.objects.get(pk='S04')
-#         },
-#         {
-#             'routine_id': 'S04T04',
-#             'time_slot_id': TimeSlot.objects.get(pk='T04')
-#         },
-#         {
-#             'routine_id': 'S04T04',
-#             'time_slot_id': TimeSlot.objects.get(pk='S04')
-#         },
-#         {
-#             'routine_id': 'S04T04',
-#             'time_slot_id': TimeSlot.objects.get(pk='T04')
-#         },
-#         {
-#             'routine_id': 'S05T05',
-#             'time_slot_id': TimeSlot.objects.get(pk='S05')
-#         },
-#         {
-#             'routine_id': 'S05T05',
-#             'time_slot_id': TimeSlot.objects.get(pk='T05')
-#         },
-#         {
-#             'routine_id': 'M01W01',
-#             'time_slot_id': TimeSlot.objects.get(pk='M01')
-#         },
-#         {
-#             'routine_id': 'M01W01',
-#             'time_slot_id': TimeSlot.objects.get(pk='W01')
-#         },
-#         {
-#             'routine_id': 'M02W02',
-#             'time_slot_id': TimeSlot.objects.get(pk='M02')
-#         },
-#         {
-#             'routine_id': 'M02W02',
-#             'time_slot_id': TimeSlot.objects.get(pk='W02')
-#         },
-#         {
-#             'routine_id': 'M03W03',
-#             'time_slot_id': TimeSlot.objects.get(pk='M03')
-#         },
-#         {
-#             'routine_id': 'M03W03',
-#             'time_slot_id': TimeSlot.objects.get(pk='W03')
-#         },
-#         {
-#             'routine_id': 'M04W04',
-#             'time_slot_id': TimeSlot.objects.get(pk='M04')
-#         },
-#         {
-#             'routine_id': 'M04W04',
-#             'time_slot_id': TimeSlot.objects.get(pk='W04')
-#         },
-#         {
-#             'routine_id': 'M04W04',
-#             'time_slot_id': TimeSlot.objects.get(pk='M04')
-#         },
-#         {
-#             'routine_id': 'M04W04',
-#             'time_slot_id': TimeSlot.objects.get(pk='W04')
-#         },
-#         {
-#             'routine_id': 'M05W05',
-#             'time_slot_id': TimeSlot.objects.get(pk='M05')
-#         },
-#         {
-#             'routine_id': 'M05W05',
-#             'time_slot_id': TimeSlot.objects.get(pk='W05')
-#         }
-#     ]
-#
-#     for i in routine_slot:
-#         t = RoutineSlot(**i)
-#         t.save()
+if __name__ == '__main__':
+    import datetime
+    import uuid
+    from advising_portal.models import RoutineSlot, TimeSlot, Department, Course, Faculty, Section, Student, CoursesTaken, Semester
+    from advising_portal.utilities.time_slot import time_slots
+    from django.contrib.auth.models import User
+
+    # str(uuid.uuid4())
+
+    students = [
+        {
+            'student_id': '2019-2-60-022',
+            'name': 'Alex Steiner',
+            'advisor': Faculty.objects.get(faculty_id='AKD'),
+            'user_id': User.objects.get(username='alex')
+        }
+    ]
+
+    # for s in students:
+    #     r = Student(**s)
+    #     r.save()
+
+    c = CoursesTaken.objects.get(
+        student_id=Student.objects.get(user_id=User.objects.get(username='alex')),
+        semester_id=Semester.objects.get(advising_status=True),
+        section_id=Section.objects.get(section_id='CSE1031')
+    )
+
+    print(c)

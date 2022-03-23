@@ -44,27 +44,24 @@
 
 {#                </tr><!-- end ngRepeat: c in OfferedCourseList -->#}
                 <tr class = "ng-scope" ng-repeat="c in sections">
-{#                    <td class="ng-binding">{{ section.course_id.course_code }}</td>#}
-                    <td class="ng-binding">{{ section.course_id }}</td>
+                    <td class="ng-binding">{{ section.course_id.course_code }}</td>
+{#                    <td class="ng-binding">{{ section.course_id }}</td>#}
                     <td class="ng-binding">{{ section.section_no }}</td>
 
 {#                    <td class="ng-binding">ST 03:10 PM - 04:40 PM</td>#}
                     <td class="ng-binding">
-{#                        {% for routine in section.routine_id.timeslot_set.all %}#}
-{#                            {{ routine }}#}
-{#                            {% if routine.start_time  %}#}
-{##}
-{#                            {% endif %}#}
-{##}
-{#                        {% endfor %}#}
+                        {% for routine in section.routine_id.timeslot_set.all %}
+                            {{ routine }}
 
-                        {{ section.routine_id }}
+                        {% endfor %}
+
+{#                        {{ section.routine_id }}#}
 
                     </td>
 
                     <td class="ng-binding">AB1-401</td>
-{#                    <td class="ng-binding"> {{ section.course_id.department_id.department_name }}</td>#}
-                    <td class="ng-binding"> {{ section.department_name }}</td>
+                    <td class="ng-binding"> {{ section.course_id.department_id.department_name }}</td>
+{#                    <td class="ng-binding"> {{ section.department_name }}</td>#}
                     <td class=""> {{ section.total_students }} / {{ section.section_capacity }}</td>
                     <td class="ng-binding">
                         <button class="btn btn-outline-info" type="submit">

@@ -27,6 +27,18 @@ class Semester(models.Model):
     semester_ends_on = models.DateField()
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    advising_status = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if self.advising_status:
+            try:
+                temp = Semester.objects.get(advising_status=True)
+                if self != temp:
+                    temp.is_the_chosen_one = False
+                    temp.save()
+            except Semester.DoesNotExist:
+                pass
+        super(Semester, self).save(*args, **kwargs)
 
 
 class Faculty(models.Model):
@@ -43,19 +55,19 @@ class Student(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
 
+class RoutineSlot(models.Model):
+    routine_id = models.CharField(max_length=100, primary_key=True)
+
+
 class TimeSlot(models.Model):
     time_slot_id = models.CharField(max_length=100, primary_key=True)
     day = models.CharField(max_length=10)
     start_time = models.TimeField()
     end_time = models.TimeField()
+    routine_id = models.ForeignKey(RoutineSlot, on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.day} {self.start_time.strftime("%H:%M")} - {self.end_time.strftime("%H:%M")}'
-
-
-class RoutineSlot(models.Model):
-    routine_id = models.CharField(max_length=100, primary_key=True)
-    time_slot_id = models.ForeignKey(TimeSlot, on_delete=models.SET_NULL, null=True)
 
 
 class Section(models.Model):

@@ -19,7 +19,7 @@ course = [
         'department_id': Department.objects.get(pk='CSE'),
         'prerequisite_course_id': None,
         'credit': 3,
-        'created_by': User.objects.get(username='zishraq')
+        'created_by': User.objects.get(username='admin')
     },
     {
         'course_id': 'CSE110',
@@ -28,6 +28,6 @@ course = [
         'department_id': Department.objects.get(pk='CSE'),
         'prerequisite_course_id': None,
         'credit': 3,
-        'created_by': User.objects.get(username='zishraq')
+        'created_by': User.objects.get(username='admin')
     }
 ]
