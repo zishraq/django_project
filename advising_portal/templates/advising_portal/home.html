@@ -25,8 +25,8 @@
                                 <td class="col-md-1">{{ section.department_name }}</td>
                                 <td class="col-md-1">{{ section.total_students }} / {{ section.section_capacity }}</td>
                                 <td class="col-md-1">
-                                    <button class="btn btn-outline-info" type="submit">
-                                        <a href="{% url 'advising-portal-select-course' section.section_id %}">Select</a>
+                                    <button class="btn btn-outline-info" type="submit" onclick="location.href='{% url 'advising-portal-select-course' section.section_id %}'">
+                                        Select
                                     </button>
                                 </td>
                             </tr>
@@ -57,8 +57,8 @@
                             <td class="col-md-1">{{ course.routine }}</td>
                             <td class="col-md-1">{{ course.credits }}</td>
                             <td class="col-md-1">
-                                <button class="btn btn-outline-info" type="submit">
-                                    <a href="{% url 'advising-portal-drop-course' course.section_id %}">Drop</a>
+                                <button class="btn btn-outline-info" type="submit" onclick="location.href='{% url 'advising-portal-drop-course' course.section_id %}'">
+                                    Select
                                 </button>
                             </td>
                         </tr>

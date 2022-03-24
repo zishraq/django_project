@@ -117,16 +117,25 @@ def add_course(request, section_id):
         routine_slots = []
 
         for section in previous_selected_sections:
-            courses.append(section.section_id.course_id)
-            routine_slots.append(section.section_id.routine_id)
 
-        if selected_course in courses:
-            messages.success(request, 'Course already added')
-            return redirect('advising-portal-home')
+            if section.section_id.course_id == selected_course:
+                messages.success(request, 'Course already added')
+                return redirect('advising-portal-home')
 
-        if selected_routine_slot in routine_slots:
-            messages.success(request, 'Conflicts')
-            return redirect('advising-portal-home')
+            if section.section_id.routine_id == selected_routine_slot:
+                messages.success(request, f'Conflicts with {section.section_id.course_id.course_code}')
+                return redirect('advising-portal-home')
+
+        #     courses.append(section.section_id.course_id)
+        #     routine_slots.append(section.section_id.routine_id)
+        #
+        # if selected_course in courses:
+        #     messages.success(request, 'Course already added')
+        #     return redirect('advising-portal-home')
+        #
+        # if selected_routine_slot in routine_slots:
+        #     messages.success(request, 'Conflicts')
+        #     return redirect('advising-portal-home')
 
     if selected_section.total_students < selected_section.section_capacity:
         selected_section.total_students = selected_section.total_students + 1
