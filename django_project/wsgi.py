@@ -17,10 +17,65 @@ application = get_wsgi_application()
 
 
 # if __name__ == '__main__':
-#     from advising_portal.models import RoutineSlot, TimeSlot, Department, Course, Faculty, Section, Student
+#     from advising_portal.models import RoutineSlot, TimeSlot, Department, Course, Faculty, Section, Student, Semester
 #     from django.contrib.auth.models import User
 #     import datetime
 #     from django.utils import timezone
+#
+#     users = [
+#         {
+#             'username': 'ishraq',
+#             'email': 'ishraq@gmail.com',
+#             'password1': '123456Seven',
+#             'password2': '123456Seven'
+#         },
+#         {
+#             'username': 'amit',
+#             'email': 'ami@gmail.com',
+#             'password1': '123456Seven',
+#             'password2': '123456Seven'
+#         },
+#         {
+#             'username': 'tuhin',
+#             'email': 'tuhin@gmail.com',
+#             'password1': '123456Seven',
+#             'password2': '123456Seven'
+#         },
+#         {
+#             'username': 'alex',
+#             'email': 'alex@gmail.com',
+#             'password1': '123456Seven',
+#             'password2': '123456Seven'
+#         }
+#     ]
+#
+#     departments = [
+#         {
+#             'department_id': 'CSE',
+#             'department_name': 'Computer Science and Engineering',
+#             'created_at': timezone.now(),
+#             'created_by': User.objects.get(username='admin')
+#         }
+#     ]
+#
+#     for i in departments:
+#         r = Department(**i)
+#         r.save()
+#
+#     semesters = [
+#         {
+#             'semester_id': 'Summer 2022',
+#             'semester_starts_on': datetime.datetime(year=2022, month=2, day=1),
+#             'semester_ends_on': datetime.datetime(year=2022, month=5, day=18),
+#             'created_at': timezone.now(),
+#             'created_by': User.objects.get(username='admin'),
+#             'advising_status': True
+#         }
+#     ]
+#
+#     for i in semesters:
+#         r = Semester(**i)
+#         r.save()
 #
 #     courses = [
 #         {
@@ -43,14 +98,9 @@ application = get_wsgi_application()
 #         }
 #     ]
 #
-#     departments = [
-#         {
-#             'department_id': 'CSE',
-#             'department_name': 'Computer Science and Engineering',
-#             'created_at': timezone.now(),
-#             'created_by': User.objects.get(username='admin')
-#         }
-#     ]
+#     for i in courses:
+#         r = Course(**i)
+#         r.save()
 #
 #     faculties = [
 #         {
@@ -66,6 +116,10 @@ application = get_wsgi_application()
 #             'user_id': User.objects.get(username='amit')
 #         }
 #     ]
+#
+#     for i in faculties:
+#         r = Faculty(**i)
+#         r.save()
 #
 #     routine_slot = [
 #         {
@@ -139,60 +193,6 @@ application = get_wsgi_application()
 #         },
 #         {
 #             'routine_id': 'M05W05'
-#         }
-#     ]
-#
-#     sections = [
-#         {
-#             'section_id': 'CSE1031',
-#             'section_no': 1,
-#             'section_capacity': 30,
-#             'total_students': 0,
-#             'instructor_id': Faculty.objects.get(pk='AKD'),
-#             'routine_id': RoutineSlot.objects.get(pk='S01T01'),
-#             'course_id': Course.objects.get(pk='CSE103'),
-#         },
-#         {
-#             'section_id': 'CSE1032',
-#             'section_no': 2,
-#             'section_capacity': 30,
-#             'total_students': 0,
-#             'instructor_id': Faculty.objects.get(pk='RDA'),
-#             'routine_id': RoutineSlot.objects.get(pk='M01W01'),
-#             'course_id': Course.objects.get(pk='CSE103'),
-#         },
-#         {
-#             'section_id': 'CSE1101',
-#             'section_no': 1,
-#             'section_capacity': 30,
-#             'total_students': 0,
-#             'instructor_id': Faculty.objects.get(pk='RDA'),
-#             'routine_id': RoutineSlot.objects.get(pk='S01T01'),
-#             'course_id': Course.objects.get(pk='CSE110'),
-#         },
-#         {
-#             'section_id': 'CSE1102',
-#             'section_no': 2,
-#             'section_capacity': 30,
-#             'total_students': 0,
-#             'instructor_id': Faculty.objects.get(pk='AKD'),
-#             'routine_id': RoutineSlot.objects.get(pk='M01W01'),
-#             'course_id': Course.objects.get(pk='CSE110'),
-#         }
-#     ]
-#
-#     students = [
-#         {
-#             'student_id': '2019-2-60-022',
-#             'name': 'Alex Steiner',
-#             'advisor': Faculty.objects.get(faculty_id='AKD'),
-#             'user_id': User.objects.get(username='alex')
-#         },
-#         {
-#             'student_id': '2019-2-60-021',
-#             'name': 'Zuhair Ishraq Zareef',
-#             'advisor': Faculty.objects.get(faculty_id='RDA'),
-#             'user_id': User.objects.get(username='ishraq')
 #         }
 #     ]
 #
@@ -572,17 +572,65 @@ application = get_wsgi_application()
 #             t = TimeSlot(**get_time_slot)
 #             t.save()
 #
-#     for i in departments:
-#         r = Department(**i)
-#         r.save()
+#     sections = [
+#         {
+#             'section_id': 'CSE1031',
+#             'section_no': 1,
+#             'section_capacity': 30,
+#             'total_students': 0,
+#             'instructor_id': Faculty.objects.get(pk='AKD'),
+#             'routine_id': RoutineSlot.objects.get(pk='S01T01'),
+#             'course_id': Course.objects.get(pk='CSE103'),
+#         },
+#         {
+#             'section_id': 'CSE1032',
+#             'section_no': 2,
+#             'section_capacity': 30,
+#             'total_students': 0,
+#             'instructor_id': Faculty.objects.get(pk='RDA'),
+#             'routine_id': RoutineSlot.objects.get(pk='M01W01'),
+#             'course_id': Course.objects.get(pk='CSE103'),
+#         },
+#         {
+#             'section_id': 'CSE1101',
+#             'section_no': 1,
+#             'section_capacity': 30,
+#             'total_students': 0,
+#             'instructor_id': Faculty.objects.get(pk='RDA'),
+#             'routine_id': RoutineSlot.objects.get(pk='S01T01'),
+#             'course_id': Course.objects.get(pk='CSE110'),
+#         },
+#         {
+#             'section_id': 'CSE1102',
+#             'section_no': 2,
+#             'section_capacity': 30,
+#             'total_students': 0,
+#             'instructor_id': Faculty.objects.get(pk='AKD'),
+#             'routine_id': RoutineSlot.objects.get(pk='M01W01'),
+#             'course_id': Course.objects.get(pk='CSE110'),
+#         }
+#     ]
 #
-#     for i in courses:
-#         r = Course(**i)
-#         r.save()
-#
-#     for i in faculties:
-#         r = Faculty(**i)
-#         r.save()
+#     students = [
+#         {
+#             'student_id': '2019-2-60-022',
+#             'name': 'Alex Steiner',
+#             'advisor': Faculty.objects.get(faculty_id='AKD'),
+#             'user_id': User.objects.get(username='alex')
+#         },
+#         {
+#             'student_id': '2019-2-60-021',
+#             'name': 'Zuhair Ishraq Zareef',
+#             'advisor': Faculty.objects.get(faculty_id='RDA'),
+#             'user_id': User.objects.get(username='ishraq')
+#         },
+#         {
+#             'student_id': 'admin',
+#             'name': 'admin',
+#             'advisor': Faculty.objects.get(faculty_id='RDA'),
+#             'user_id': User.objects.get(username='admin')
+#         }
+#     ]
 #
 #     for i in sections:
 #         r = Section(**i)
