@@ -7,13 +7,13 @@ faculties = [
         'faculty_id': 'RDA',
         'name': 'Rashedul Amin Tuhin',
         'initials': 'RDA',
-        'user_id': User.objects.get(username='tuhin')
+        'username_id': User.objects.get(username='tuhin').pk
     },
     {
         'faculty_id': 'AKD',
         'name': 'Amit Kumar Das',
         'initials': 'AKD',
-        'user_id': User.objects.get(username='amit')
+        'username_id': User.objects.get(username='amit').pk
     }
 ]
 

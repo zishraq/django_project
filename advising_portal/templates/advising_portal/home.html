@@ -20,7 +20,7 @@
                             <tr>
                                 <td class="col-md-1">{{ section.course_id }}</td>
                                 <td class="col-md-1">{{ section.section_no }}</td>
-                                <td class="col-md-1">{{ section.routine_id }}</td>
+                                <td class="col-md-1"><small>{{ section.routine_id }}</small></td>
                                 <td class="col-md-1">{{ section.credit }}</td>
                                 <td class="col-md-1">{{ section.department_name }}</td>
                                 <td class="col-md-1">{{ section.total_students }} / {{ section.section_capacity }}</td>
@@ -45,19 +45,19 @@
                     <tr>
                         <td class="col-md-1"><b>Course</b></td>
                         <td class="col-md-2"><b>Section</b></td>
-                        <td class="col-md-3"><b>Routine</b></td>
+                        <td class="col-md-3"><b>Timing</b></td>
                         <td class="col-md-3"><b>Credits</b></td>
-                        <td class="col-md-3"><b>Drop Course</b></td>
+                        <td class="col-md-3"><b>Drop</b></td>
                     </tr>
 
                     {% for course in selected_courses %}
                         <tr>
                             <td class="col-md-1">{{ course.course_code }}</td>
                             <td class="col-md-1">{{ course.section_no }}</td>
-                            <td class="col-md-1">{{ course.routine }}</td>
+                            <td class="col-md-1"><small>{{ course.routine }}</small></td>
                             <td class="col-md-1">{{ course.credits }}</td>
                             <td class="col-md-1">
-                                <button class="btn btn-outline-info" type="submit" onclick="location.href='{% url 'advising-portal-drop-course' course.section_id %}'">
+                                <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'advising-portal-drop-course' course.section_id %}'">
                                     Drop
                                 </button>
                             </td>

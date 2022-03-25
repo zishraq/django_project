@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
-from advising_portal.models import Course, Section, CoursesTaken, Semester, Student
+from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, RoutineAndTime, TimeSlot, RoutineSlot
 from django.contrib.auth.decorators import login_required
 
 import datetime
@@ -20,16 +20,23 @@ def home(request):
             'section_no': section.section_no,
             'section_capacity': section.section_capacity,
             'total_students': section.total_students,
-            'department_name': section.course_id.department_id.department_name,
-            'instructor_id': section.instructor_id.name,
-            'course_id': section.course_id.course_code,
-            'credit': section.course_id.credit,
+            'department_name': section.course.department.department_name,
+            'instructor_id': section.instructor.name,
+            'course_id': section.course.course_code,
+            'credit': section.course.credit,
         }
 
         routines = {}
-        for routine in section.routine_id.timeslot_set.all():
-            time_part = str(routine)[2:]
-            day_part = str(routine)[0]
+
+        get_time_slots = RoutineAndTime.objects.filter(
+            routine_slot_id=section.routine_id
+        ).values('time_slot_id').distinct()
+
+        for time_slot in get_time_slots:
+            time_slot = TimeSlot.objects.get(time_slot_id=time_slot['time_slot_id'])
+
+            time_part = str(time_slot)[2:]
+            day_part = str(time_slot)[0]
 
             if time_part not in routines:
                 routines[time_part] = day_part
@@ -40,12 +47,12 @@ def home(request):
         routine_str = ''
 
         for time, day in routines.items():
-            routine_str += f'{day} {time}\n'
+            routine_str += f'{day} {time}'
 
         formatted_data['routine_id'] = routine_str
         view_data.append(formatted_data)
 
-    student = Student.objects.get(user_id=User.objects.get(username=request.user))
+    student = Student.objects.get(username_id=request.user)
     current_semester = Semester.objects.get(advising_status=True)
 
     courses_taken = CoursesTaken.objects.filter(
@@ -57,16 +64,23 @@ def home(request):
 
     for course in courses_taken:
         formatted_data = {
-            'course_code': course.section_id.course_id.course_code,
-            'section_no': course.section_id.section_no,
-            'section_id': course.section_id.section_id,
-            'credits': course.section_id.course_id.credit,
+            'course_code': course.section.course.course_code,
+            'section_no': course.section.section_no,
+            'section_id': course.section_id,
+            'credits': course.section.course.credit,
         }
 
+        get_time_slots = RoutineAndTime.objects.filter(
+            routine_slot_id=course.section.routine_id
+        ).values('time_slot_id').distinct()
+
         routines = {}
-        for routine in course.section_id.routine_id.timeslot_set.all():
-            time_part = str(routine)[2:]
-            day_part = str(routine)[0]
+
+        for routine in get_time_slots:
+            time_slot = TimeSlot.objects.get(time_slot_id=routine['time_slot_id'])
+
+            time_part = str(time_slot)[2:]
+            day_part = str(time_slot)[0]
 
             if time_part not in routines:
                 routines[time_part] = day_part
@@ -93,17 +107,17 @@ def home(request):
 @login_required
 def add_course(request, section_id):
     current_semester = Semester.objects.get(advising_status=True)
-    student = Student.objects.get(user_id=User.objects.get(username=request.user))
+    student = Student.objects.get(username_id=request.user)
     selected_section = Section.objects.get(section_id=section_id)
-    selected_course = selected_section.course_id
-    selected_routine_slot = selected_section.routine_id.routine_id
+    selected_course = selected_section.course
+    selected_routine_slot = selected_section.routine_id
 
     selected_routine_slot_chunks = [selected_routine_slot[i:i+3] for i in range(0, len(selected_routine_slot), 3)]
 
     existence_check = CoursesTaken.objects.filter(
-        student_id=student,
-        semester_id=current_semester,
-        section_id=selected_section
+        student=student,
+        semester=current_semester,
+        section=selected_section
     ).exists()
 
     if existence_check:
@@ -116,18 +130,20 @@ def add_course(request, section_id):
         ).coursestaken_set.all()
 
         for section in previous_selected_sections:
-            if section.section_id.course_id == selected_course:
+            # if section.section_id.course_id == selected_course:
+            if section.section.course == selected_course:
                 messages.success(request, 'Course already added')
                 return redirect('advising-portal-home')
 
-            routine_id = section.section_id.routine_id.routine_id
+            # routine_id = section.section_id.routine_id.routine_id
+            routine_id = section.section.routine_id
 
             section_routine_slot_chunks = [routine_id[i:i+3] for i in range(0, len(routine_id), 3)]
 
             for i in section_routine_slot_chunks:
                 for j in selected_routine_slot_chunks:
                     if i == j:
-                        messages.success(request, f'Conflicts with {section.section_id.course_id.course_code}')
+                        messages.success(request, f'Conflicts with {section.section.course.course_code}')
                         return redirect('advising-portal-home')
 
             # if section.section_id.routine_id == selected_routine_slot:
@@ -137,12 +153,12 @@ def add_course(request, section_id):
         selected_section.save()
 
         course_selected = CoursesTaken(
-            student_id=student,
-            semester_id=current_semester,
-            section_id=selected_section,
+            student=student,
+            semester=current_semester,
+            section=selected_section,
         )
         course_selected.save()
-        messages.success(request, f'Successfully added Section-{selected_section.section_no} of {selected_section.course_id.course_code}')
+        messages.success(request, f'Successfully added Section-{selected_section.section_no} of {selected_section.course.course_code}')
     else:
         messages.success(request, 'Section is full!')
 
@@ -151,17 +167,17 @@ def add_course(request, section_id):
 
 @login_required
 def drop_course(request, section_id):
-    current_semester = Semester.objects.get(advising_status=True)
-    student = Student.objects.get(user_id=User.objects.get(username=request.user))
+    current_semester_id = Semester.objects.get(advising_status=True).semester_id
+    student_id = Student.objects.get(username_id=request.user).student_id
     selected_section = Section.objects.get(section_id=section_id)
 
     selected_section.total_students = selected_section.total_students - 1
     selected_section.save()
 
     CoursesTaken.objects.filter(
-        student_id=student,
-        semester_id=current_semester,
-        section_id=selected_section
+        student_id=student_id,
+        semester_id=current_semester_id,
+        section_id=selected_section.section_id
     ).delete()
 
     return redirect('advising-portal-home')
@@ -211,3 +227,16 @@ def view_selected_courses(request):
     }
 
     return render(request, 'advising_portal/selected_courses.html', context)
+
+
+@login_required
+def view_grade_report(request):
+    # student = Student.objects.get(user_id=User.objects.get(username=request.user))
+    student = Student.objects.get(user_id=User.objects.get(username='alex'))
+    courses_taken = CoursesTaken.objects.filter(
+        student_id=student
+    ).values('semester_id').distinct()
+
+    print(courses_taken)
+
+    return HttpResponse('test')

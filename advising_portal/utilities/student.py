@@ -7,14 +7,20 @@ students = [
     {
         'student_id': '2019-2-60-022',
         'name': 'Alex Steiner',
-        'advisor': Faculty.objects.get(faculty_id='AKD'),
-        'user_id': User.objects.get(username='alex')
+        'advisor_id': Faculty.objects.get(faculty_id='AKD').pk,
+        'username_id': User.objects.get(username='alex').pk
     },
     {
         'student_id': '2019-2-60-021',
         'name': 'Zuhair Ishraq Zareef',
-        'advisor': Faculty.objects.get(faculty_id='RDA'),
-        'user_id': User.objects.get(username='ishraq')
+        'advisor_id': Faculty.objects.get(faculty_id='RDA').pk,
+        'username_id': User.objects.get(username='ishraq').pk
+    },
+    {
+        'student_id': 'admin',
+        'name': 'Zuhair Ishraq Zareef',
+        'advisor_id': Faculty.objects.get(faculty_id='admin').pk,
+        'username_id': User.objects.get(username='admin').pk
     }
 ]
 

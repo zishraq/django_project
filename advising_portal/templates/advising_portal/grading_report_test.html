@@ -1,0 +1,55 @@
+{% extends "advising_portal/base.html" %}
+{% block content %}
+<div ng-repeat="t in TranscriptDatas" style="width:11.5cm !important; margin-left:0.55cm;margin-right:0.55cm; overflow:hidden !important;margin-bottom: 0.15cm;break-inside: avoid-column;-moz-break-inside: avoid-column;-webkit-break-inside: avoid-column;page-break-inside: avoid; " class="courseContainerDiv ng-scope">
+                    <h6 class="headingabovetable ng-binding">Summer-2019</h6>
+
+                    <table class="transcriptdatatable">
+
+                        <tbody><tr style="border-top: 1px solid; border-bottom: 1px solid">
+                            <th style="width: 13%; border: 0px">Course</th>
+                            <th style="width: 59%; border: 0px">Course Title</th>
+                            <th style="width: 7%; border: 0px">cr</th>
+                            <th style="width: 7%; border: 0px">grd</th>
+                            <th style="width: 7%; border: 0px">gp</th>
+                            <th style="width: 7%; border: 0px">gpacr</th>
+                        </tr>
+
+                        <!-- ngRepeat: c in t.courses --><tr ng-repeat="c in t.courses" class="ng-scope">
+                            <td style="width: 13%; border: 0px" class="ng-binding">CSE103</td>
+                            <td style="width: 59%; border: 0px" class="ng-binding">Structured Programming</td>
+                            <td style="width: 7%; border: 0px" class="ng-binding">4.50</td>
+                            <td style="width: 7%; border: 0px" class="ng-binding">C-</td>
+                            <td style="width: 7%; border: 0px" class="ng-binding">7.65</td>
+                            <td style="width: 7%; border: 0px" class="ng-binding">4.50</td>
+                        </tr><!-- end ngRepeat: c in t.courses --><tr ng-repeat="c in t.courses" class="ng-scope">
+                            <td style="width: 13%; border: 0px" class="ng-binding">ENG101</td>
+                            <td style="width: 59%; border: 0px" class="ng-binding">Basic English</td>
+                            <td style="width: 7%; border: 0px" class="ng-binding">3.00</td>
+                            <td style="width: 7%; border: 0px" class="ng-binding">A</td>
+                            <td style="width: 7%; border: 0px" class="ng-binding">12.00</td>
+                            <td style="width: 7%; border: 0px" class="ng-binding">3.00</td>
+                        </tr><!-- end ngRepeat: c in t.courses --><tr ng-repeat="c in t.courses" class="ng-scope">
+                            <td style="width: 13%; border: 0px" class="ng-binding">MAT101</td>
+                            <td style="width: 59%; border: 0px" class="ng-binding">Differential &amp; Integral Calculus</td>
+                            <td style="width: 7%; border: 0px" class="ng-binding">3.00</td>
+                            <td style="width: 7%; border: 0px" class="ng-binding">B</td>
+                            <td style="width: 7%; border: 0px" class="ng-binding">9.00</td>
+                            <td style="width: 7%; border: 0px" class="ng-binding">3.00</td>
+                        </tr><!-- end ngRepeat: c in t.courses -->
+
+                        <tr style="border-top: 1px solid; border-bottom: 1px solid">
+
+                            <td style="text-align:center;border: 0px;padding-right:3.3%" colspan="2" class="ng-binding">CGPA: 2.73</td>
+                            <td style="border: 0px;text-align:left" colspan="4" class="ng-binding">
+                                Term GPA: 2.73
+                            </td>
+
+
+                        </tr>
+
+                    </tbody></table>
+                    <!-- ngIf: extraSpaces -->
+                </div>
+
+
+{% endblock content %}
