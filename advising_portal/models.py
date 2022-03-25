@@ -61,7 +61,7 @@ class RoutineSlot(models.Model):
 
 
 class TimeSlot(models.Model):
-    time_slot_id = models.CharField(max_length=100, primary_key=True)
+    time_slot_id = models.CharField(max_length=100)
     day = models.CharField(max_length=10)
     start_time = models.TimeField()
     end_time = models.TimeField()

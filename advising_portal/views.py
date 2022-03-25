@@ -96,7 +96,9 @@ def add_course(request, section_id):
     student = Student.objects.get(user_id=User.objects.get(username=request.user))
     selected_section = Section.objects.get(section_id=section_id)
     selected_course = selected_section.course_id
-    selected_routine_slot = selected_section.routine_id
+    selected_routine_slot = selected_section.routine_id.routine_id
+
+    selected_routine_slot_chunks = [selected_routine_slot[i:i+3] for i in range(0, len(selected_routine_slot), 3)]
 
     existence_check = CoursesTaken.objects.filter(
         student_id=student,
@@ -113,29 +115,22 @@ def add_course(request, section_id):
             student_id=student.student_id
         ).coursestaken_set.all()
 
-        courses = []
-        routine_slots = []
-
         for section in previous_selected_sections:
-
             if section.section_id.course_id == selected_course:
                 messages.success(request, 'Course already added')
                 return redirect('advising-portal-home')
 
-            if section.section_id.routine_id == selected_routine_slot:
-                messages.success(request, f'Conflicts with {section.section_id.course_id.course_code}')
-                return redirect('advising-portal-home')
+            routine_id = section.section_id.routine_id.routine_id
 
-        #     courses.append(section.section_id.course_id)
-        #     routine_slots.append(section.section_id.routine_id)
-        #
-        # if selected_course in courses:
-        #     messages.success(request, 'Course already added')
-        #     return redirect('advising-portal-home')
-        #
-        # if selected_routine_slot in routine_slots:
-        #     messages.success(request, 'Conflicts')
-        #     return redirect('advising-portal-home')
+            section_routine_slot_chunks = [routine_id[i:i+3] for i in range(0, len(routine_id), 3)]
+
+            for i in section_routine_slot_chunks:
+                for j in selected_routine_slot_chunks:
+                    if i == j:
+                        messages.success(request, f'Conflicts with {section.section_id.course_id.course_code}')
+                        return redirect('advising-portal-home')
+
+            # if section.section_id.routine_id == selected_routine_slot:
 
     if selected_section.total_students < selected_section.section_capacity:
         selected_section.total_students = selected_section.total_students + 1
