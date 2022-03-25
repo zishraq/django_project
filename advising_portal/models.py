@@ -22,8 +22,8 @@ class Course(models.Model):
 
 
 class Semester(models.Model):
-    semester_id = models.CharField(max_length=100, primary_key=True)
-    # semester_id = models.AutoField(primary_key=True)
+    semester_id = models.IntegerField(primary_key=True)
+    semester_name = models.TextField()
     semester_starts_on = models.DateField()
     semester_ends_on = models.DateField()
     created_at = models.DateTimeField(default=timezone.now)
