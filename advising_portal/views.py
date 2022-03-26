@@ -11,7 +11,17 @@ import datetime
 
 @login_required
 def home(request):
-    sections = list(Section.objects.all())
+    # sections = list(Section.objects.all())
+    student = Student.objects.get(username_id=request.user)
+
+    sections = list(Section.objects.exclude(
+        course_id__in=Section.objects.filter(
+            section_id__in=CoursesTaken.objects.filter(
+                student_id=student,
+            ).values('section_id').all()
+        ).values('course_id').all()
+    ))
+
     view_data = []
 
     for section in sections:
