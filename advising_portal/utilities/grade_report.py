@@ -47,7 +47,7 @@ grade_report = [
     {
         'student': Student.objects.get(student_id='2019-2-60-022'),
         'semester': Semester.objects.get(semester_id=3),
-        'section': Section.objects.get(section_id='CSE1041'),
+        'section': Section.objects.get(section_id='MAT1041'),
         'grade': Grade.objects.get(grade='D+')
     },
     {

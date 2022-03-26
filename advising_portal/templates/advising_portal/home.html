@@ -1,9 +1,17 @@
 {% extends "advising_portal/base.html" %}
 {% block content %}
-    <div class="row">
+{#    <div class="fix-width">#}
+{#        <button type="button" class="btn btn-outline-primary">Primary</button>#}
+{#        <button type="button" class="btn btn-outline-secondary">Secondary</button>#}
+{#    </div>#}
+    <div class="row fix-width">
         <div class="col-7">
-            <h2 class="sub-header">Offered Courses</h2>
-            <div class="table-responsive">
+            <div class="btn-self-design">
+                <button type="button" class="btn btn-outline-primary btn-fix-width">Recommended</button>
+                <button type="button" class="btn btn-outline-secondary btn-fix-width">Retakable</button>
+            </div>
+
+            <div class="table-responsive left-table-align">
                 <table class="table table-striped">
                     <tbody>
                         <tr>
@@ -20,7 +28,8 @@
                             <tr>
                                 <td class="col-md-1">{{ section.course_id }}</td>
                                 <td class="col-md-1">{{ section.section_no }}</td>
-                                <td class="col-md-1"><small>{{ section.routine_id }}</small></td>
+{#                                <td class="col-md-1"><small>{{ section.routine_id|linebreaks }}</small></td>#}
+                                <td class="col-md-1"><small><pre>{{ section.routine_id }}</pre></small></td>
                                 <td class="col-md-1">{{ section.credit }}</td>
                                 <td class="col-md-1">{{ section.department_name }}</td>
                                 <td class="col-md-1">{{ section.total_students }} / {{ section.section_capacity }}</td>
@@ -39,7 +48,7 @@
 
         <div class="col-5">
             <h2 class="sub-header">Selected Courses</h2>
-            <div class="table-responsive">
+            <div class="table-responsive right-table-align">
                 <table class="table table-striped">
                     <tbody>
                     <tr>
@@ -54,7 +63,8 @@
                         <tr>
                             <td class="col-md-1">{{ course.course_code }}</td>
                             <td class="col-md-1">{{ course.section_no }}</td>
-                            <td class="col-md-1"><small>{{ course.routine }}</small></td>
+{#                            <td class="col-md-1"><small>{{ course.routine|linebreaks }}</small></td>#}
+                            <td class="col-md-1"><small><pre>{{ course.routine }}</pre></small></td>
                             <td class="col-md-1">{{ course.credits }}</td>
                             <td class="col-md-1">
                                 <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'advising-portal-drop-course' course.section_id %}'">

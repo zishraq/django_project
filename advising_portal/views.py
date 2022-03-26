@@ -47,17 +47,17 @@ def home(request):
         routine_str = ''
 
         for time, day in routines.items():
-            routine_str += f'{day} {time}'
+            routine_str += f'{day} {time}\n'
 
         formatted_data['routine_id'] = routine_str
         view_data.append(formatted_data)
 
-    student = Student.objects.get(username_id=request.user)
-    current_semester = Semester.objects.get(advising_status=True)
+    student_id = Student.objects.get(username_id=request.user).pk
+    current_semester_id = Semester.objects.get(advising_status=True).pk
 
     courses_taken = CoursesTaken.objects.filter(
-        student_id=student,
-        semester_id=current_semester
+        student_id=student_id,
+        semester_id=current_semester_id
     ).all()
 
     view_selected_courses_data = []
@@ -91,7 +91,7 @@ def home(request):
         routine_str = ''
 
         for time, day in routines.items():
-            routine_str += f'{day} {time}\n'
+            routine_str += f'{day} {time} \n'
 
         formatted_data['routine'] = routine_str
         view_selected_courses_data.append(formatted_data)
@@ -125,17 +125,16 @@ def add_course(request, section_id):
         return redirect('advising-portal-home')
 
     elif not existence_check:
-        previous_selected_sections = Student.objects.get(
-            student_id=student.student_id
-        ).coursestaken_set.all()
+        previous_selected_sections = CoursesTaken.objects.filter(
+            student_id=student.student_id,
+            semester=current_semester,
+        ).all()
 
         for section in previous_selected_sections:
-            # if section.section_id.course_id == selected_course:
             if section.section.course == selected_course:
                 messages.success(request, 'Course already added')
                 return redirect('advising-portal-home')
 
-            # routine_id = section.section_id.routine_id.routine_id
             routine_id = section.section.routine_id
 
             section_routine_slot_chunks = [routine_id[i:i+3] for i in range(0, len(routine_id), 3)]
@@ -144,6 +143,9 @@ def add_course(request, section_id):
                 for j in selected_routine_slot_chunks:
                     if i == j:
                         messages.success(request, f'Conflicts with {section.section.course.course_code}')
+                        # messages.error(request, f'Conflicts with {section.section.course.course_code}')
+
+                        # messages.danger(request, f'Conflicts with {section.section.course.course_code}')
                         return redirect('advising-portal-home')
 
             # if section.section_id.routine_id == selected_routine_slot:
@@ -231,28 +233,64 @@ def view_selected_courses(request):
 
 @login_required
 def view_grade_report(request):
-    # student = Student.objects.get(user_id=User.objects.get(username=request.user))
     student = Student.objects.get(username_id=User.objects.get(username=request.user).pk)
-    # courses_taken = CoursesTaken.objects.filter(
-    #     student_id=student
-    # ).values('semester_id').distinct()
-
-    print()
 
     courses_taken = CoursesTaken.objects.filter(
-        student_id=student
-        # semester__advising_status=False
-    ).aggregate()
+        student_id=student.student_id,
+        semester__advising_status=False
+    ).all()
 
-    print(courses_taken)
+    courses_by_semesters = {}
 
-    courses_by_semesters = []
-
-    semesters_taken = []
+    total_gpa = 0
+    total_credit = 0
 
     for course in courses_taken:
-        {
-            'semester_id'
-        }
+        total_gpa += (course.grade.grade_point * course.section.course.credit)
+        total_credit += course.section.course.credit
 
-    return HttpResponse('test')
+        if course.semester_id not in courses_by_semesters:
+            courses_by_semesters[course.semester_id] = {
+                'semester_id': course.semester_id,
+                'semester_name': course.semester.semester_name,
+                'total_credit': course.section.course.credit,
+                'courses': [
+                    {
+                        'course_code': course.section.course.course_code,
+                        'course_title': course.section.course.course_title,
+                        'course_credit': course.section.course.credit,
+                        'grade': course.grade.grade,
+                        'total_gp': course.section.course.credit * 4,
+                        'grade_point': course.grade.grade_point,
+                    }
+                ],
+                'term_gpa': course.grade.grade_point * course.section.course.credit
+            }
+
+        else:
+            courses_by_semesters[course.semester_id]['total_credit'] += course.section.course.credit
+            courses_by_semesters[course.semester_id]['term_gpa'] += (course.grade.grade_point * course.section.course.credit)
+            courses_by_semesters[course.semester_id]['courses'].append(
+                {
+                    'course_code': course.section.course.course_code,
+                    'course_title': course.section.course.course_title,
+                    'course_credit': course.section.course.credit,
+                    'grade': course.grade.grade,
+                    'total_gp': course.section.course.credit * 4,
+                    'grade_point': course.grade.grade_point,
+                }
+            )
+
+    for semester in courses_by_semesters.values():
+        semester['term_gpa'] = semester['term_gpa'] / semester['total_credit']
+        semester['term_gpa'] = '{:.2f}'.format(semester['term_gpa'])
+
+    cgpa = total_gpa / total_credit
+    cgpa = '{:.2f}'.format(cgpa)
+
+    context = {
+        'cgpa': cgpa,
+        'courses_by_semesters': courses_by_semesters
+    }
+
+    return render(request, 'advising_portal/grading_report_test2.html', context)

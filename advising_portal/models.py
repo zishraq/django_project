@@ -67,7 +67,12 @@ class TimeSlot(models.Model):
     end_time = models.TimeField()
 
     def __str__(self):
-        return f'{self.day} {self.start_time.strftime("%I:%M %p")} - {self.end_time.strftime("%I:%M %p")}'
+        time_visual_format = f'{self.day} {self.start_time.strftime("%I:%M %p")}-{self.end_time.strftime("%I:%M %p")}'
+
+        if time_visual_format[8:10] == time_visual_format[17:19]:
+            time_visual_format = time_visual_format[:7] + time_visual_format[10:19]
+
+        return time_visual_format
 
 
 class RoutineAndTime(models.Model):

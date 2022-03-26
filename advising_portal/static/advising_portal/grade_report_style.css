@@ -1,0 +1,38 @@
+body {
+    background-color: #c5cae9;
+    padding: 25px;
+}
+
+.container {
+    width: 720px;
+    height: 440px;
+    margin: 0 auto;
+    padding-left: 32px;
+    padding-right: 32px;
+    padding-top: 40px;
+    border-radius: 12px;
+    background-color: #90a4ae;
+    font-family: Lato;
+}
+
+.container h2 {
+    text-align: center;
+    font-size: 20px;
+}
+
+table {
+    margin: 0 auto;
+    border: 2px dotted;
+    font-size: 14px;
+}
+
+th {
+    padding: 12px;
+    border-bottom: 2px dotted;
+    text-align: center;
+}
+
+td {
+    padding: 8px;
+    text-align: center;
+}

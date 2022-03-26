@@ -1,20 +1,5 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-
-<head>
-  <title>Grade Report</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="Keywords" content="html, css, html tables, table">
-  <meta name="Description" content="html table">
-  <!-- add icon -->
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
-  <link href="{% static 'advising_portal/grade_report_style.css' %}" rel='stylesheet' type='text/css'>
-
-</head>
-<body>
+{% extends "advising_portal/base.html" %}
+{% block content %}
     {% for semester, value in courses_by_semesters.items %}
         <div class="container">
             <h2>{{ value.semester_name }}</h2>
@@ -22,7 +7,8 @@
                 <thead>
                 <tr>
                     <th>Course</th>
-                    <th style="padding-right: 100px;">Course Title</th>
+{#                    <th style="padding-right: 100px;">Course Title</th>#}
+                    <th>Course Title</th>
                     <th>cr</th>
                     <th>grd</th>
                     <th>gp</th>
@@ -34,7 +20,8 @@
                 {% for course in value.courses %}
                     <tr>
                         <td>{{ course.course_code }}</td>
-                        <td style="padding-right: 100px;">{{ course.course_title }}</td>
+{#                        <td style="padding-right: 100px;">{{ course.course_title }}</td>#}
+                        <td>{{ course.course_title }}</td>
                         <td>{{ course.course_credit }}</td>
                         <td>{{ course.grade }}</td>
                         <td>{{ course.total_gp }}</td>
@@ -43,12 +30,15 @@
                 {% endfor %}
                 <tr>
 {#                      <td colspan="3" style="border-top: 2px dotted;">CGPA: 3.21</td>#}
-                  <td colspan="3" style="border-top: 2px dotted;">CGPA: {{ value.term_gpa }}</td>
-                  <td colspan="3" style="border-top: 2px dotted;">Term GPA: {{ value.term_gpa }}</td>
+                  <td colspan="3" style="border-top: 2px solid;">CGPA: {{ cgpa }}</td>
+                  <td colspan="3" style="border-top: 2px solid;">Term GPA: {{ value.term_gpa }}</td>
                 </tr>
                 </tbody>
             </table>
         </div>
+        <br>
+        <br>
+        <br>
+        <br>
     {% endfor %}
-</body>
-</html>
+{% endblock content %}
