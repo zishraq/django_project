@@ -80,7 +80,7 @@ courses = [
             'course_code': 'CSE345',
             'course_title': 'Digital Logic Design',
             'department_id': Department.objects.get(pk='CSE').pk,
-            'prerequisite_course_id': "CSE251",
+            'prerequisite_course_id': None,
             'credit': 4,
             'created_by_id': User.objects.get(username='admin').pk
         },
@@ -98,7 +98,7 @@ courses = [
             'course_code': 'CSE360',
             'course_title': 'Computer Architecture',
             'department_id': Department.objects.get(pk='CSE').pk,
-            'prerequisite_course_id': "CSE325",
+            'prerequisite_course_id': 'CSE325',
             'credit': 3,
             'created_by_id': User.objects.get(username='admin').pk
         },
@@ -107,7 +107,7 @@ courses = [
             'course_code': 'CSE405',
             'course_title': 'Computer Networks',
             'department_id': Department.objects.get(pk='CSE').pk,
-            'prerequisite_course_id': "CSE246   ",
+            'prerequisite_course_id': 'CSE246',
             'credit': 4,
             'created_by_id': User.objects.get(username='admin').pk
         },
@@ -121,20 +121,20 @@ courses = [
             'created_by_id': User.objects.get(username='admin').pk
         },
         {
+            'course_id': 'ENG102',
+            'course_code': 'ENG102',
+            'course_title': 'Composition and Communication Skills',
+            'department_id': Department.objects.get(pk='GEN').pk,
+            'prerequisite_course_id': "ENG101",
+            'credit': 3,
+            'created_by_id': User.objects.get(username='admin').pk
+        },
+        {
             'course_id': 'GEN226',
             'course_code': 'GEN226',
             'course_title': 'Emergence of Bangladesh',
             'department_id': Department.objects.get(pk='GEN').pk,
             'prerequisite_course_id': 'ENG102',
-            'credit': 3,
-            'created_by_id': User.objects.get(username='admin').pk
-        },
-        {
-            'course_id': 'ENG102',
-            'course_code': 'ENG102',
-            'course_title': 'Composition and Communication Skills',
-            'department_id': Department.objects.get(pk='GEN').pk,
-            'prerequisite_course_id': "CSE101",
             'credit': 3,
             'created_by_id': User.objects.get(username='admin').pk
         },
@@ -146,7 +146,7 @@ courses = [
             'prerequisite_course_id': None,
             'credit': 3,
             'created_by_id': User.objects.get(username='admin').pk
-        },        {
+        }, {
             'course_id': 'GEN203',
             'course_code': 'GEN203',
             'course_title': 'Ecological System and Environment',
@@ -187,7 +187,7 @@ courses = [
             'course_code': 'PHY109',
             'course_title': 'Engineering Physics-I (Introductory Classical Physics)',
             'department_id': Department.objects.get(pk='GEN').pk,
-            'prerequisite_course_id': "MAT102",
+            'prerequisite_course_id': None,
             'credit': 4,
             'created_by_id': User.objects.get(username='admin').pk
         },
@@ -196,11 +196,11 @@ courses = [
             'course_code': 'PHY209',
             'course_title': 'Engineering Physics-II (Introductory Quantum Physics)',
             'department_id': Department.objects.get(pk='GEN').pk,
-            'prerequisite_course_id': "MAT205",
+            'prerequisite_course_id': None,
             'credit': 3,
             'created_by_id': User.objects.get(username='admin').pk
         }
-]
+    ]
 
 for i in courses:
     r = Course(**i)

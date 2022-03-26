@@ -8,7 +8,7 @@ sections = [
             'section_capacity': 30,
             'total_students': 0,
             'instructor_id': 'AKD',
-            'routine_id': 'M01W01R01',
+            'routine_id': 'M01W01W09',
             'course_id': 'CSE103',
         },
         {
@@ -188,7 +188,7 @@ sections = [
             'section_capacity': 30,
             'total_students': 0,
             'instructor_id': Faculty.objects.get(pk='AKD').pk,
-            'routine_id': RoutineSlot.objects.get(pk='T01R01R01').pk,
+            'routine_id': RoutineSlot.objects.get(pk='T01R01R09').pk,
             'course_id': Course.objects.get(pk='PHY209').pk,
         },
         {
@@ -197,10 +197,10 @@ sections = [
             'section_capacity': 30,
             'total_students': 0,
             'instructor_id': Faculty.objects.get(pk='RDA').pk,
-            'routine_id': RoutineSlot.objects.get(pk='S01R01R01').pk,
+            'routine_id': RoutineSlot.objects.get(pk='S01R01R09').pk,
             'course_id': Course.objects.get(pk='PHY209').pk,
         }
-]
+    ]
 
 
 for i in sections:

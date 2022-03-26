@@ -86,7 +86,7 @@ class Section(models.Model):
 
 
 class Grade(models.Model):
-    grade = models.CharField(max_length=10)
+    grade = models.CharField(max_length=10, primary_key=True)
     grade_point = models.FloatField()
     maximum = models.FloatField()
     minimum = models.FloatField()
