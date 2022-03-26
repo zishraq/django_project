@@ -232,11 +232,27 @@ def view_selected_courses(request):
 @login_required
 def view_grade_report(request):
     # student = Student.objects.get(user_id=User.objects.get(username=request.user))
-    student = Student.objects.get(user_id=User.objects.get(username='alex'))
+    student = Student.objects.get(username_id=User.objects.get(username=request.user).pk)
+    # courses_taken = CoursesTaken.objects.filter(
+    #     student_id=student
+    # ).values('semester_id').distinct()
+
+    print()
+
     courses_taken = CoursesTaken.objects.filter(
         student_id=student
-    ).values('semester_id').distinct()
+        # semester__advising_status=False
+    ).aggregate()
 
     print(courses_taken)
+
+    courses_by_semesters = []
+
+    semesters_taken = []
+
+    for course in courses_taken:
+        {
+            'semester_id'
+        }
 
     return HttpResponse('test')
