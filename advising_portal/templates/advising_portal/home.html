@@ -7,8 +7,12 @@
     <div class="row fix-width">
         <div class="col-7">
             <div class="btn-self-design">
-                <button type="button" class="btn btn-outline-primary btn-fix-width">Recommended</button>
-                <button type="button" class="btn btn-outline-secondary btn-fix-width">Retakable</button>
+                <button class="btn btn-outline-primary btn-fix-width" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=recommended'">
+                    Recommended
+                </button>
+                <button class="btn btn-outline-secondary btn-fix-width" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=retakable'">
+                    Retakable
+                </button>
             </div>
 
             <div class="table-responsive left-table-align">

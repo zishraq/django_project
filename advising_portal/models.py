@@ -46,14 +46,14 @@ class Faculty(models.Model):
     faculty_id = models.CharField(max_length=100, primary_key=True)
     name = models.TextField()
     initials = models.TextField()
-    username = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
 
 
 class Student(models.Model):
     student_id = models.CharField(max_length=100, primary_key=True)
     name = models.TextField()
     advisor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
-    username = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
 
 
 class RoutineSlot(models.Model):

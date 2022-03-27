@@ -1,20 +1,5 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-
-<head>
-  <title>Grade Report</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="Keywords" content="html, css, html tables, table">
-  <meta name="Description" content="html table">
-  <!-- add icon -->
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
-  <link href="{% static 'advising_portal/grade_report_style.css' %}" rel='stylesheet' type='text/css'>
-
-</head>
-<body>
+{% extends "advising_portal/base.html" %}
+{% block content %}
     {% for semester, value in courses_by_semesters.items %}
         <div class="container">
             <h2>{{ value.semester_name }}</h2>
@@ -42,13 +27,15 @@
                     </tr>
                 {% endfor %}
                 <tr>
-{#                      <td colspan="3" style="border-top: 2px dotted;">CGPA: 3.21</td>#}
-                  <td colspan="3" style="border-top: 2px dotted;">CGPA: {{ value.term_gpa }}</td>
+                  <td colspan="3" style="border-top: 2px dotted;">CGPA: {{ cgpa }}</td>
                   <td colspan="3" style="border-top: 2px dotted;">Term GPA: {{ value.term_gpa }}</td>
                 </tr>
                 </tbody>
             </table>
         </div>
+        <br>
+        <br>
+        <br>
+        <br>
     {% endfor %}
-</body>
-</html>
+{% endblock content %}

@@ -14,13 +14,69 @@ def home(request):
     # sections = list(Section.objects.all())
     student = Student.objects.get(username_id=request.user)
 
-    sections = list(Section.objects.exclude(
-        course_id__in=Section.objects.filter(
-            section_id__in=CoursesTaken.objects.filter(
-                student_id=student,
-            ).values('section_id').all()
-        ).values('course_id').all()
-    ))
+    filter_condition = request.GET.get('filter', 'recommended')
+
+    if filter_condition == 'recommended':
+        section_filter = CoursesTaken.objects.filter(
+            student_id=student,
+            semester_id__in=Semester.objects.filter(
+                advising_status=False
+            ).values('semester_id').all()
+        ).values('section_id').all()
+
+        sections = Section.objects.exclude(
+            course_id__in=Section.objects.filter(
+                section_id__in=section_filter
+            ).values('course_id').all()
+        )
+
+        # sections.filter(
+        #     course_id__in=Course.objects.filter(
+        #         prerequisite_course_id__in=Section.objects.filter(
+        #             section_id__in=CoursesTaken.objects.filter(
+        #                 student_id=student,
+        #                 semester_id__in=Semester.objects.filter(
+        #                     advising_status=False
+        #                 ).values('semester_id').all()
+        #             ).values('section_id').all()
+        #         ).values('course_id').all()
+        #     ).values('course_id').all()
+        # )
+
+    else:
+        sections = Section.objects.filter(
+            course_id__in=Section.objects.filter(
+                section_id__in=CoursesTaken.objects.filter(
+                    student_id=student,
+                ).values('section_id').all()
+            ).values('course_id').all()
+        )
+
+        # sections.exclude(
+        #     course_id__in=Course.objects.filter(
+        #         prerequisite_course_id__in=CoursesTaken.objects.filter(
+        #             student_id=student,
+        #             semester_id__in=Semester.objects.filter(
+        #                 advising_status=False
+        #             ).values('semester_id').all()
+        #         ).values('section_id')
+        #     )
+        # )
+
+        # sections.filter(
+        #     course_id__in=Course.objects.filter(
+        #         prerequisite_course_id__in=Section.objects.filter(
+        #             section_id__in=CoursesTaken.objects.filter(
+        #                 student_id=student,
+        #                 semester_id__in=Semester.objects.filter(
+        #                     advising_status=False
+        #                 ).values('semester_id').all()
+        #             ).values('section_id').all()
+        #         ).values('course_id').all()
+        #     ).values('course_id').all()
+        # )
+
+    sections = list(sections)
 
     view_data = []
 
@@ -295,12 +351,16 @@ def view_grade_report(request):
         semester['term_gpa'] = semester['term_gpa'] / semester['total_credit']
         semester['term_gpa'] = '{:.2f}'.format(semester['term_gpa'])
 
-    cgpa = total_gpa / total_credit
-    cgpa = '{:.2f}'.format(cgpa)
+    if total_credit != 0:
+        cgpa = total_gpa / total_credit
+        cgpa = '{:.2f}'.format(cgpa)
+
+    else:
+        cgpa = 0.0
 
     context = {
         'cgpa': cgpa,
         'courses_by_semesters': courses_by_semesters
     }
 
-    return render(request, 'advising_portal/grading_report_test2.html', context)
+    return render(request, 'advising_portal/grading_report_test.html', context)

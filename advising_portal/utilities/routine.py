@@ -1,9 +1,3 @@
-from advising_portal.models import TimeSlot
-
-
-routine_slot_types = ['ST', 'MW', 'TR', 'SR']
-
-
 routine_slot = [
     {
         'routine_id': 'S01T01'
@@ -21,7 +15,22 @@ routine_slot = [
         'routine_id': 'S05T05'
     },
     {
+        'routine_id': 'S01T01R01'
+    },
+    {
+        'routine_id': 'S01T01R06'
+    },
+    {
         'routine_id': 'S01T01R09'
+    },
+    {
+        'routine_id': 'S01T01R11'
+    },
+    {
+        'routine_id': 'S03T03R06'
+    },
+    {
+        'routine_id': 'S03T03R09'
     },
     {
         'routine_id': 'S01R01'
@@ -39,7 +48,22 @@ routine_slot = [
         'routine_id': 'S05R05'
     },
     {
+        'routine_id': 'S01R01T06'
+    },
+    {
+        'routine_id': 'S01R01T09'
+    },
+    {
         'routine_id': 'S01R01R09'
+    },
+    {
+        'routine_id': 'S01R01T11'
+    },
+    {
+        'routine_id': 'S03R03T06'
+    },
+    {
+        'routine_id': 'S03R03T09'
     },
     {
         'routine_id': 'T01R01'
@@ -60,6 +84,9 @@ routine_slot = [
         'routine_id': 'T01R01R09'
     },
     {
+        'routine_id': 'T01R01R11'
+    },
+    {
         'routine_id': 'M01W01'
     },
     {
@@ -75,6 +102,15 @@ routine_slot = [
         'routine_id': 'M05W05'
     },
     {
+        'routine_id': 'M01W01W06'
+    },
+    {
         'routine_id': 'M01W01W09'
+    },
+    {
+        'routine_id': 'M01W01W11'
+    },
+    {
+        'routine_id': 'T01'
     }
 ]
