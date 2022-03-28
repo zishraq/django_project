@@ -1,7 +1,1 @@
 .idea/
-venv
-django_project/__pycache__/
-advising_portal/__pycache__
-users/__pycache__/
-users/migrations/__pycache__/
-advising_portal/migrations/__pycache__/
