@@ -12,6 +12,11 @@ class UserRegisterForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'password1', 'password2']
 
+    # def clean(self):
+    #     cleaned_data = super(UserRegisterForm, self).clean()
+    #     # additional cleaning here
+    #     return cleaned_data
+
 
 class UserUpdateFrom(forms.ModelForm):
     email = forms.EmailField()

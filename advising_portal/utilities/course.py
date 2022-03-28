@@ -170,7 +170,7 @@ courses = [
         'course_code': 'CSE246',
         'course_title': 'Algorithms',
         'department_id': Department.objects.get(pk='CSE').pk,
-        'prerequisite_course_id': None,
+        'prerequisite_course_id': 'CSE207',
         'credit': 4.5,
         'created_by_id': User.objects.get(username='admin').pk
     },

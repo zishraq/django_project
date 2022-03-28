@@ -44,19 +44,19 @@ class Semester(models.Model):
 
 class Faculty(models.Model):
     faculty_id = models.CharField(max_length=100, primary_key=True)
-    name = models.TextField()
+    name = models.CharField(max_length=30)
     initials = models.TextField()
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
 
 
 class Student(models.Model):
     student_id = models.CharField(max_length=100, primary_key=True)
-    name = models.TextField()
+    name = models.CharField(max_length=30)
     advisor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
 
 
-class RoutineSlot(models.Model):
+class WeekSlot(models.Model):
     routine_id = models.CharField(max_length=100, primary_key=True)
 
 
@@ -75,8 +75,8 @@ class TimeSlot(models.Model):
         return time_visual_format
 
 
-class RoutineAndTime(models.Model):
-    routine_slot = models.ForeignKey(RoutineSlot, on_delete=models.CASCADE)
+class Routine(models.Model):
+    routine_slot = models.ForeignKey(WeekSlot, on_delete=models.CASCADE)
     time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
 
 
@@ -86,7 +86,7 @@ class Section(models.Model):
     section_capacity = models.PositiveIntegerField(default=0)
     total_students = models.PositiveIntegerField(default=0)
     instructor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
-    routine = models.ForeignKey(RoutineSlot, on_delete=models.SET_NULL, null=True)
+    routine = models.ForeignKey(WeekSlot, on_delete=models.SET_NULL, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True)
 
 

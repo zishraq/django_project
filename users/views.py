@@ -1,23 +1,33 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+
+from advising_portal.forms import StudentRegisterForm
 from .forms import UserRegisterForm, UserUpdateFrom, ProfileUpdateForm
 
 
 def register(request):
     if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
+        u_form = UserRegisterForm(request.POST)
+        s_form = StudentRegisterForm(request.POST)
 
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
+        if u_form.is_valid():
+            u_form.save()
+            username = u_form.cleaned_data.get('username')
             messages.success(request, f'Account created successfully for {username}!')
             return redirect('login')
 
     else:
-        form = UserRegisterForm()
+        u_form = UserRegisterForm()
+        s_form = StudentRegisterForm()
 
-    return render(request, 'users/register.html', {'form': form})
+    context = {
+        'u_form': u_form,
+        's_form': s_form
+    }
+
+    # return render(request, 'users/register.html', {'form': u_form})
+    return render(request, 'users/register.html', context)
 
 
 @login_required

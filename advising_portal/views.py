@@ -6,7 +6,7 @@ from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
-from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, RoutineAndTime, TimeSlot, RoutineSlot
+from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, Routine, TimeSlot, WeekSlot
 from django.contrib.auth.decorators import login_required
 
 
@@ -71,7 +71,7 @@ def home(request):
 
         routines = {}
 
-        get_time_slots = RoutineAndTime.objects.filter(
+        get_time_slots = Routine.objects.filter(
             routine_slot_id=section.routine_id
         ).values('time_slot_id').distinct()
 
@@ -113,7 +113,7 @@ def home(request):
             'credits': course.section.course.credit,
         }
 
-        get_time_slots = RoutineAndTime.objects.filter(
+        get_time_slots = Routine.objects.filter(
             routine_slot_id=course.section.routine_id
         ).values('time_slot_id').distinct()
 

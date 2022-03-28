@@ -1,4 +1,4 @@
-from advising_portal.models import Faculty, RoutineSlot, Course, Section
+from advising_portal.models import Faculty, WeekSlot, Course, Section
 
 
 sections = [
@@ -8,7 +8,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='M01W01W11').pk,
+        'routine_id': WeekSlot.objects.get(pk='M01W01W11').pk,
         'course_id': Course.objects.get(pk='CSE103').pk,
     },
     {
@@ -17,7 +17,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S03T03').pk,
+        'routine_id': WeekSlot.objects.get(pk='S03T03').pk,
         'course_id': Course.objects.get(pk='ENG101').pk,
     },
     {
@@ -26,7 +26,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S01T01').pk,
+        'routine_id': WeekSlot.objects.get(pk='S01T01').pk,
         'course_id': Course.objects.get(pk='CSE106').pk,
     },
     {
@@ -35,7 +35,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S03T03').pk,
+        'routine_id': WeekSlot.objects.get(pk='S03T03').pk,
         'course_id': Course.objects.get(pk='ENG102').pk,
     },
     {
@@ -44,7 +44,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S04T04').pk,
+        'routine_id': WeekSlot.objects.get(pk='S04T04').pk,
         'course_id': Course.objects.get(pk='MAT101').pk,
     },
     {
@@ -53,7 +53,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S04T04').pk,
+        'routine_id': WeekSlot.objects.get(pk='S04T04').pk,
         'course_id': Course.objects.get(pk='CSE106').pk,
     },
     {
@@ -62,7 +62,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S04T04').pk,
+        'routine_id': WeekSlot.objects.get(pk='S04T04').pk,
         'course_id': Course.objects.get(pk='MAT102').pk,
     },
     {
@@ -71,7 +71,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S01R01T11').pk,
+        'routine_id': WeekSlot.objects.get(pk='S01R01T11').pk,
         'course_id': Course.objects.get(pk='CSE110').pk,
     },
     {
@@ -80,7 +80,7 @@ sections = [
         'section_capacity': 35,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='M01W01').pk,
+        'routine_id': WeekSlot.objects.get(pk='M01W01').pk,
         'course_id': Course.objects.get(pk='MAT104').pk,
     },
     {
@@ -89,7 +89,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='M01W01W06').pk,
+        'routine_id': WeekSlot.objects.get(pk='M01W01W06').pk,
         'course_id': Course.objects.get(pk='CHE109').pk,
     },
     {
@@ -98,7 +98,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S03R03T06').pk,
+        'routine_id': WeekSlot.objects.get(pk='S03R03T06').pk,
         'course_id': Course.objects.get(pk='CSE209').pk,
     },
     {
@@ -107,7 +107,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S01T01R01').pk,
+        'routine_id': WeekSlot.objects.get(pk='S01T01R01').pk,
         'course_id': Course.objects.get(pk='CSE251').pk,
     },
     {
@@ -116,7 +116,7 @@ sections = [
         'section_capacity': 40,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='T01').pk,
+        'routine_id': WeekSlot.objects.get(pk='T01').pk,
         'course_id': Course.objects.get(pk='CSE200').pk,
     },
     {
@@ -125,7 +125,7 @@ sections = [
         'section_capacity': 40,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S03T03').pk,
+        'routine_id': WeekSlot.objects.get(pk='S03T03').pk,
         'course_id': Course.objects.get(pk='MAT205').pk,
     },
     {
@@ -134,7 +134,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='T03R03').pk,
+        'routine_id': WeekSlot.objects.get(pk='T03R03').pk,
         'course_id': Course.objects.get(pk='GEN226').pk,
     },
     {
@@ -143,7 +143,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S05R05').pk,
+        'routine_id': WeekSlot.objects.get(pk='S05R05').pk,
         'course_id': Course.objects.get(pk='ECO101').pk,
     },
     {
@@ -152,7 +152,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='M01W01W09').pk,
+        'routine_id': WeekSlot.objects.get(pk='M01W01W09').pk,
         'course_id': Course.objects.get(pk='CSE246').pk,
     },
     {
@@ -161,7 +161,7 @@ sections = [
         'section_capacity': 35,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='M01W01W11').pk,
+        'routine_id': WeekSlot.objects.get(pk='M01W01W11').pk,
         'course_id': Course.objects.get(pk='CSE207').pk,
     },
     {
@@ -170,7 +170,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S03T03R06').pk,
+        'routine_id': WeekSlot.objects.get(pk='S03T03R06').pk,
         'course_id': Course.objects.get(pk='CSE405').pk,
     },
     {
@@ -179,7 +179,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='M01W01W09').pk,
+        'routine_id': WeekSlot.objects.get(pk='M01W01W09').pk,
         'course_id': Course.objects.get(pk='CSE405').pk,
     },
     {
@@ -188,7 +188,7 @@ sections = [
         'section_capacity': 40,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S01T01R11').pk,
+        'routine_id': WeekSlot.objects.get(pk='S01T01R11').pk,
         'course_id': Course.objects.get(pk='CSE302').pk,
     },
     {
@@ -197,7 +197,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='M01W01W06').pk,
+        'routine_id': WeekSlot.objects.get(pk='M01W01W06').pk,
         'course_id': Course.objects.get(pk='CSE325').pk,
     },
     {
@@ -206,7 +206,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S01R01T09').pk,
+        'routine_id': WeekSlot.objects.get(pk='S01R01T09').pk,
         'course_id': Course.objects.get(pk='CSE345').pk,
     },
     {
@@ -215,7 +215,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='M05W05').pk,
+        'routine_id': WeekSlot.objects.get(pk='M05W05').pk,
         'course_id': Course.objects.get(pk='STA102').pk,
     },
     {
@@ -224,7 +224,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S03T03R09').pk,
+        'routine_id': WeekSlot.objects.get(pk='S03T03R09').pk,
         'course_id': Course.objects.get(pk='CSE347').pk,
     },
     {
@@ -233,7 +233,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='M03W03W09').pk,
+        'routine_id': WeekSlot.objects.get(pk='M03W03W09').pk,
         'course_id': Course.objects.get(pk='CSE347').pk,
     },
     {
@@ -242,7 +242,7 @@ sections = [
         'section_capacity': 45,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='M01W01W09').pk,
+        'routine_id': WeekSlot.objects.get(pk='M01W01W09').pk,
         'course_id': Course.objects.get(pk='CSE360').pk,
     },
     {
@@ -251,7 +251,7 @@ sections = [
         'section_capacity': 35,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='T05R05').pk,
+        'routine_id': WeekSlot.objects.get(pk='T05R05').pk,
         'course_id': Course.objects.get(pk='ENG101').pk,
     },
     {
@@ -260,7 +260,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S05R05').pk,
+        'routine_id': WeekSlot.objects.get(pk='S05R05').pk,
         'course_id': Course.objects.get(pk='ENG102').pk,
     },
     {
@@ -269,7 +269,7 @@ sections = [
         'section_capacity': 35,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S05T05').pk,
+        'routine_id': WeekSlot.objects.get(pk='S05T05').pk,
         'course_id': Course.objects.get(pk='GEN203').pk,
     },
     {
@@ -278,7 +278,7 @@ sections = [
         'section_capacity': 35,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='M05W05').pk,
+        'routine_id': WeekSlot.objects.get(pk='M05W05').pk,
         'course_id': Course.objects.get(pk='GEN203').pk,
     },
     {
@@ -287,7 +287,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='M01W01').pk,
+        'routine_id': WeekSlot.objects.get(pk='M01W01').pk,
         'course_id': Course.objects.get(pk='GEN214').pk,
     },
     {
@@ -296,7 +296,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S01R01').pk,
+        'routine_id': WeekSlot.objects.get(pk='S01R01').pk,
         'course_id': Course.objects.get(pk='GEN214').pk,
     },
     {
@@ -305,7 +305,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S03T03').pk,
+        'routine_id': WeekSlot.objects.get(pk='S03T03').pk,
         'course_id': Course.objects.get(pk='GEN210').pk,
     },
     {
@@ -314,7 +314,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S04T04').pk,
+        'routine_id': WeekSlot.objects.get(pk='S04T04').pk,
         'course_id': Course.objects.get(pk='GEN210').pk,
     },
     {
@@ -323,7 +323,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S02T02').pk,
+        'routine_id': WeekSlot.objects.get(pk='S02T02').pk,
         'course_id': Course.objects.get(pk='BUS231').pk,
     },
     {
@@ -332,7 +332,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='M01W01W06').pk,
+        'routine_id': WeekSlot.objects.get(pk='M01W01W06').pk,
         'course_id': Course.objects.get(pk='PHY109').pk,
     },
     {
@@ -341,7 +341,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='AKD').pk,
-        'routine_id': RoutineSlot.objects.get(pk='T01R01R09').pk,
+        'routine_id': WeekSlot.objects.get(pk='T01R01R09').pk,
         'course_id': Course.objects.get(pk='PHY209').pk,
     },
     {
@@ -350,7 +350,7 @@ sections = [
         'section_capacity': 30,
         'total_students': 0,
         'instructor_id': Faculty.objects.get(pk='RDA').pk,
-        'routine_id': RoutineSlot.objects.get(pk='S01R01').pk,
+        'routine_id': WeekSlot.objects.get(pk='S01R01').pk,
         'course_id': Course.objects.get(pk='PHY209').pk,
     }
 ]
