@@ -97,9 +97,19 @@ class Grade(models.Model):
     minimum = models.FloatField()
 
 
+# class StudentRecordsBySemester(models.Model):
+#     semester_record_id = models.AutoField(primary_key=True)
+#     student = models.ForeignKey(Student, on_delete=models.CASCADE)
+#     semester = models.ForeignKey(Semester, on_delete=models.SET_NULL, null=True)
+#     term_gpa = models.FloatField()
+#     current_cgpa = models.FloatField()
+#     total_credits = models.FloatField()
+
+
 class CoursesTaken(models.Model):
     course_record_id = models.AutoField(primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     semester = models.ForeignKey(Semester, on_delete=models.SET_NULL, null=True)
+    # semester = models.ForeignKey(StudentRecordsBySemester, on_delete=models.SET_NULL, null=True)
     section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True)
     grade = models.ForeignKey(Grade, on_delete=models.SET_NULL, null=True)

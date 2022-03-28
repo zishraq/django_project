@@ -51,22 +51,20 @@
 </header>
 {#<main role="main" class="container">#}
 <main class="container-fluid">
-        {% if messages %}
-            {% for message in messages %}
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == "success" %}
                 <div class="alert alert-{{ message.tags }}">
                     {{ message }}
                 </div>
-            {% endfor %}
-
-{#                {% for message in messages %}#}
-{#                    <p{% if message.tags == "success" %} class="alert alert-success "{% endif %}>{{ message }}</p>#}
-{#                    {% if message == 'danger' %}#}
-{#                  <p{% if message.tags == 'danger'  %} class="alert alert-danger"{% endif %}>{{ message }}</p>#}
-{#                  {% endif %}#}
-{#                {% endfor %}#}
-
-        {% endif %}
-        {% block content %}{% endblock %}
+            {% else %}
+                <div class="alert alert-danger">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
 </main>
 
 <!-- Optional JavaScript -->

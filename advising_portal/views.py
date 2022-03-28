@@ -1,17 +1,17 @@
+import re
+
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, RoutineAndTime, TimeSlot, RoutineSlot
 from django.contrib.auth.decorators import login_required
 
-import datetime
-
 
 @login_required
 def home(request):
-    # sections = list(Section.objects.all())
     student = Student.objects.get(username_id=request.user)
 
     filter_condition = request.GET.get('filter', 'recommended')
@@ -30,51 +30,28 @@ def home(request):
             ).values('course_id').all()
         )
 
-        # sections.filter(
-        #     course_id__in=Course.objects.filter(
-        #         prerequisite_course_id__in=Section.objects.filter(
-        #             section_id__in=CoursesTaken.objects.filter(
-        #                 student_id=student,
-        #                 semester_id__in=Semester.objects.filter(
-        #                     advising_status=False
-        #                 ).values('semester_id').all()
-        #             ).values('section_id').all()
-        #         ).values('course_id').all()
-        #     ).values('course_id').all()
-        # )
+        sections = sections.exclude(
+            course_id__in=Course.objects.filter(
+                prerequisite_course_id__in=Section.objects.exclude(
+                    section_id__in=CoursesTaken.objects.filter(
+                        student_id=student,
+                        semester_id__in=Semester.objects.filter(
+                            advising_status=False
+                        ).values('semester_id').all()
+                    ).values('section_id').all()
+                ).values('course_id').all()
+            ).values('course_id').all()
+        )
 
     else:
         sections = Section.objects.filter(
             course_id__in=Section.objects.filter(
                 section_id__in=CoursesTaken.objects.filter(
                     student_id=student,
+                    grade_id__in=['C', 'C+', 'C-', 'D', 'D+', 'F']
                 ).values('section_id').all()
             ).values('course_id').all()
         )
-
-        # sections.exclude(
-        #     course_id__in=Course.objects.filter(
-        #         prerequisite_course_id__in=CoursesTaken.objects.filter(
-        #             student_id=student,
-        #             semester_id__in=Semester.objects.filter(
-        #                 advising_status=False
-        #             ).values('semester_id').all()
-        #         ).values('section_id')
-        #     )
-        # )
-
-        # sections.filter(
-        #     course_id__in=Course.objects.filter(
-        #         prerequisite_course_id__in=Section.objects.filter(
-        #             section_id__in=CoursesTaken.objects.filter(
-        #                 student_id=student,
-        #                 semester_id__in=Semester.objects.filter(
-        #                     advising_status=False
-        #                 ).values('semester_id').all()
-        #             ).values('section_id').all()
-        #         ).values('course_id').all()
-        #     ).values('course_id').all()
-        # )
 
     sections = list(sections)
 
@@ -187,7 +164,7 @@ def add_course(request, section_id):
     ).exists()
 
     if existence_check:
-        messages.success(request, 'Section already added')
+        messages.error(request, 'Section already added')
         return redirect('advising-portal-home')
 
     elif not existence_check:
@@ -198,7 +175,7 @@ def add_course(request, section_id):
 
         for section in previous_selected_sections:
             if section.section.course == selected_course:
-                messages.success(request, 'Course already added')
+                messages.error(request, 'Course already added')
                 return redirect('advising-portal-home')
 
             routine_id = section.section.routine_id
@@ -208,13 +185,19 @@ def add_course(request, section_id):
             for i in section_routine_slot_chunks:
                 for j in selected_routine_slot_chunks:
                     if i == j:
-                        messages.success(request, f'Conflicts with {section.section.course.course_code}')
-                        # messages.error(request, f'Conflicts with {section.section.course.course_code}')
-
-                        # messages.danger(request, f'Conflicts with {section.section.course.course_code}')
+                        messages.error(request, f'Conflicts with {section.section.course.course_code}')
                         return redirect('advising-portal-home')
 
-            # if section.section_id.routine_id == selected_routine_slot:
+            total_credits = Course.objects.filter(
+                course_id__in=previous_selected_sections.values('section__course__course_id')
+            ).aggregate(Sum('credit'))
+
+            total_credits = total_credits['credit__sum']
+            selected_course_credit = selected_course.credit
+
+            if total_credits + selected_course_credit > 12:
+                messages.error(request, f'Total credits cannot be more than 12')
+                return redirect('advising-portal-home')
 
     if selected_section.total_students < selected_section.section_capacity:
         selected_section.total_students = selected_section.total_students + 1
@@ -228,7 +211,7 @@ def add_course(request, section_id):
         course_selected.save()
         messages.success(request, f'Successfully added Section-{selected_section.section_no} of {selected_section.course.course_code}')
     else:
-        messages.success(request, 'Section is full!')
+        messages.error(request, 'Section is full!')
 
     return redirect('advising-portal-home')
 
@@ -248,6 +231,7 @@ def drop_course(request, section_id):
         section_id=selected_section.section_id
     ).delete()
 
+    messages.success(request, f'Dropped Section-{selected_section.section_no} of {selected_section.course.course_code}')
     return redirect('advising-portal-home')
 
 
@@ -323,7 +307,7 @@ def view_grade_report(request):
                 'courses': [
                     {
                         'course_code': course.section.course.course_code,
-                        'course_title': course.section.course.course_title,
+                        'course_title': re.sub('\(.*\)', '', str(course.section.course.course_title)),
                         'course_credit': course.section.course.credit,
                         'grade': course.grade.grade,
                         'total_gp': course.section.course.credit * 4,
@@ -343,7 +327,7 @@ def view_grade_report(request):
             courses_by_semesters[course.semester_id]['courses'].append(
                 {
                     'course_code': course.section.course.course_code,
-                    'course_title': course.section.course.course_title,
+                    'course_title': re.sub('\(.*\)', '', str(course.section.course.course_title)),
                     'course_credit': course.section.course.credit,
                     'grade': course.grade.grade,
                     'total_gp': course.section.course.credit * 4,
@@ -353,14 +337,14 @@ def view_grade_report(request):
 
     for semester in courses_by_semesters.values():
         semester['current_cgpa'] = semester['current_cgpa'] / semester['current_total_credit']
-        semester['current_cgpa'] = '{:.2f}'.format(semester['current_cgpa'])
+        semester['current_cgpa'] = round(semester['current_cgpa'], 2)
 
         semester['term_gpa'] = semester['term_gpa'] / semester['total_credit']
-        semester['term_gpa'] = '{:.2f}'.format(semester['term_gpa'])
+        semester['term_gpa'] = round(semester['term_gpa'], 2)
 
     if total_credit != 0:
         cgpa = total_cgpa / total_credit
-        cgpa = '{:.2f}'.format(cgpa)
+        cgpa = round(cgpa, 2)
 
     else:
         cgpa = 0.0

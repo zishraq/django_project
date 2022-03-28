@@ -53,7 +53,7 @@ courses = [
         'course_code': 'MAT102',
         'course_title': 'Differential Equations and Special Functions',
         'department_id': Department.objects.get(pk='GEN').pk,
-        'prerequisite_course_id': "MAT101",
+        'prerequisite_course_id': 'MAT101',
         'credit': 3,
         'created_by_id': User.objects.get(username='admin').pk
     },
@@ -71,7 +71,7 @@ courses = [
         'course_code': 'MAT104',
         'course_title': 'Co-ordinate Geometry & Vector Analysis',
         'department_id': Department.objects.get(pk='GEN').pk,
-        'prerequisite_course_id': "CSE106",
+        'prerequisite_course_id': "MAT101",
         'credit': 4.5,
         'created_by_id': User.objects.get(username='admin').pk
     },
@@ -80,7 +80,7 @@ courses = [
         'course_code': 'CHE109',
         'course_title': 'Engineering Chemistry-I',
         'department_id': Department.objects.get(pk='GEN').pk,
-        'prerequisite_course_id': "MAT101",
+        'prerequisite_course_id': None,
         'credit': 3,
         'created_by_id': User.objects.get(username='admin').pk
     },
@@ -98,7 +98,7 @@ courses = [
         'course_code': 'MAT205',
         'course_title': 'Linear Algebra & Complex Variables',
         'department_id': Department.objects.get(pk='GEN').pk,
-        'prerequisite_course_id': "MAT104",
+        'prerequisite_course_id': "MAT102",
         'credit': 3,
         'created_by_id': User.objects.get(username='admin').pk
     },
@@ -116,7 +116,7 @@ courses = [
         'course_code': 'ECO101',
         'course_title': 'Principles of Microeconomics',
         'department_id': Department.objects.get(pk='GEN').pk,
-        'prerequisite_course_id': 'ENG102',
+        'prerequisite_course_id': None,
         'credit': 3,
         'created_by_id': User.objects.get(username='admin').pk
     },
@@ -134,7 +134,7 @@ courses = [
         'course_code': 'STA102',
         'course_title': 'Statistics and Probability',
         'department_id': Department.objects.get(pk='GEN').pk,
-        'prerequisite_course_id': 'ENG102',
+        'prerequisite_course_id': None,
         'credit': 3,
         'created_by_id': User.objects.get(username='admin').pk
     },
@@ -242,7 +242,7 @@ courses = [
         'course_code': 'GEN203',
         'course_title': 'Ecological System and Environment',
         'department_id': Department.objects.get(pk='GEN').pk,
-        'prerequisite_course_id': "ENG102",
+        'prerequisite_course_id': None,
         'credit': 3,
         'created_by_id': User.objects.get(username='admin').pk
     },
