@@ -111,6 +111,9 @@ routine_slot = [
         'routine_id': 'M01W01W11'
     },
     {
+        'routine_id': 'M03W03W09'
+    },
+    {
         'routine_id': 'T01'
     }
 ]

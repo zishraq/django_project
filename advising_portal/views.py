@@ -308,11 +308,11 @@ def view_grade_report(request):
 
     courses_by_semesters = {}
 
-    total_gpa = 0
+    total_cgpa = 0
     total_credit = 0
 
     for course in courses_taken:
-        total_gpa += (course.grade.grade_point * course.section.course.credit)
+        total_cgpa += (course.grade.grade_point * course.section.course.credit)
         total_credit += course.section.course.credit
 
         if course.semester_id not in courses_by_semesters:
@@ -330,11 +330,15 @@ def view_grade_report(request):
                         'grade_point': course.grade.grade_point,
                     }
                 ],
+                'current_cgpa': total_cgpa,
+                'current_total_credit': total_credit,
                 'term_gpa': course.grade.grade_point * course.section.course.credit
             }
 
         else:
             courses_by_semesters[course.semester_id]['total_credit'] += course.section.course.credit
+            courses_by_semesters[course.semester_id]['current_cgpa'] = total_cgpa
+            courses_by_semesters[course.semester_id]['current_total_credit'] = total_credit
             courses_by_semesters[course.semester_id]['term_gpa'] += (course.grade.grade_point * course.section.course.credit)
             courses_by_semesters[course.semester_id]['courses'].append(
                 {
@@ -348,11 +352,14 @@ def view_grade_report(request):
             )
 
     for semester in courses_by_semesters.values():
+        semester['current_cgpa'] = semester['current_cgpa'] / semester['current_total_credit']
+        semester['current_cgpa'] = '{:.2f}'.format(semester['current_cgpa'])
+
         semester['term_gpa'] = semester['term_gpa'] / semester['total_credit']
         semester['term_gpa'] = '{:.2f}'.format(semester['term_gpa'])
 
     if total_credit != 0:
-        cgpa = total_gpa / total_credit
+        cgpa = total_cgpa / total_credit
         cgpa = '{:.2f}'.format(cgpa)
 
     else:
