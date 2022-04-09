@@ -88,6 +88,10 @@ class Section(models.Model):
     instructor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
     routine = models.ForeignKey(WeekSlot, on_delete=models.SET_NULL, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='creator')
+    updated_at = models.DateTimeField(default=timezone.now)
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='updater')
 
 
 class Grade(models.Model):
@@ -113,3 +117,14 @@ class CoursesTaken(models.Model):
     # semester = models.ForeignKey(StudentRecordsBySemester, on_delete=models.SET_NULL, null=True)
     section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True)
     grade = models.ForeignKey(Grade, on_delete=models.SET_NULL, null=True)
+
+
+class SectionsRequested(models.Model):
+    request_id = models.AutoField(primary_key=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    semester = models.ForeignKey(Semester, on_delete=models.SET_NULL, null=True)
+    # semester = models.ForeignKey(StudentRecordsBySemester, on_delete=models.SET_NULL, null=True)
+    section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True)
+    reason = models.TextField()
+    approved_by = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
+
