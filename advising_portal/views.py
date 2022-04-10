@@ -303,17 +303,17 @@ def request_section(request, section_id):
                 return redirect('advising-portal-home')
 
     # check section capacity
-    if selected_section.total_students < selected_section.section_capacity:
-        selected_section.total_students = selected_section.total_students + 1
-        selected_section.save()
+    if requested_section.total_students < requested_section.section_capacity:
+        requested_section.total_students = requested_section.total_students + 1
+        requested_section.save()
 
         course_selected = CoursesTaken(
             student=student,
             semester=current_semester,
-            section=selected_section,
+            section=requested_section,
         )
         course_selected.save()
-        messages.success(request, f'Successfully added Section-{selected_section.section_no} of {selected_section.course.course_code}')
+        messages.success(request, f'Successfully added Section-{requested_section.section_no} of {requested_section.course.course_code}')
     else:
         messages.error(request, 'Section is full!')
 
