@@ -244,6 +244,143 @@ def drop_course(request, section_id):
 
 
 @login_required
+def request_section_list_view(request):
+    student = Student.objects.get(username_id=request.user)
+
+    filter_condition = request.GET.get('filter', 'recommended')
+
+    if filter_condition == 'recommended':
+        section_filter = CoursesTaken.objects.filter(
+            student_id=student,
+            semester_id__in=Semester.objects.filter(
+                advising_status=False
+            ).values('semester_id').all()
+        ).values('section_id').all()
+
+        sections = Section.objects.exclude(
+            course_id__in=Section.objects.filter(
+                section_id__in=section_filter
+            ).values('course_id').all()
+        )
+
+        sections = sections.exclude(
+            course_id__in=Course.objects.filter(
+                prerequisite_course_id__in=Section.objects.exclude(
+                    section_id__in=CoursesTaken.objects.filter(
+                        student_id=student,
+                        semester_id__in=Semester.objects.filter(
+                            advising_status=False
+                        ).values('semester_id').all()
+                    ).values('section_id').all()
+                ).values('course_id').all()
+            ).values('course_id').all()
+        )
+
+    else:
+        sections = Section.objects.filter(
+            course_id__in=Section.objects.filter(
+                section_id__in=CoursesTaken.objects.filter(
+                    student_id=student,
+                    grade_id__in=['C', 'C+', 'C-', 'D', 'D+', 'F']
+                ).values('section_id').all()
+            ).values('course_id').all()
+        )
+
+    sections = list(sections)
+
+    view_data = []
+
+    for section in sections:
+        formatted_data = {
+            'section_id': section.section_id,
+            'section_no': section.section_no,
+            'section_capacity': section.section_capacity,
+            'total_students': section.total_students,
+            'department_name': section.course.department.department_name,
+            'instructor_id': section.instructor.name,
+            'course_id': section.course.course_code,
+            'credit': section.course.credit,
+        }
+
+        routines = {}
+
+        get_time_slots = Routine.objects.filter(
+            routine_slot_id=section.routine_id
+        ).values('time_slot_id').distinct()
+
+        for time_slot in get_time_slots:
+            time_slot = TimeSlot.objects.get(time_slot_id=time_slot['time_slot_id'])
+
+            time_part = str(time_slot)[2:]
+            day_part = str(time_slot)[0]
+
+            if time_part not in routines:
+                routines[time_part] = day_part
+
+            else:
+                routines[time_part] += day_part
+
+        routine_str = ''
+
+        for time, day in routines.items():
+            routine_str += f'{day} {time}\n'
+
+        formatted_data['routine_id'] = routine_str
+        view_data.append(formatted_data)
+
+    student_id = Student.objects.get(username_id=request.user).pk
+    current_semester_id = Semester.objects.get(advising_status=True).pk
+
+    courses_taken = CoursesTaken.objects.filter(
+        student_id=student_id,
+        semester_id=current_semester_id
+    ).all()
+
+    view_selected_courses_data = []
+
+    for course in courses_taken:
+        formatted_data = {
+            'course_code': course.section.course.course_code,
+            'section_no': course.section.section_no,
+            'section_id': course.section_id,
+            'credits': course.section.course.credit,
+        }
+
+        get_time_slots = Routine.objects.filter(
+            routine_slot_id=course.section.routine_id
+        ).values('time_slot_id').distinct()
+
+        routines = {}
+
+        for routine in get_time_slots:
+            time_slot = TimeSlot.objects.get(time_slot_id=routine['time_slot_id'])
+
+            time_part = str(time_slot)[2:]
+            day_part = str(time_slot)[0]
+
+            if time_part not in routines:
+                routines[time_part] = day_part
+
+            else:
+                routines[time_part] += day_part
+
+        routine_str = ''
+
+        for time, day in routines.items():
+            routine_str += f'{day} {time} \n'
+
+        formatted_data['routine'] = routine_str
+        view_selected_courses_data.append(formatted_data)
+
+    context = {
+        'sections': view_data,
+        'selected_courses': view_selected_courses_data
+    }
+
+    return render(request, 'advising_portal/home.html', context)
+
+
+@login_required
 def request_section(request, section_id):
     current_semester = Semester.objects.get(advising_status=True)   # get current semester
     student = Student.objects.get(username_id=request.user)   # get User's student info
