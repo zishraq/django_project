@@ -166,6 +166,15 @@ courses = [
         'created_by_id': User.objects.get(username='admin').pk
     },
     {
+        'course_id': 'CSE207',
+        'course_code': 'CSE207',
+        'course_title': 'Data Structures',
+        'department_id': Department.objects.get(pk='CSE').pk,
+        'prerequisite_course_id': "CSE110",
+        'credit': 4,
+        'created_by_id': User.objects.get(username='admin').pk
+    },
+    {
         'course_id': 'CSE246',
         'course_code': 'CSE246',
         'course_title': 'Algorithms',

@@ -6,7 +6,7 @@ from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
-from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, Routine, TimeSlot, WeekSlot
+from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, Routine, TimeSlot, WeekSlot, SectionsRequested
 from django.contrib.auth.decorators import login_required
 
 
@@ -149,14 +149,16 @@ def home(request):
 
 @login_required
 def add_course(request, section_id):
-    current_semester = Semester.objects.get(advising_status=True)
-    student = Student.objects.get(username_id=request.user)
-    selected_section = Section.objects.get(section_id=section_id)
-    selected_course = selected_section.course
-    selected_routine_slot = selected_section.routine_id
+    current_semester = Semester.objects.get(advising_status=True)   # get current semester
+    student = Student.objects.get(username_id=request.user)   # get User's student info
+    selected_section = Section.objects.get(section_id=section_id)   # get selected section data
+    selected_course = selected_section.course   # get course data of the selected section
+    selected_routine_slot = selected_section.routine_id   # store routine id of the selected section
 
+    # Split the routine id of the selected section into Time Slots
     selected_routine_slot_chunks = [selected_routine_slot[i:i+3] for i in range(0, len(selected_routine_slot), 3)]
 
+    # Check whether the section was already taken
     existence_check = CoursesTaken.objects.filter(
         student=student,
         semester=current_semester,
@@ -168,26 +170,31 @@ def add_course(request, section_id):
         return redirect('advising-portal-home')
 
     elif not existence_check:
+        # Get current selected sections
         previous_selected_sections = CoursesTaken.objects.filter(
             student_id=student.student_id,
             semester=current_semester,
         ).all()
 
         for section in previous_selected_sections:
+            # Check if the course of the section is already taken
             if section.section.course == selected_course:
                 messages.error(request, 'Course already added')
                 return redirect('advising-portal-home')
 
-            routine_id = section.section.routine_id
+            routine_id = section.section.routine_id   # Get routine id of the comparing section
 
+            # Split the routine id of the comparing section into Time Slots
             section_routine_slot_chunks = [routine_id[i:i+3] for i in range(0, len(routine_id), 3)]
 
+            # Check for time slot conflict
             for i in section_routine_slot_chunks:
                 for j in selected_routine_slot_chunks:
                     if i == j:
                         messages.error(request, f'Conflicts with {section.section.course.course_code}')
                         return redirect('advising-portal-home')
 
+            # Check whether total credits exceed limit
             total_credits = Course.objects.filter(
                 course_id__in=previous_selected_sections.values('section__course__course_id')
             ).aggregate(Sum('credit'))
@@ -199,6 +206,7 @@ def add_course(request, section_id):
                 messages.error(request, f'Total credits cannot be more than 12')
                 return redirect('advising-portal-home')
 
+    # check section capacity
     if selected_section.total_students < selected_section.section_capacity:
         selected_section.total_students = selected_section.total_students + 1
         selected_section.save()
@@ -236,49 +244,80 @@ def drop_course(request, section_id):
 
 
 @login_required
-def view_selected_courses(request):
-    student = Student.objects.get(user_id=User.objects.get(username=request.user))
-    current_semester = Semester.objects.get(advising_status=True)
+def request_section(request, section_id):
+    current_semester = Semester.objects.get(advising_status=True)   # get current semester
+    student = Student.objects.get(username_id=request.user)   # get User's student info
+    requested_section = Section.objects.get(section_id=section_id)   # get selected section data
+    selected_course = requested_section.course   # get course data of the selected section
+    selected_routine_slot = requested_section.routine_id   # store routine id of the selected section
 
-    courses_taken = CoursesTaken.objects.filter(
-        student_id=student,
-        semester_id=current_semester
-    ).all()
+    # Split the routine id of the selected section into Time Slots
+    selected_routine_slot_chunks = [selected_routine_slot[i:i+3] for i in range(0, len(selected_routine_slot), 3)]
 
-    view_data = []
+    # Check whether the section was already taken
+    existence_check = SectionsRequested.objects.filter(
+        student=student,
+        semester=current_semester,
+        section=requested_section
+    ).exists()
 
-    for course in courses_taken:
-        formatted_data = {
-            'course_code': course.section_id.course_id.course_code,
-            'section_no': course.section_id.section_no,
-            'section_id': course.section_id.section_id,
-            'credits': course.section_id.course_id.credit,
-        }
+    if existence_check:
+        messages.error(request, 'Section already requested')
+        return redirect('advising-portal-home')
 
-        routines = {}
-        for routine in course.section_id.routine_id.timeslot_set.all():
-            time_part = str(routine)[2:]
-            day_part = str(routine)[0]
+    elif not existence_check:
+        # Get current selected sections
+        previous_selected_sections = CoursesTaken.objects.filter(
+            student_id=student.student_id,
+            semester=current_semester,
+        ).all()
 
-            if time_part not in routines:
-                routines[time_part] = day_part
+        for section in previous_selected_sections:
+            # Check if the course of the section is already taken
+            if section.section.course == selected_course:
+                messages.error(request, 'Course already added')
+                return redirect('advising-portal-home')
 
-            else:
-                routines[time_part] += day_part
+            routine_id = section.section.routine_id   # Get routine id of the comparing section
 
-        routine_str = ''
+            # Split the routine id of the comparing section into Time Slots
+            section_routine_slot_chunks = [routine_id[i:i+3] for i in range(0, len(routine_id), 3)]
 
-        for time, day in routines.items():
-            routine_str += f'{day} {time}\n'
+            # Check for time slot conflict
+            for i in section_routine_slot_chunks:
+                for j in selected_routine_slot_chunks:
+                    if i == j:
+                        messages.error(request, f'Conflicts with {section.section.course.course_code}')
+                        return redirect('advising-portal-home')
 
-        formatted_data['routine'] = routine_str
-        view_data.append(formatted_data)
+            # Check whether total credits exceed limit
+            total_credits = Course.objects.filter(
+                course_id__in=previous_selected_sections.values('section__course__course_id')
+            ).aggregate(Sum('credit'))
 
-    context = {
-        'courses': view_data
-    }
+            total_credits = total_credits['credit__sum']
+            selected_course_credit = selected_course.credit
 
-    return render(request, 'advising_portal/selected_courses.html', context)
+            if total_credits + selected_course_credit > 12:
+                messages.error(request, f'Total credits cannot be more than 12')
+                return redirect('advising-portal-home')
+
+    # check section capacity
+    if selected_section.total_students < selected_section.section_capacity:
+        selected_section.total_students = selected_section.total_students + 1
+        selected_section.save()
+
+        course_selected = CoursesTaken(
+            student=student,
+            semester=current_semester,
+            section=selected_section,
+        )
+        course_selected.save()
+        messages.success(request, f'Successfully added Section-{selected_section.section_no} of {selected_section.course.course_code}')
+    else:
+        messages.error(request, 'Section is full!')
+
+    return redirect('advising-portal-home')
 
 
 @login_required
