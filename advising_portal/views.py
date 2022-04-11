@@ -41,7 +41,7 @@ def home(request):
                     ).values('section_id').all()
                 ).values('course_id').all()
             ).values('course_id').all()
-        )
+        ).order_by('course__course_code')
 
     else:
         sections = Section.objects.filter(
@@ -51,7 +51,7 @@ def home(request):
                     grade_id__in=['C', 'C+', 'C-', 'D', 'D+', 'F']
                 ).values('section_id').all()
             ).values('course_id').all()
-        )
+        ).order_by('course__course_code')
 
     sections = list(sections)
 
