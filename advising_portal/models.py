@@ -127,4 +127,3 @@ class SectionsRequested(models.Model):
     section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True)
     reason = models.TextField()
     approved_by = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
-
