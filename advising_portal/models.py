@@ -127,3 +127,12 @@ class SectionsRequested(models.Model):
     section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True)
     reason = models.TextField()
     approved_by = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
+
+
+    # is_approved = models.BooleanField(default=False)
+    # chairman = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
+    # chairmans_text = models.TextField()
+    # advisor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
+    # advisor_text = models.TextField()
+    # instructor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
+    # instructor_text = models.TextField()
