@@ -132,7 +132,7 @@ def advising_portal_list_view(request):
 
 
 @login_required
-def add_course(request, section_id):
+def add_course_view(request, section_id):
     current_semester = Semester.objects.get(advising_status=True)   # get current semester
     student = Student.objects.get(username_id=request.user)   # get User's student info
     selected_section = Section.objects.get(section_id=section_id)   # get selected section data
@@ -209,7 +209,7 @@ def add_course(request, section_id):
 
 
 @login_required
-def drop_course(request, section_id):
+def drop_course_view(request, section_id):
     current_semester_id = Semester.objects.get(advising_status=True).semester_id
     student_id = Student.objects.get(username_id=request.user).student_id
     selected_section = Section.objects.get(section_id=section_id)
@@ -236,7 +236,7 @@ def request_section_list_view(request):
             reason = form.cleaned_data.get('reason')
 
     else:
-        form = {}
+        form = SectionRequestForm()
 
     student = Student.objects.get(username_id=request.user)
 
@@ -372,7 +372,7 @@ def request_section(request, section_id):
 
 
 @login_required
-def drop_course(request, section_id):
+def revoke_section_request_view(request, section_id):
     current_semester_id = Semester.objects.get(advising_status=True).semester_id
     student_id = Student.objects.get(username_id=request.user).student_id
     selected_section = Section.objects.get(section_id=section_id)

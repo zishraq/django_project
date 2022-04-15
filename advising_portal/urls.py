@@ -3,8 +3,8 @@ from . import views
 
 urlpatterns = [
     path('advising/', views.advising_portal_list_view, name='advising-portal-home'),
-    path('select-section/<section_id>/', views.add_course, name='advising-portal-select-course'),
-    path('drop-section/<section_id>/', views.drop_course, name='advising-portal-drop-course'),
+    path('select-section/<section_id>/', views.add_course_view, name='advising-portal-select-course'),
+    path('drop-section/<section_id>/', views.revoke_section_request_view, name='advising-portal-drop-course'),
 
     path('request-section/', views.request_section_list_view, name='advising-portal-request-section'),
     path('make-section-request/<section_id>/', views.request_section, name='advising-portal-make-section-request'),

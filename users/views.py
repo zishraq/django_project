@@ -8,14 +8,13 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
-from advising_portal.forms import StudentRegisterForm
 from advising_portal.models import Student
 from .email_text import email_text
 from .forms import UserRegisterForm, UserUpdateFrom, ProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm
 from .models import OTPmodel
 
 
-def activate(request):
+def activate_profile_view(request):
     if request.method == 'POST':
         form = ProfileActivationForm(request.POST)
 
@@ -74,7 +73,7 @@ def activate(request):
     return render(request, 'users/activate.html', context)
 
 
-def set_password(request, otp_id):
+def set_password_view(request, otp_id):
     if request.method == 'POST':
         form = ProfilePasswordForm(request.POST)
 
@@ -126,7 +125,7 @@ def set_password(request, otp_id):
 
 
 @login_required
-def profile(request):
+def profile_view(request):
     if request.method == 'POST':
         u_form = UserUpdateFrom(request.POST, instance=request.user)
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.student)
