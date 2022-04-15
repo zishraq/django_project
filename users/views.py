@@ -1,9 +1,11 @@
+import datetime
 import uuid
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 from advising_portal.models import Student
 from .forms import UserUpdateFrom, ProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm
@@ -12,6 +14,8 @@ from .send_otp import generate_otp, send_otp
 
 
 def activate_profile_view(request):
+    current_time = timezone.now()
+
     if request.method == 'POST':
         form = ProfileActivationForm(request.POST)
 
@@ -42,6 +46,8 @@ def activate_profile_view(request):
                 'otp_id': otp_id,
                 'otp': otp,
                 'student_id': student_id,
+                'created_at': current_time,
+                'expired_at': current_time + datetime.timedelta(minutes=1),
             }
 
             otp_store = OTPmodel(**otp_data)
@@ -70,6 +76,8 @@ def activate_profile_view(request):
 
 
 def set_password_view(request, otp_id):
+    current_time = timezone.now()
+
     if request.method == 'POST':
         form = ProfilePasswordForm(request.POST)
 
@@ -83,6 +91,10 @@ def set_password_view(request, otp_id):
 
             if otp_data.otp != received_otp:
                 messages.error(request, 'OTP mismatched')
+                return redirect('set_password', otp_id=otp_id)
+
+            if current_time > otp_data.expired_at:
+                messages.error(request, 'OTP expired! Activate Again')
                 return redirect('set_password', otp_id=otp_id)
 
             student_id = otp_data.student_id
