@@ -119,6 +119,9 @@ def set_password_view(request, otp_id):
                 messages.success(request, f'Account already activated for ID {student_id}!')
                 return redirect('set_password', otp_id=otp_id)
 
+            otp_data.is_successful = True
+            otp_data.save()
+
             messages.success(request, f'Account created successfully for {student_id}!')
             return redirect('login')
 
