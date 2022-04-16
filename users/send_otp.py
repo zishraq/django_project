@@ -19,22 +19,22 @@ def send_otp(receiver_mail: str, otp: str):
         return result
 
     email_text = f"""\
-    Subject: OTP For Online Advising Portal
+Subject: OTP For Online Advising Portal
 
-    Dear User,
+Dear User,
 
-    Your Account activation request has been processed successfully.
+Your Account activation request has been processed successfully.
 
-    Please use this ONE TIME PASSWORD to activate your account:
+Please use this ONE TIME PASSWORD to activate your account:
 
-    ------------------------------
-    User email: {receiver_mail}
-    Token: {otp}
-    ------------------------------
+------------------------------
+User email: {receiver_mail}
+Token: {otp}
+------------------------------
 
-    Thank You
-    ABCD University
-    """
+Thank You
+ABCD University
+"""
 
     try:
         smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)

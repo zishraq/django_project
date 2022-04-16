@@ -5,6 +5,27 @@ from django.contrib.auth.forms import UserCreationForm
 from advising_portal.models import Student, Faculty
 
 
+class UserRegisterForm(UserCreationForm):
+    email = forms.EmailField()
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
+
+    # def clean(self):
+    #     cleaned_data = super(UserRegisterForm, self).clean()
+    #     # additional cleaning here
+    #     return cleaned_data
+
+
+class UserUpdateFrom(forms.ModelForm):
+    email = forms.EmailField()
+
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Student

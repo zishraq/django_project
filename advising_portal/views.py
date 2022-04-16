@@ -118,6 +118,7 @@ def advising_portal_list_view(request):
             'section_id': course.section_id,
             'credits': course.section.course.credit,
             'routine_id': format_routine(course.section.routine_id)
+            # 'routine': format_routine(course.section.routine_id)
         }
 
         view_selected_courses_data.append(formatted_data)
@@ -301,6 +302,8 @@ def request_section_list_view(request):
 
 @login_required
 def request_section(request, section_id):
+    print('adsfadsgfadsgadsf')
+
     current_semester = Semester.objects.get(advising_status=True)   # get current semester
     student = Student.objects.get(username_id=request.user)   # get User's student info
     requested_section = Section.objects.get(section_id=section_id)   # get selected section data

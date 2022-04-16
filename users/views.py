@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
 from advising_portal.models import Student
-from .forms import UserUpdateFrom, ProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm
+from .forms import ProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm, UserUpdateFrom
 from .models import OTPmodel
 from .send_otp import generate_otp, send_otp
 

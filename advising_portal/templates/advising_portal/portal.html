@@ -6,6 +6,7 @@
     {#        <button type="button" class="btn btn-outline-primary">Primary</button>#}
     {#        <button type="button" class="btn btn-outline-secondary">Secondary</button>#}
     {#    </div>#}
+
     <div class="row fix-width">
         <div class="col-7">
             <div class="btn-self-design">
@@ -37,26 +38,44 @@
                     </tr>
 
                     {% for section in sections %}
-                        {#                        {% setvar section.section_id as request_section_id %}#}
-                        {% setvar "CSE1031" as request_section_id %}
-
 
                         <tr>
                             <td class="col-md-1">{{ section.course_id }}</td>
                             <td class="col-md-1">{{ section.section_no }}</td>
                             <td class="col-md-1"><small>{{ section.routine_id|linebreaks }}</small></td>
-                            {#                                <td class="col-md-1"><small><pre>{{ section.routine_id }}</pre></small></td>#}
+                            {# <td class="col-md-1"><small><pre>{{ section.routine_id }}</pre></small></td>#}
                             <td class="col-md-1">{{ section.credit }}</td>
                             <td class="col-md-1">{{ section.department_name }}</td>
                             <td class="col-md-1">{{ section.total_students }} / {{ section.section_capacity }}</td>
                             <td class="col-md-1">
                                 {% if portal_type == 'section_request' or section.total_students == section.section_capacity %}
-                                    {#                                    <button class="btn btn-outline-info" type="submit" onclick="openForm()">#}
-
-                                    <button class="btn btn-outline-info" type="submit" data-toggle="modal"
-                                            data-target="#request-section">
+                                    <button class="btn btn-outline-info" type="submit" data-toggle="modal" data-target="#{{ section.section_id }}">
                                         Request
                                     </button>
+
+                                    <div class="modal" tabindex="-1" id="{{ section.section_id }}">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Seat Request</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form method="POST">
+                                                        {% csrf_token %}
+                                                        {{ form|crispy }}
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-primary" onclick="location.href='{% url 'advising-portal-make-section-request' section.section_id %}'">Submit</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 {% else %}
                                     <button class="btn btn-outline-info" type="submit" onclick="location.href='{% url 'advising-portal-select-course' section.section_id %}'">
                                         Select
@@ -67,31 +86,6 @@
                     {% endfor %}
                     </tbody>
                 </table>
-
-                <div class="modal" tabindex="-1" id="request-section">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Seat Request</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <form method="POST">
-                                    {% csrf_token %}
-                                    {{ form|crispy }}
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                {#                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>#}
-                                {#                        <button type="button" class="btn btn-primary" onclick="location.href='{% url 'advising-portal-make-section-request' request_section_id %}'">Submit</button>#}
-                                <button type="button" class="btn btn-primary">Submit</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
 
@@ -119,8 +113,8 @@
                         <tr>
                             <td class="col-md-1">{{ course.course_code }}</td>
                             <td class="col-md-1">{{ course.section_no }}</td>
-                            <td class="col-md-1"><small>{{ course.routine|linebreaks }}</small></td>
-                            {#                            <td class="col-md-1"><small><pre>{{ course.routine }}</pre></small></td>#}
+                            <td class="col-md-1"><small>{{ course.routine_id|linebreaks }}</small></td>
+                            {# <td class="col-md-1"><small><pre>{{ course.routine_id }}</pre></small></td>#}
                             <td class="col-md-1">{{ course.credits }}</td>
                             <td class="col-md-1">
                                 <button class="btn btn-outline-danger" type="submit"
@@ -136,13 +130,5 @@
             </div>
         </div>
     </div>
-
-    <script type="text/javascript">
-        $("#submit").click(function () {
-            var section_id = {{ section.section_id }};
-            {#$("#modal_body").html(section_id);#}
-            return section_id
-        });
-    </script>
 
 {% endblock content %}
