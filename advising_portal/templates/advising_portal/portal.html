@@ -1,5 +1,4 @@
 {% extends "advising_portal/base.html" %}
-{% load custom_template_tags %}
 {% load crispy_forms_tags %}
 {% block content %}
     {#    <div class="fix-width">#}
@@ -33,7 +32,9 @@
                         <td class="col-md-1"><b>Timing</b></td>
                         <td class="col-md-1"><b>Credits</b></td>
                         <td class="col-md-1"><b>Department</b></td>
-                        <td class="col-md-1"><b>Capacity</b></td>
+                        {% if portal_type == 'course_advising' %}
+                            <td class="col-md-1"><b>Capacity</b></td>
+                        {% endif %}
                         <td class="col-md-1"><b>Select</b></td>
                     </tr>
 
@@ -46,7 +47,11 @@
                             {# <td class="col-md-1"><small><pre>{{ section.routine_id }}</pre></small></td>#}
                             <td class="col-md-1">{{ section.credit }}</td>
                             <td class="col-md-1">{{ section.department_name }}</td>
-                            <td class="col-md-1">{{ section.total_students }} / {{ section.section_capacity }}</td>
+
+                            {% if portal_type == 'course_advising' %}
+                                <td class="col-md-1">{{ section.total_students }} / {{ section.section_capacity }}</td>
+                            {% endif %}
+
                             <td class="col-md-1">
                                 {% if portal_type == 'section_request' or section.total_students == section.section_capacity %}
                                     <button class="btn btn-outline-info" type="submit" data-toggle="modal" data-target="#{{ section.section_id }}">

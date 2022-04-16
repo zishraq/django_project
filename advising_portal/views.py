@@ -302,8 +302,6 @@ def request_section_list_view(request):
 
 @login_required
 def request_section(request, section_id):
-    print('adsfadsgfadsgadsf')
-
     current_semester = Semester.objects.get(advising_status=True)   # get current semester
     student = Student.objects.get(username_id=request.user)   # get User's student info
     requested_section = Section.objects.get(section_id=section_id)   # get selected section data
@@ -326,7 +324,7 @@ def request_section(request, section_id):
 
     elif not existence_check:
         # Get current selected sections
-        previous_requested_sections = CoursesTaken.objects.filter(
+        previous_requested_sections = SectionsRequested.objects.filter(
             student_id=student.student_id,
             semester=current_semester,
         ).all()
