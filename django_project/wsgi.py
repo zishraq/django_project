@@ -22,6 +22,30 @@ if __name__ == '__main__':
     import datetime
     from django.utils import timezone
 
+    users = [
+        {
+            'username': 'admin',
+            'password': 'admin',
+            'is_superuser': True
+        },
+        {
+            'username': '2020-1-65-001',
+            'password': '123456Seven',
+        },
+        {
+            'username': 'amit',
+            'password': '123456Seven',
+        },
+        {
+            'username': 'tuhin',
+            'password': '123456Seven',
+        }
+    ]
+
+    for u in users:
+        user = User.objects.create_user(**u)
+        user.save()
+
     departments = [
         {
             'department_id': 'CSE',
