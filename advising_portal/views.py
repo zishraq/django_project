@@ -302,6 +302,12 @@ def request_section_list_view(request):
 
 @login_required
 def request_section(request, section_id):
+    form = SectionRequestForm(request.POST)
+
+    if form.is_valid():
+        reason = form.cleaned_data.get('reason')
+        print(reason)
+
     current_semester = Semester.objects.get(advising_status=True)   # get current semester
     student = Student.objects.get(username_id=request.user)   # get User's student info
     requested_section = Section.objects.get(section_id=section_id)   # get selected section data

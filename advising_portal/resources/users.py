@@ -1,11 +1,11 @@
 from django.contrib.auth.models import User
 
-
 users = [
     {
         'username': 'admin',
         'password': 'admin',
-        'is_superuser': True
+        'is_superuser': True,
+        'is_staff': True
     },
     {
         'username': '2020-1-65-001',
