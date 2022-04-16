@@ -6,7 +6,6 @@ from advising_portal.models import Student, Faculty, SectionsRequested
 # from bootstrap_modal_forms.mixins import PopRequestMixin, CreateUpdateAjaxMixin
 
 
-class SectionRequestForm(forms.ModelForm):
-    class Meta:
-        model = SectionsRequested
-        fields = ['reason']
+class SectionRequestForm(forms.Form):
+    reason = forms.CharField(label='reason', max_length=500, widget=forms.Textarea)
+    section = forms.CharField(label='section', widget=forms.HiddenInput())

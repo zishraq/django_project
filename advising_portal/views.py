@@ -235,6 +235,9 @@ def request_section_list_view(request):
 
         if form.is_valid():
             reason = form.cleaned_data.get('reason')
+            section_id = form.cleaned_data.get('section')
+
+            request_section(request=request, section_id=section_id, reason=reason)
 
     else:
         form = SectionRequestForm()
@@ -300,14 +303,8 @@ def request_section_list_view(request):
     return render(request, 'advising_portal/portal.html', context)
 
 
-@login_required
-def request_section(request, section_id):
-    form = SectionRequestForm(request.POST)
-
-    if form.is_valid():
-        reason = form.cleaned_data.get('reason')
-        print(reason)
-
+# @login_required
+def request_section(request, section_id, reason):
     current_semester = Semester.objects.get(advising_status=True)   # get current semester
     student = Student.objects.get(username_id=request.user)   # get User's student info
     requested_section = Section.objects.get(section_id=section_id)   # get selected section data
@@ -372,6 +369,7 @@ def request_section(request, section_id):
         student=student,
         semester=current_semester,
         section=requested_section,
+        reason=reason
     )
     sections_requested.save()
     messages.success(request, f'Successfully requested for Section-{requested_section.section_no} of {requested_section.course.course_code}')
