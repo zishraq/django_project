@@ -128,7 +128,6 @@ class SectionsRequested(models.Model):
     reason = models.TextField()
     approved_by = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
 
-
     # is_approved = models.BooleanField(default=False)
     # chairman = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
     # chairmans_text = models.TextField()

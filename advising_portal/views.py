@@ -303,7 +303,6 @@ def request_section_list_view(request):
     return render(request, 'advising_portal/portal.html', context)
 
 
-# @login_required
 def request_section(request, section_id, reason):
     current_semester = Semester.objects.get(advising_status=True)   # get current semester
     student = Student.objects.get(username_id=request.user)   # get User's student info
@@ -323,7 +322,7 @@ def request_section(request, section_id, reason):
 
     if existence_check:
         messages.error(request, 'Already requested for this Section')
-        return redirect('advising-portal-request-section')
+        return redirect('advising-portal-request-section-list-view')
 
     elif not existence_check:
         # Get current selected sections
@@ -336,7 +335,7 @@ def request_section(request, section_id, reason):
             # Check if the course of the section is already taken
             if section.section.course == selected_course:
                 messages.error(request, 'Already requested for this Course')
-                return redirect('advising-portal-request-section')
+                return redirect('advising-portal-request-section-list-view')
 
             routine_id = section.section.routine_id   # Get routine id of the comparing section
 
@@ -348,7 +347,7 @@ def request_section(request, section_id, reason):
                 for j in selected_routine_slot_chunks:
                     if i == j:
                         messages.error(request, f'Conflicts with {section.section.course.course_code}')
-                        return redirect('advising-portal-request-section')
+                        return redirect('advising-portal-request-section-list-view')
 
             # Check whether total credits exceed limit
             total_credits = Course.objects.filter(
@@ -362,7 +361,7 @@ def request_section(request, section_id, reason):
 
             if total_credits + selected_course_credit > credit_limit:
                 messages.error(request, f'Cannot request for more than {credit_limit} credits')
-                return redirect('advising-portal-request-section')
+                return redirect('advising-portal-request-section-list-view')
 
     # check section capacity
     sections_requested = SectionsRequested(
@@ -373,7 +372,7 @@ def request_section(request, section_id, reason):
     )
     sections_requested.save()
     messages.success(request, f'Successfully requested for Section-{requested_section.section_no} of {requested_section.course.course_code}')
-    return redirect('advising-portal-request-section')
+    return redirect('advising-portal-request-section-list-view')
 
 
 @login_required
@@ -389,7 +388,7 @@ def revoke_section_request_view(request, section_id):
     ).delete()
 
     messages.success(request, f'Request removed for Section-{selected_section.section_no} of {selected_section.course.course_code}')
-    return redirect('advising-portal-request-section')
+    return redirect('advising-portal-request-section-list-view')
 
 
 @login_required
