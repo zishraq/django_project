@@ -34,7 +34,7 @@ Token: {otp}
 ------------------------------
 
 Thank You
-ABCD University
+EWU University
 """
 
     try:
