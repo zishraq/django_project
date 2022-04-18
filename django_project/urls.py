@@ -11,5 +11,7 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(template_name='users/logout.html'), name='logout'),
     path('activate/', user_views.activate_profile_view, name='activate'),
     path('set-password/<otp_id>', user_views.set_password_view, name='set_password'),
+    path('forgot-password/', user_views.forgot_password_view, name='forgot_password'),
+    path('reset-password/<otp_id>', user_views.reset_password_view, name='reset_password'),
     path('', include('advising_portal.urls'))
 ]

@@ -1,6 +1,3 @@
-import datetime
-import uuid
-
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -10,7 +7,7 @@ from django.utils import timezone
 from advising_portal.models import Student
 from .forms import ProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm, UserUpdateFrom
 from .models import OTPmodel
-from .send_otp import generate_otp, send_otp
+from .send_otp import send_otp, store_otp
 
 
 def activate_profile_view(request):
@@ -38,24 +35,16 @@ def activate_profile_view(request):
                 messages.error(request, 'Profile already activated')
                 return redirect('activate')
 
-            otp = generate_otp()
-            receiver_mail = f'{student_id}@std.ewubd.edu'
+            otp_outputs = store_otp(student_id, current_time)
 
-            otp_id = str(uuid.uuid4())
-            otp_data = {
-                'otp_id': otp_id,
-                'otp': otp,
-                'student_id': student_id,
-                'created_at': current_time,
-                'expired_at': current_time + datetime.timedelta(minutes=1),
-            }
-
-            otp_store = OTPmodel(**otp_data)
-            otp_store.save()
+            receiver_mail = otp_outputs['receiver_mail']
+            otp = otp_outputs['otp']
+            otp_id = otp_outputs['otp_id']
 
             sent_otp = send_otp(
                 receiver_mail=receiver_mail,
-                otp=otp
+                otp=otp,
+                reset_password=False
             )
 
             if not sent_otp['success']:
@@ -73,6 +62,60 @@ def activate_profile_view(request):
     }
 
     return render(request, 'users/activate.html', context)
+
+
+def forgot_password_view(request):
+    current_time = timezone.now()
+
+    if request.method == 'POST':
+        form = ProfileActivationForm(request.POST)
+
+        if form.is_valid():
+            student_id = form.cleaned_data.get('student_id')
+
+            student_existence_check = Student.objects.filter(
+                student_id=student_id
+            ).exists()
+
+            if not student_existence_check:
+                messages.error(request, 'No such Student')
+                return redirect('forgot_password')
+
+            user_existence_check = User.objects.filter(
+                username=student_id
+            ).exists()
+
+            if not user_existence_check:
+                messages.error(request, "Account hasn't been activated yet")
+                return redirect('activate')
+
+            otp_outputs = store_otp(student_id, current_time)
+
+            receiver_mail = otp_outputs['receiver_mail']
+            otp = otp_outputs['otp']
+            otp_id = otp_outputs['otp_id']
+
+            sent_otp = send_otp(
+                receiver_mail=receiver_mail,
+                otp=otp,
+                reset_password=True
+            )
+
+            if not sent_otp['success']:
+                messages.error(request, sent_otp['error'])
+                return redirect('forgot_password')
+
+            messages.success(request, f'OTP sent successfully!')
+            return redirect('reset_password', otp_id=otp_id)
+
+    else:
+        form = ProfileActivationForm()
+
+    context = {
+        'form': form
+    }
+
+    return render(request, 'users/forgot_password.html', context)
 
 
 def set_password_view(request, otp_id):
@@ -98,7 +141,7 @@ def set_password_view(request, otp_id):
                 return redirect('set_password', otp_id=otp_id)
 
             student_id = otp_data.student_id
-
+            print(password)
             new_user = User.objects.create_user(
                 username=student_id,
                 email=f'{student_id}@std.ewubd.edu',
@@ -133,6 +176,54 @@ def set_password_view(request, otp_id):
     }
 
     return render(request, 'users/activate.html', context)
+
+
+def reset_password_view(request, otp_id):
+    current_time = timezone.now()
+
+    if request.method == 'POST':
+        form = ProfilePasswordForm(request.POST)
+
+        if form.is_valid():
+            password = form.cleaned_data.get('password')
+            received_otp = form.cleaned_data.get('otp')
+
+            otp_data = OTPmodel.objects.get(
+                otp_id=otp_id
+            )
+
+            if otp_data.otp != received_otp:
+                messages.error(request, 'OTP mismatched')
+                return redirect('reset_password', otp_id=otp_id)
+
+            if current_time > otp_data.expired_at:
+                messages.error(request, 'OTP expired! Resend OTP')
+                return redirect('reset_password', otp_id=otp_id)
+
+            student_id = otp_data.student_id
+
+            print(student_id)
+
+            update_user = User.objects.get(
+                username=student_id
+            )
+            update_user.set_password(password)
+            update_user.save()
+
+            otp_data.is_successful = True
+            otp_data.save()
+
+            messages.success(request, f'Password has been reset successfully for {student_id}!')
+            return redirect('login')
+
+    else:
+        form = ProfilePasswordForm()
+
+    context = {
+        'form': form
+    }
+
+    return render(request, 'users/forgot_password.html', context)
 
 
 @login_required
