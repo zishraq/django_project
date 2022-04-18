@@ -1,6 +1,3 @@
-import datetime
-import uuid
-
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -10,7 +7,7 @@ from django.utils import timezone
 from advising_portal.models import Student
 from .forms import ProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm, UserUpdateFrom
 from .models import OTPmodel
-from .send_otp import generate_otp, send_otp, send_otp_forgot_password
+from .send_otp import send_otp, store_otp
 
 
 def activate_profile_view(request):
@@ -38,24 +35,16 @@ def activate_profile_view(request):
                 messages.error(request, 'Profile already activated')
                 return redirect('activate')
 
-            otp = generate_otp()
-            receiver_mail = f'{student_id}@std.ewubd.edu'
+            otp_outputs = store_otp(student_id, current_time)
 
-            otp_id = str(uuid.uuid4())
-            otp_data = {
-                'otp_id': otp_id,
-                'otp': otp,
-                'student_id': student_id,
-                'created_at': current_time,
-                'expired_at': current_time + datetime.timedelta(minutes=2),
-            }
-
-            otp_store = OTPmodel(**otp_data)
-            otp_store.save()
+            receiver_mail = otp_outputs['receiver_mail']
+            otp = otp_outputs['otp']
+            otp_id = otp_outputs['otp_id']
 
             sent_otp = send_otp(
                 receiver_mail=receiver_mail,
-                otp=otp
+                otp=otp,
+                reset_password=False
             )
 
             if not sent_otp['success']:
@@ -100,25 +89,16 @@ def forgot_password_view(request):
                 messages.error(request, "Account hasn't been activated yet")
                 return redirect('activate')
 
+            otp_outputs = store_otp(student_id, current_time)
 
-            otp = generate_otp()
-            receiver_mail = f'{student_id}@std.ewubd.edu'
+            receiver_mail = otp_outputs['receiver_mail']
+            otp = otp_outputs['otp']
+            otp_id = otp_outputs['otp_id']
 
-            otp_id = str(uuid.uuid4())
-            otp_data = {
-                'otp_id': otp_id,
-                'otp': otp,
-                'student_id': student_id,
-                'created_at': current_time,
-                'expired_at': current_time + datetime.timedelta(minutes=2),
-            }
-
-            otp_store = OTPmodel(**otp_data)
-            otp_store.save()
-
-            sent_otp = send_otp_forgot_password(
+            sent_otp = send_otp(
                 receiver_mail=receiver_mail,
-                otp=otp
+                otp=otp,
+                reset_password=True
             )
 
             if not sent_otp['success']:
@@ -244,7 +224,6 @@ def reset_password_view(request, otp_id):
     }
 
     return render(request, 'users/forgot_password.html', context)
-
 
 
 @login_required
