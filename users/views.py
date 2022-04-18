@@ -123,10 +123,10 @@ def forgot_password_view(request):
 
             if not sent_otp['success']:
                 messages.error(request, sent_otp['error'])
-                return redirect('activate')
+                return redirect('forgot_password')
 
             messages.success(request, f'OTP sent successfully!')
-            return redirect('set_password', otp_id=otp_id)
+            return redirect('reset_password', otp_id=otp_id)
 
     else:
         form = ProfileActivationForm()
@@ -161,7 +161,7 @@ def set_password_view(request, otp_id):
                 return redirect('set_password', otp_id=otp_id)
 
             student_id = otp_data.student_id
-
+            print(password)
             new_user = User.objects.create_user(
                 username=student_id,
                 email=f'{student_id}@std.ewubd.edu',
@@ -217,22 +217,18 @@ def reset_password_view(request, otp_id):
                 return redirect('reset_password', otp_id=otp_id)
 
             if current_time > otp_data.expired_at:
-                messages.error(request, 'OTP expired! Activate Again')
+                messages.error(request, 'OTP expired! Resend OTP')
                 return redirect('reset_password', otp_id=otp_id)
 
             student_id = otp_data.student_id
 
-            update_user = User.objects.filter(
+            print(student_id)
+
+            update_user = User.objects.get(
                 username=student_id
-            ).update(
-                password=password
             )
-
+            update_user.set_password(password)
             update_user.save()
-
-            student_data = Student.objects.get(
-                student_id=student_id
-            )
 
             otp_data.is_successful = True
             otp_data.save()
