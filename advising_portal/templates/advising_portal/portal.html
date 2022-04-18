@@ -6,7 +6,9 @@
     {#        <button type="button" class="btn btn-outline-secondary">Secondary</button>#}
     {#    </div>#}
 
-    <div class="row fix-width">
+    <div class="container-fluid">
+{#        <div class="row fix-width">#}
+        <div class="row">
         <div class="col-7">
             <div class="btn-self-design">
                 {% if portal_type == 'section_request' %}
@@ -23,19 +25,19 @@
                 {% endif %}
             </div>
 
-            <div class="table-responsive left-table-align">
+            <div class="table-responsive card shadow left-table-align">
                 <table class="table table-striped">
                     <tbody>
                     <tr>
-                        <td class="col-md-1"><b>Course</b></td>
-                        <td class="col-md-1"><b>Section</b></td>
-                        <td class="col-md-1"><b>Timing</b></td>
-                        <td class="col-md-1"><b>Credits</b></td>
-                        <td class="col-md-1"><b>Department</b></td>
+                        <th class="col-md-1"><b>Course</b></th>
+                        <th class="col-md-1"><b>Section</b></th>
+                        <th class="col-md-1"><b>Timing</b></th>
+                        <th class="col-md-1"><b>Credits</b></th>
+                        <th class="col-md-1"><b>Department</b></th>
                         {% if portal_type == 'course_advising' %}
-                            <td class="col-md-1"><b>Capacity</b></td>
+                            <th class="col-md-1"><b>Capacity</b></th>
                         {% endif %}
-                        <td class="col-md-1"><b>Select</b></td>
+                        <th class="col-md-1"><b>Select</b></th>
                     </tr>
 
                     {% for section in sections %}
@@ -107,15 +109,15 @@
                 {% endif %}
             </h2>
 
-            <div class="table-responsive right-table-align">
+            <div class="table-responsive card shadow right-table-align">
                 <table class="table table-striped">
                     <tbody>
                     <tr>
-                        <td class="col-md-1"><b>Course</b></td>
-                        <td class="col-md-2"><b>Section</b></td>
-                        <td class="col-md-3"><b>Timing</b></td>
-                        <td class="col-md-3"><b>Credits</b></td>
-                        <td class="col-md-3"><b>Drop</b></td>
+                        <th class="col-md-1"><b>Course</b></th>
+                        <th class="col-md-2"><b>Section</b></th>
+                        <th class="col-md-3"><b>Timing</b></th>
+                        <th class="col-md-3"><b>Credits</b></th>
+                        <th class="col-md-3"><b>Drop</b></th>
                     </tr>
 
                     {% for course in selected_courses %}
@@ -145,5 +147,5 @@
             </div>
         </div>
     </div>
-
+    </div>
 {% endblock content %}
