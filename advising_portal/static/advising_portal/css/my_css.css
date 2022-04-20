@@ -1,3 +1,9 @@
+.selection_card_design {
+  height: 38px;
+  justify-content: end;
+  font-size: 1rem;
+}
+
 .fix-width {
     width: 1300px;
     margin: 0 auto;
@@ -9,7 +15,7 @@
 }
 
 .right-table-align {
-    margin-top: 50px;
+    margin-top: 40px;
 }
 
 .btn-fix-width {

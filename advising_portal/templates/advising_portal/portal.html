@@ -12,9 +12,16 @@
         <div class="col-7">
             <div class="btn-self-design">
                 {% if portal_type == 'section_request' %}
-                    <h2 class="sub-header">
-                        Requestable Sections
-                    </h2>
+                    <div class="card border-left-primary shadow py-2 selection_card_design">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Requestable Sections
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 {% else %}
                     <div class="row">
                         <div class="col-3">
@@ -23,7 +30,7 @@
                             </button>
                         </div>
                         <div class="col-3">
-                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=recommended'">
+                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=retakable'">
                                 Retakable
                             </button>
                         </div>
@@ -121,7 +128,7 @@
         </div>
 
         <div class="col-5">
-            <div class="card border-left-primary shadow py-2">
+            <div class="card border-left-primary shadow py-2 selection_card_design">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
