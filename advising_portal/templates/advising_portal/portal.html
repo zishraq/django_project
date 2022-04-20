@@ -121,13 +121,19 @@
         </div>
 
         <div class="col-5">
-            <h2 class="sub-header">
-                {% if portal_type == 'section_request' %}
-                    Requested Sections
-                {% else %}
-                    Selected Courses
-                {% endif %}
-            </h2>
+            <div class="card border-left-primary shadow py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            {% if portal_type == 'section_request' %}
+                                Requested Sections
+                            {% else %}
+                                Selected Courses
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="table-responsive card shadow right-table-align">
                 <table class="table table-striped">
