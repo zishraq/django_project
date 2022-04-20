@@ -10,7 +10,7 @@ from .models import OTPmodel
 from .send_otp import send_otp, store_otp
 
 
-def activate_profile_view(request):
+def activate_student_profile_view(request):
     current_time = timezone.now()
 
     if request.method == 'POST':
