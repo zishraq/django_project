@@ -32,9 +32,10 @@ var ctx = document.getElementById("myAreaChart");
 var myLineChart = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+//    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        labels: ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"],
         datasets: [{
-            label: "Earnings",
+            label: "CGPA",
             lineTension: 0.3,
             backgroundColor: "rgba(78, 115, 223, 0.05)",
             borderColor: "rgba(78, 115, 223, 1)",
@@ -46,7 +47,8 @@ var myLineChart = new Chart(ctx, {
             pointHoverBorderColor: "rgba(78, 115, 223, 1)",
             pointHitRadius: 10,
             pointBorderWidth: 2,
-            data: [0, 10000, 5000, 15000, 10000, 20000, 15000, 25000, 20000, 30000, 25000, 40000],
+//      data: [0, 10000, 5000, 15000, 10000, 20000, 15000, 25000, 20000, 30000, 25000, 40000],
+            data: [2.73, 2.53, 2.48, 2.53, 2.56, 2.87, 2.94, 3.01],
         }],
     },
     options: {
@@ -74,12 +76,16 @@ var myLineChart = new Chart(ctx, {
             }],
             yAxes: [{
                 ticks: {
-                    maxTicksLimit: 5,
+//          maxTicksLimit: 5,
+                    max: 4,
                     padding: 10,
+                    beginAtZero: true,
+                    stepSize: 1
+
                     // Include a dollar sign in the ticks
-                    callback: function (value, index, values) {
-                        return '$' + number_format(value);
-                    }
+//          callback: function(value, index, values) {
+//            return '$' + number_format(value);
+//          }
                 },
                 gridLines: {
                     color: "rgb(234, 236, 244)",
@@ -107,12 +113,12 @@ var myLineChart = new Chart(ctx, {
             intersect: false,
             mode: 'index',
             caretPadding: 10,
-            callbacks: {
-                label: function (tooltipItem, chart) {
-                    var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-                    return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
-                }
-            }
+//      callbacks: {
+//        label: function(tooltipItem, chart) {
+//          var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+//          return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
+//        }
+//      }
         }
     }
 });
