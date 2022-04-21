@@ -1,0 +1,242 @@
+{% extends "advising_portal/student_base.html" %}
+{% load static %}
+{% block content %}
+    <div class="row">
+        <div class="col-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">CGPA progress by semesters</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="myAreaChart1"></canvas>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Term GPA per semester</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="myAreaChart2"></canvas>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {% for semester, value in courses_by_semesters.items %}
+        <div class="card shadow p-3 mb-3 mt-3" align="left">
+            <h2>{{ value.semester_name }}</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Course</th>
+                    <th style="padding-right: 100px;">Course Title</th>
+                    <th>cr</th>
+                    <th>grd</th>
+                    <th>gp</th>
+                    <th>gpacr</th>
+                <tr>
+                </thead>
+
+                <tbody>
+                {% for course in value.courses %}
+                    <tr>
+                        <td>{{ course.course_code }}</td>
+                        <td style="padding-right: 100px;">{{ course.course_title }}</td>
+                        <td>{{ course.course_credit }}</td>
+                        <td>{{ course.grade }}</td>
+                        <td>{{ course.total_gp }}</td>
+                        <td>{{ course.grade_point }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="3" style="border-top: 2px solid;">CGPA: {{ value.current_cgpa }}</td>
+                    <td colspan="3" style="border-top: 2px solid;">Term GPA: {{ value.term_gpa }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+    {% endfor %}
+
+    <script src="{% static 'advising_portal/vendor/chart.js/Chart.min.js' %}"></script>
+    <script>
+        // Set new default font family and font color to mimic Bootstrap's default styling
+        Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+        Chart.defaults.global.defaultFontColor = '#858796';
+
+        // Area Chart Example
+
+        var graphs = [
+            {{ semester_list|safe }}, {{ semester_list|safe }}
+        ]
+
+        var ctx1 = document.getElementById("myAreaChart1");
+        var myLineChart1 = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: {{ semester_list|safe }},
+                datasets: [{
+                    label: "CGPA",
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(78, 115, 223, 0.05)",
+                    borderColor: "rgba(78, 115, 223, 1)",
+                    pointRadius: 3,
+                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHoverRadius: 3,
+                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHitRadius: 10,
+                    pointBorderWidth: 2,
+                    data: {{ cgpa_progress_list }}
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 0,
+                        top: 25,
+                        bottom: 0
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 7
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            max: 4,
+                            padding: 10,
+                            beginAtZero: true,
+                            stepSize: 1
+                        },
+                        gridLines: {
+                            color: "rgb(234, 236, 244)",
+                            zeroLineColor: "rgb(234, 236, 244)",
+                            drawBorder: false,
+                            borderDash: [2],
+                            zeroLineBorderDash: [2]
+                        }
+                    }],
+                },
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    titleMarginBottom: 10,
+                    titleFontColor: '#6e707e',
+                    titleFontSize: 14,
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    intersect: false,
+                    mode: 'index',
+                    caretPadding: 10
+                }
+            }
+        });
+
+        var ctx2 = document.getElementById("myAreaChart2");
+        var myLineChart2 = new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: {{ semester_list|safe }},
+                datasets: [{
+                    label: "CGPA",
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(78, 115, 223, 0.05)",
+                    borderColor: "rgba(78, 115, 223, 1)",
+                    pointRadius: 3,
+                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHoverRadius: 3,
+                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHitRadius: 10,
+                    pointBorderWidth: 2,
+                    data: {{ term_gpa_list }}
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 25,
+                        top: 25,
+                        bottom: 0
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 7
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            max: 4,
+                            padding: 10,
+                            beginAtZero: true,
+                            stepSize: 1
+                        },
+                        gridLines: {
+                            color: "rgb(234, 236, 244)",
+                            zeroLineColor: "rgb(234, 236, 244)",
+                            drawBorder: false,
+                            borderDash: [2],
+                            zeroLineBorderDash: [2]
+                        }
+                    }],
+                },
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    titleMarginBottom: 10,
+                    titleFontColor: '#6e707e',
+                    titleFontSize: 14,
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    intersect: false,
+                    mode: 'index',
+                    caretPadding: 10
+                }
+            }
+        });
+
+    </script>
+
+{% endblock content %}

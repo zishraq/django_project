@@ -7,196 +7,243 @@
     {#    </div>#}
 
     <div class="container-fluid">
-{#        <div class="row fix-width">#}
+        {#        <div class="row fix-width">#}
         <div class="row">
-        <div class="col-7">
-            <div class="btn-self-design">
-                {% if portal_type == 'section_request' %}
-                    <div class="card border-left-primary shadow py-2 custom-selection-card-design">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                    Requestable Sections
+            <div class="col-7">
+                <div class="btn-self-design">
+                    {% if portal_type == 'section_request' %}
+                        <div class="card border-left-primary shadow py-2 custom-selection-card-design">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Requestable Sections
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                {% else %}
-                    <div class="row">
-                        <div class="col-3">
-                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-portal' %}?filter=recommended'">
-                                Recommended
-                            </button>
+                    {% else %}
+                        <div class="row">
+                            <div class="col-3">
+                                <button class="btn btn-outline-primary btn-block" type="submit"
+                                        onclick="location.href='{% url 'student-panel-portal' %}?filter=recommended'">
+                                    Recommended
+                                </button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-outline-primary btn-block" type="submit"
+                                        onclick="location.href='{% url 'student-panel-portal' %}?filter=retakable'">
+                                    Retakable
+                                </button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-outline-primary btn-block" type="submit"
+                                        onclick="location.href='{% url 'student-panel-portal' %}?filter=recommended'">
+                                    F-grade
+                                </button>
+                            </div>
+                            <div class="col-3">
+                                {#                             <button class="btn btn-outline-primary btn-fix-width" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=recommended'">#}
+                                <button class="btn btn-outline-primary btn-block" type="submit"
+                                        onclick="location.href='{% url 'student-panel-portal' %}?filter=recommended'">
+                                    D/D+
+                                </button>
+                            </div>
+
                         </div>
-                        <div class="col-3">
-                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-portal' %}?filter=retakable'">
-                                Retakable
-                            </button>
-                        </div>
-                        <div class="col-3">
-                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-portal' %}?filter=recommended'">
-                                F-grade
-                            </button>
-                        </div>
-                        <div class="col-3">
-{#                             <button class="btn btn-outline-primary btn-fix-width" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=recommended'">#}
-                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-portal' %}?filter=recommended'">
-                                D/D+
-                            </button>
-                        </div>
 
-                    </div>
+                    {% endif %}
+                </div>
 
-                {% endif %}
-            </div>
-
-            <div class="table-responsive card shadow custom-left-table-align">
-{#            <div class="table-responsive card shadow">#}
-                <table class="table table-striped">
-                    <tbody>
-                    <tr>
-                        <th class="col-md-1"><b>Course</b></th>
-                        <th class="col-md-1"><b>Section</b></th>
-                        <th class="col-md-1"><b>Timing</b></th>
-                        <th class="col-md-1"><b>Credits</b></th>
-                        <th class="col-md-1"><b>Department</b></th>
-                        {% if portal_type == 'course_advising' %}
-                            <th class="col-md-1"><b>Capacity</b></th>
-                        {% endif %}
-                        <th class="col-md-1"><b>Select</b></th>
-                    </tr>
-
-                    <tr>
-                        <td colspan="7" align="right">
-                            <form
-                                class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                                <div class="input-group custom-search-align">
-                                    <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                        aria-label="Search" aria-describedby="basic-addon2">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary" type="button">
-                                            <i class="fas fa-search fa-sm"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-
-                        </td>
-                    </tr>
-
-                    {% for section in sections %}
+                <div class="table-responsive card shadow custom-left-table-align">
+                    {#            <div class="table-responsive card shadow">#}
+                    <table id="myTable" class="table table-striped">
+                        <tbody>
+                        <tr>
+                            <th class="col-md-1"><b>Course</b></th>
+                            <th class="col-md-1"><b>Section</b></th>
+                            <th class="col-md-1"><b>Timing</b></th>
+                            <th class="col-md-1"><b>Credits</b></th>
+                            <th class="col-md-1"><b>Department</b></th>
+                            {% if portal_type == 'course_advising' %}
+                                <th class="col-md-1"><b>Capacity</b></th>
+                            {% endif %}
+                            <th class="col-md-1"><b>Select</b></th>
+                        </tr>
 
                         <tr>
-                            <td class="col-md-1">{{ section.course_id }}</td>
-                            <td class="col-md-1">{{ section.section_no }}</td>
-                            <td class="col-md-1"><small>{{ section.routine_id|linebreaks }}</small></td>
-                            {# <td class="col-md-1"><small><pre>{{ section.routine_id }}</pre></small></td>#}
-                            <td class="col-md-1">{{ section.credit }}</td>
-                            <td class="col-md-1">{{ section.department_name }}</td>
-
-                            {% if portal_type == 'course_advising' %}
-                                <td class="col-md-1">{{ section.total_students }} / {{ section.section_capacity }}</td>
-                            {% endif %}
-
-                            <td class="col-md-1">
-                                {% if portal_type == 'section_request' or section.total_students == section.section_capacity %}
-                                    <button class="btn btn-outline-info" type="submit" data-toggle="modal" data-target="#{{ section.section_id }}">
-                                        Request
-                                    </button>
-
-                                    <div class="modal" tabindex="-1" id="{{ section.section_id }}">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Seat Request</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form method="POST" >
-                                                        {% csrf_token %}
-                                                        <fieldset class="form-group">
-                                                            {{ form|crispy }}
-                                                            <input type="hidden" name="section" value="{{ section.section_id }}">
-
-                                                        </fieldset>
-                                                        <div class="form-group modal-footer">
-                                                            <button type="submit" class="btn btn-primary">Submit</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-
-                                            </div>
+                            <td colspan="7" align="right">
+                                <form
+                                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                                    <div class="input-group custom-search-align">
+                                        <input type="text" id="myInput" onkeyup="myFunction()"
+                                               class="form-control bg-light border-0 small" placeholder="Search for..."
+                                               aria-label="Search" aria-describedby="basic-addon2">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button">
+                                                <i class="fas fa-search fa-sm"></i>
+                                            </button>
                                         </div>
                                     </div>
+                                </form>
 
-                                {% else %}
-                                    <button class="btn btn-outline-primary font-weight-bold" type="submit" onclick="location.href='{% url 'advising-portal-select-course' section.section_id %}'">
-                                        Select
-                                    </button>
-                                {% endif %}
                             </td>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
-        <div class="col-5">
-            <div class="card border-left-primary shadow py-2 custom-selection-card-design">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            {% if portal_type == 'section_request' %}
-                                Requested Sections
-                            {% else %}
-                                Selected Courses
-                            {% endif %}
-                        </div>
-                    </div>
+                        {% for section in sections %}
+
+                            <tr>
+                                <td class="col-md-1">{{ section.course_id }}</td>
+                                <td class="col-md-1">{{ section.section_no }}</td>
+                                <td class="col-md-1"><small>{{ section.routine_id|linebreaks }}</small></td>
+                                {# <td class="col-md-1"><small><pre>{{ section.routine_id }}</pre></small></td>#}
+                                <td class="col-md-1">{{ section.credit }}</td>
+                                <td class="col-md-1">{{ section.department_name }}</td>
+
+                                {% if portal_type == 'course_advising' %}
+                                    <td class="col-md-1">{{ section.total_students }}
+                                        / {{ section.section_capacity }}</td>
+                                {% endif %}
+
+                                <td class="col-md-1">
+                                    {% if portal_type == 'section_request' or section.total_students == section.section_capacity %}
+                                        <button class="btn btn-outline-info" type="submit" data-toggle="modal"
+                                                data-target="#{{ section.section_id }}">
+                                            Request
+                                        </button>
+
+                                        <div class="modal" tabindex="-1" id="{{ section.section_id }}">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Seat Request</h5>
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                                aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form method="POST">
+                                                            {% csrf_token %}
+                                                            <fieldset class="form-group">
+                                                                {{ form|crispy }}
+                                                                <input type="hidden" name="section"
+                                                                       value="{{ section.section_id }}">
+
+                                                            </fieldset>
+                                                            <div class="form-group modal-footer">
+                                                                <button type="submit" class="btn btn-primary">Submit
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    {% else %}
+                                        <button class="btn btn-outline-primary font-weight-bold" type="submit"
+                                                onclick="location.href='{% url 'student-panel-select-course' section.section_id %}'">
+                                            Select
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="table-responsive card shadow right-table-align">
-                <table class="table table-striped">
-                    <tbody>
-                    <tr>
-                        <th class="col-md-1"><b>Course</b></th>
-                        <th class="col-md-2"><b>Section</b></th>
-                        <th class="col-md-3"><b>Timing</b></th>
-                        <th class="col-md-3"><b>Credits</b></th>
-                        <th class="col-md-3"><b>Drop</b></th>
-                    </tr>
-
-                    {% for course in selected_courses %}
-                        <tr>
-                            <td class="col-md-1">{{ course.course_code }}</td>
-                            <td class="col-md-1">{{ course.section_no }}</td>
-                            <td class="col-md-1"><small>{{ course.routine_id|linebreaks }}</small></td>
-                            {# <td class="col-md-1"><small><pre>{{ course.routine_id }}</pre></small></td>#}
-                            <td class="col-md-1">{{ course.credits }}</td>
-                            <td class="col-md-1">
+            <div class="col-5">
+                <div class="card border-left-primary shadow py-2 custom-selection-card-design">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 {% if portal_type == 'section_request' %}
-                                    <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'advising-portal-revoke-section-request' course.section_id %}'">
-                                        Revoke
-                                    </button>
+                                    Requested Sections
                                 {% else %}
-                                    <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'advising-portal-drop-course' course.section_id %}'">
-                                        Drop
-                                    </button>
+                                    Selected Courses
                                 {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                            </td>
+                <div class="table-responsive card shadow right-table-align">
+                    <table class="table table-striped">
+                        <tbody>
+                        <tr>
+                            <th class="col-md-1"><b>Course</b></th>
+                            <th class="col-md-2"><b>Section</b></th>
+                            <th class="col-md-3"><b>Timing</b></th>
+                            <th class="col-md-3"><b>Credits</b></th>
+                            <th class="col-md-3"><b>Drop</b></th>
                         </tr>
-                    {% endfor %}
 
-                    </tbody>
-                </table>
+                        {% for course in selected_courses %}
+                            <tr>
+                                <td class="col-md-1">{{ course.course_code }}</td>
+                                <td class="col-md-1">{{ course.section_no }}</td>
+                                <td class="col-md-1"><small>{{ course.routine_id|linebreaks }}</small></td>
+                                {# <td class="col-md-1"><small><pre>{{ course.routine_id }}</pre></small></td>#}
+                                <td class="col-md-1">{{ course.credits }}</td>
+                                <td class="col-md-1">
+                                    {% if portal_type == 'section_request' %}
+                                        <button class="btn btn-outline-danger" type="submit"
+                                                onclick="location.href='{% url 'student-panel-revoke-section-request' course.section_id %}'">
+                                            Revoke
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-outline-danger" type="submit"
+                                                onclick="location.href='{% url 'student-panel-drop-course' course.section_id %}'">
+                                            Drop
+                                        </button>
+                                    {% endif %}
+
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-    </div>
+
+    <script>
+        function myFunction() {
+            // Declare variables
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("myTable");
+            tr = table.getElementsByTagName("tr");
+
+            console.log(tr)
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+                if (i === 0) {
+                    continue;
+                }
+                td = tr[i].getElementsByTagName("td")[0];
+
+                {#console.log(typeof td)#}
+                console.log(td)
+                console.log(td.colSpan)
+
+                if (td && td.colSpan !== 7) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
 {% endblock content %}

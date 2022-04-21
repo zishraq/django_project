@@ -46,24 +46,31 @@ def home(request):
 
 @login_required
 def advising_portal_list_view(request):
+
     student = Student.objects.get(username_id=request.user)
 
     filter_condition = request.GET.get('filter', 'recommended')
 
     if filter_condition == 'recommended':
-        section_filter = CoursesTaken.objects.filter(
+        # get semester ids
+        get_semester_ids = Semester.objects.filter(
+            advising_status=False
+        ).values('semester_id').all()
+
+        # get previous courses
+        get_previous_selected_sections = CoursesTaken.objects.filter(
             student_id=student,
-            semester_id__in=Semester.objects.filter(
-                advising_status=False
-            ).values('semester_id').all()
+            semester_id__in=get_semester_ids
         ).values('section_id').all()
 
+        # exclude previously completed courses
         sections = Section.objects.exclude(
             course_id__in=Section.objects.filter(
-                section_id__in=section_filter
+                section_id__in=get_previous_selected_sections
             ).values('course_id').all()
         )
 
+        # exclude courses without pre-requisite completion
         sections = sections.exclude(
             course_id__in=Course.objects.filter(
                 prerequisite_course_id__in=Section.objects.exclude(
@@ -157,7 +164,7 @@ def add_course_view(request, section_id):
 
     if existence_check:
         messages.error(request, 'Section already added')
-        return redirect('advising-portal-portal')
+        return redirect('student-panel-portal')
 
     elif not existence_check:
         # Get current selected sections
@@ -170,7 +177,7 @@ def add_course_view(request, section_id):
             # Check if the course of the section is already taken
             if section.section.course == selected_course:
                 messages.error(request, 'Course already added')
-                return redirect('advising-portal-portal')
+                return redirect('student-panel-portal')
 
             routine_id = section.section.routine_id   # Get routine id of the comparing section
 
@@ -182,7 +189,7 @@ def add_course_view(request, section_id):
                 for j in selected_routine_slot_chunks:
                     if i == j:
                         messages.error(request, f'Conflicts with {section.section.course.course_code}')
-                        return redirect('advising-portal-portal')
+                        return redirect('student-panel-portal')
 
             # Check whether total credits exceed limit
             total_credits = Course.objects.filter(
@@ -194,7 +201,7 @@ def add_course_view(request, section_id):
 
             if total_credits + selected_course_credit > 12:
                 messages.error(request, f'Total credits cannot be more than 12')
-                return redirect('advising-portal-portal')
+                return redirect('student-panel-portal')
 
     # check section capacity
     if selected_section.total_students < selected_section.section_capacity:
@@ -211,7 +218,7 @@ def add_course_view(request, section_id):
     else:
         messages.error(request, 'Section is full!')
 
-    return redirect('advising-portal-portal')
+    return redirect('student-panel-portal')
 
 
 @login_required
@@ -230,7 +237,7 @@ def drop_course_view(request, section_id):
     ).delete()
 
     messages.success(request, f'Dropped Section-{selected_section.section_no} of {selected_section.course.course_code}')
-    return redirect('advising-portal-portal')
+    return redirect('student-panel-portal')
 
 
 @login_required
@@ -327,7 +334,7 @@ def request_section(request, section_id, reason):
 
     if existence_check:
         messages.error(request, 'Already requested for this Section')
-        return redirect('advising-portal-request-section-list-view')
+        return redirect('student-panel-request-section-list-view')
 
     elif not existence_check:
         # Get current selected sections
@@ -340,7 +347,7 @@ def request_section(request, section_id, reason):
             # Check if the course of the section is already taken
             if section.section.course == selected_course:
                 messages.error(request, 'Already requested for this Course')
-                return redirect('advising-portal-request-section-list-view')
+                return redirect('student-panel-request-section-list-view')
 
             routine_id = section.section.routine_id   # Get routine id of the comparing section
 
@@ -352,7 +359,7 @@ def request_section(request, section_id, reason):
                 for j in selected_routine_slot_chunks:
                     if i == j:
                         messages.error(request, f'Conflicts with {section.section.course.course_code}')
-                        return redirect('advising-portal-request-section-list-view')
+                        return redirect('student-panel-request-section-list-view')
 
             # Check whether total credits exceed limit
             total_credits = Course.objects.filter(
@@ -366,7 +373,7 @@ def request_section(request, section_id, reason):
 
             if total_credits + selected_course_credit > credit_limit:
                 messages.error(request, f'Cannot request for more than {credit_limit} credits')
-                return redirect('advising-portal-request-section-list-view')
+                return redirect('student-panel-request-section-list-view')
 
     # check section capacity
     sections_requested = SectionsRequested(
@@ -377,7 +384,7 @@ def request_section(request, section_id, reason):
     )
     sections_requested.save()
     messages.success(request, f'Successfully requested for Section-{requested_section.section_no} of {requested_section.course.course_code}')
-    return redirect('advising-portal-request-section-list-view')
+    return redirect('student-panel-request-section-list-view')
 
 
 @login_required
@@ -393,7 +400,7 @@ def revoke_section_request_view(request, section_id):
     ).delete()
 
     messages.success(request, f'Request removed for Section-{selected_section.section_no} of {selected_section.course.course_code}')
-    return redirect('advising-portal-request-section-list-view')
+    return redirect('student-panel-request-section-list-view')
 
 
 @login_required
@@ -406,6 +413,9 @@ def view_grade_report(request):
     ).all()
 
     courses_by_semesters = {}
+    cgpa_progress_list = []
+    term_gpa_list = []
+    semesters_list = []
 
     total_cgpa = 0
     total_credit = 0
@@ -457,6 +467,10 @@ def view_grade_report(request):
         semester['term_gpa'] = semester['term_gpa'] / semester['total_credit']
         semester['term_gpa'] = round(semester['term_gpa'], 2)
 
+        cgpa_progress_list.append(semester['current_cgpa'])
+        term_gpa_list.append(semester['term_gpa'])
+        semesters_list.append(semester['semester_name'])
+
     if total_credit != 0:
         cgpa = total_cgpa / total_credit
         cgpa = round(cgpa, 2)
@@ -466,7 +480,10 @@ def view_grade_report(request):
 
     context = {
         'cgpa': cgpa,
-        'courses_by_semesters': courses_by_semesters
+        'courses_by_semesters': courses_by_semesters,
+        'semester_list': semesters_list,
+        'cgpa_progress_list': cgpa_progress_list,
+        'term_gpa_list': term_gpa_list
     }
 
-    return render(request, 'advising_portal/grading_report_test.html', context)
+    return render(request, 'advising_portal/grading_report.html', context)
