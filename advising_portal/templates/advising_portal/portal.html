@@ -12,7 +12,7 @@
         <div class="col-7">
             <div class="btn-self-design">
                 {% if portal_type == 'section_request' %}
-                    <div class="card border-left-primary shadow py-2 selection_card_design">
+                    <div class="card border-left-primary shadow py-2 custom-selection-card-design">
                         <div class="card-body">
                             <div class="row no-gutters align-items-center">
                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
@@ -25,23 +25,23 @@
                 {% else %}
                     <div class="row">
                         <div class="col-3">
-                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=recommended'">
+                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-portal' %}?filter=recommended'">
                                 Recommended
                             </button>
                         </div>
                         <div class="col-3">
-                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=retakable'">
+                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-portal' %}?filter=retakable'">
                                 Retakable
                             </button>
                         </div>
                         <div class="col-3">
-                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=recommended'">
+                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-portal' %}?filter=recommended'">
                                 F-grade
                             </button>
                         </div>
                         <div class="col-3">
 {#                             <button class="btn btn-outline-primary btn-fix-width" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=recommended'">#}
-                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=recommended'">
+                             <button class="btn btn-outline-primary btn-block" type="submit" onclick="location.href='{% url 'advising-portal-portal' %}?filter=recommended'">
                                 D/D+
                             </button>
                         </div>
@@ -51,7 +51,7 @@
                 {% endif %}
             </div>
 
-            <div class="table-responsive card shadow left-table-align">
+            <div class="table-responsive card shadow custom-left-table-align">
 {#            <div class="table-responsive card shadow">#}
                 <table class="table table-striped">
                     <tbody>
@@ -65,6 +65,24 @@
                             <th class="col-md-1"><b>Capacity</b></th>
                         {% endif %}
                         <th class="col-md-1"><b>Select</b></th>
+                    </tr>
+
+                    <tr>
+                        <td colspan="7" align="right">
+                            <form
+                                class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                                <div class="input-group custom-search-align">
+                                    <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                                        aria-label="Search" aria-describedby="basic-addon2">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button">
+                                            <i class="fas fa-search fa-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </td>
                     </tr>
 
                     {% for section in sections %}
@@ -128,7 +146,7 @@
         </div>
 
         <div class="col-5">
-            <div class="card border-left-primary shadow py-2 selection_card_design">
+            <div class="card border-left-primary shadow py-2 custom-selection-card-design">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">

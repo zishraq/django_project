@@ -40,6 +40,11 @@ def format_routine(routine_id):
 
 
 @login_required
+def home(request):
+    return render(request, 'advising_portal/student_base.html')
+
+
+@login_required
 def advising_portal_list_view(request):
     student = Student.objects.get(username_id=request.user)
 
@@ -152,7 +157,7 @@ def add_course_view(request, section_id):
 
     if existence_check:
         messages.error(request, 'Section already added')
-        return redirect('advising-portal-home')
+        return redirect('advising-portal-portal')
 
     elif not existence_check:
         # Get current selected sections
@@ -165,7 +170,7 @@ def add_course_view(request, section_id):
             # Check if the course of the section is already taken
             if section.section.course == selected_course:
                 messages.error(request, 'Course already added')
-                return redirect('advising-portal-home')
+                return redirect('advising-portal-portal')
 
             routine_id = section.section.routine_id   # Get routine id of the comparing section
 
@@ -177,7 +182,7 @@ def add_course_view(request, section_id):
                 for j in selected_routine_slot_chunks:
                     if i == j:
                         messages.error(request, f'Conflicts with {section.section.course.course_code}')
-                        return redirect('advising-portal-home')
+                        return redirect('advising-portal-portal')
 
             # Check whether total credits exceed limit
             total_credits = Course.objects.filter(
@@ -189,7 +194,7 @@ def add_course_view(request, section_id):
 
             if total_credits + selected_course_credit > 12:
                 messages.error(request, f'Total credits cannot be more than 12')
-                return redirect('advising-portal-home')
+                return redirect('advising-portal-portal')
 
     # check section capacity
     if selected_section.total_students < selected_section.section_capacity:
@@ -206,7 +211,7 @@ def add_course_view(request, section_id):
     else:
         messages.error(request, 'Section is full!')
 
-    return redirect('advising-portal-home')
+    return redirect('advising-portal-portal')
 
 
 @login_required
@@ -225,7 +230,7 @@ def drop_course_view(request, section_id):
     ).delete()
 
     messages.success(request, f'Dropped Section-{selected_section.section_no} of {selected_section.course.course_code}')
-    return redirect('advising-portal-home')
+    return redirect('advising-portal-portal')
 
 
 @login_required

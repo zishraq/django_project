@@ -1,15 +1,19 @@
-.selection_card_design {
+.custom-selection-card-design {
   height: 38px;
   justify-content: end;
   font-size: 1rem;
 }
 
-.fix-width {
+.custom-search-align {
+    padding-right: 13px;
+}
+
+.custom-fix-width {
     width: 1300px;
     margin: 0 auto;
 }
 
-.left-table-align {
+.custom-left-table-align {
     /*max-height: 500px;*/
     margin-top: 40px;
 }
@@ -24,19 +28,19 @@
     height: 50px;
 }
 
-.left-table-align th {
+.custom-left-table-align th {
   background-color: #4e73df;
   /*background-color: #e3f2fd;*/
   color: #ffffff;
   /*color: #000000b5;*/
 }
 
-.left-table-align td {
+.custom-left-table-align td {
     color: rgba(0, 0, 0, 0.58);
     font-weight: bold;
 }
 
-.left-table-align td small {
+.custom-left-table-align td small {
     color: rgba(0, 0, 0, 0.58);
     font-weight: bold;
 }

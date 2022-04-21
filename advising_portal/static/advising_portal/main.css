@@ -8,12 +8,12 @@ body {
 /*    width: 1400px;*/
 /*}*/
 
-.fix-width {
+.custom-fix-width {
     width: 1300px;
     margin: 0 auto;
 }
 
-.left-table-align {
+.custom-left-table-align {
     /*max-height: 500px;*/
     margin-top: 40px;
 }
