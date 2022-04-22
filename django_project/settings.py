@@ -133,5 +133,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-LOGIN_REDIRECT_URL = 'advising-portal-home'
+LOGIN_REDIRECT_URL = 'student-panel-home'
 LOGIN_URL = 'login'

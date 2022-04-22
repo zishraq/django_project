@@ -26,26 +26,26 @@
                         <div class="row">
                             <div class="col-3">
                                 <button class="btn btn-outline-primary btn-block" type="submit"
-                                        onclick="location.href='{% url 'student-panel-portal' %}?filter=recommended'">
+                                        onclick="location.href='{% url 'student-panel-portal' 'recommended' %}'">
                                     Recommended
                                 </button>
                             </div>
                             <div class="col-3">
                                 <button class="btn btn-outline-primary btn-block" type="submit"
-                                        onclick="location.href='{% url 'student-panel-portal' %}?filter=retakable'">
+                                        onclick="location.href='{% url 'student-panel-portal' 'retakable' %}'">
                                     Retakable
                                 </button>
                             </div>
                             <div class="col-3">
                                 <button class="btn btn-outline-primary btn-block" type="submit"
-                                        onclick="location.href='{% url 'student-panel-portal' %}?filter=recommended'">
+                                        onclick="location.href='{% url 'student-panel-portal' 'recommended' %}">
                                     F-grade
                                 </button>
                             </div>
                             <div class="col-3">
                                 {#                             <button class="btn btn-outline-primary btn-fix-width" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=recommended'">#}
                                 <button class="btn btn-outline-primary btn-block" type="submit"
-                                        onclick="location.href='{% url 'student-panel-portal' %}?filter=recommended'">
+                                        onclick="location.href='{% url 'student-panel-portal' 'recommended' %}">
                                     D/D+
                                 </button>
                             </div>

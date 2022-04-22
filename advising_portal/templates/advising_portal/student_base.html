@@ -42,7 +42,7 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'student-panel-portal' %}">
+                <a class="nav-link" href="{% url 'student-panel-portal' 'recommended' %}">
 {#                    <i class="fas fa-fw fa-tachometer-alt"></i>#}
                     Advising
                 </a>
@@ -110,6 +110,7 @@
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button">
                                                 <i class="fas fa-search fa-sm"></i>
+                                                <i class="fas fa-search fa-sm"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -176,7 +177,7 @@
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ user.student.name }}</span>
                                 <img class="img-profile rounded-circle"
-                                    src="img/undraw_profile.svg">
+                                    src="{% static 'advising_portal/img/undraw_profile.svg' %}">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"

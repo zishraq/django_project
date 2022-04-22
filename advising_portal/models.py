@@ -24,11 +24,12 @@ class Course(models.Model):
 class Semester(models.Model):
     semester_id = models.IntegerField(primary_key=True)
     semester_name = models.TextField()
-    semester_starts_on = models.DateField()
-    semester_ends_on = models.DateField()
+    semester_starts_at = models.DateField()
+    semester_ends_at = models.DateField()
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     advising_status = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.advising_status:

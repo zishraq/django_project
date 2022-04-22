@@ -110,10 +110,6 @@
 
         // Area Chart Example
 
-        var graphs = [
-            {{ semester_list|safe }}, {{ semester_list|safe }}
-        ]
-
         var ctx1 = document.getElementById("myAreaChart1");
         var myLineChart1 = new Chart(ctx1, {
             type: 'line',
@@ -133,6 +129,7 @@
                     pointHitRadius: 10,
                     pointBorderWidth: 2,
                     data: {{ cgpa_progress_list }}
+                    {#data: [2.73, 2.53, 2.48, 2.53, 2.56, 2.87, 2.94, 3.01]#}
                 }],
             },
             options: {
@@ -198,7 +195,7 @@
             data: {
                 labels: {{ semester_list|safe }},
                 datasets: [{
-                    label: "CGPA",
+                    label: "Term GPA",
                     lineTension: 0.3,
                     backgroundColor: "rgba(78, 115, 223, 0.05)",
                     borderColor: "rgba(78, 115, 223, 1)",
@@ -211,6 +208,7 @@
                     pointHitRadius: 10,
                     pointBorderWidth: 2,
                     data: {{ term_gpa_list }}
+                    {#data: [2.73, 2.3, 2.39, 2.69, 2.66, 3.47, 3.29, 3.41]#}
                 }],
             },
             options: {

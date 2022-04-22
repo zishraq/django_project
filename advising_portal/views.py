@@ -12,6 +12,8 @@ from advising_portal.models import Course, Section, CoursesTaken, Semester, Stud
     SectionsRequested, Grade
 from django.contrib.auth.decorators import login_required
 
+from users.decorators import allowed_users
+
 
 def format_routine(routine_id):
     get_time_slots = Routine.objects.filter(
@@ -40,19 +42,31 @@ def format_routine(routine_id):
     return routine_str
 
 
+def get_referer_parameter(request):
+    referer = str(request.META.get('HTTP_REFERER'))
+    split_referer = referer.split('/')
+    referer_parameter = split_referer[-1]
+
+    if not referer_parameter:
+        referer_parameter = split_referer[-2]
+
+    return referer_parameter
+
 @login_required
 def home(request):
     return render(request, 'advising_portal/student_base.html')
 
 
 @login_required
-def advising_portal_list_view(request):
+def advising_portal_list_view(request, section_filter):
+    print(request.user.groups.all())
 
     student = Student.objects.get(username_id=request.user)
 
-    filter_condition = request.GET.get('filter', 'recommended')
+    if section_filter not in ['recommended', 'retakable']:
+        section_filter = 'recommended'
 
-    if filter_condition == 'recommended':
+    if section_filter == 'recommended':
         ### Get all sections of courses which are not completed
         # get semester ids
         get_semester_ids = Semester.objects.filter(
@@ -144,6 +158,8 @@ def advising_portal_list_view(request):
 
 @login_required
 def add_course_view(request, section_id):
+    referer_parameter = get_referer_parameter(request)
+
     current_semester = Semester.objects.get(advising_status=True)   # get current semester
     student = Student.objects.get(username_id=request.user)   # get User's student info
     selected_section = Section.objects.get(section_id=section_id)   # get selected section data
@@ -162,7 +178,7 @@ def add_course_view(request, section_id):
 
     if existence_check:
         messages.error(request, 'Section already added')
-        return redirect('student-panel-portal')
+        return redirect('student-panel-portal', referer_parameter)
 
     elif not existence_check:
         # Get current selected sections
@@ -175,7 +191,7 @@ def add_course_view(request, section_id):
             # Check if the course of the section is already taken
             if section.section.course == selected_course:
                 messages.error(request, 'Course already added')
-                return redirect('student-panel-portal')
+                return redirect('student-panel-portal', referer_parameter)
 
             routine_id = section.section.routine_id   # Get routine id of the comparing section
 
@@ -187,7 +203,7 @@ def add_course_view(request, section_id):
                 for j in selected_routine_slot_chunks:
                     if i == j:
                         messages.error(request, f'Conflicts with {section.section.course.course_code}')
-                        return redirect('student-panel-portal')
+                        return redirect('student-panel-portal', referer_parameter)
 
             # Check whether total credits exceed limit
             total_credits = Course.objects.filter(
@@ -199,7 +215,7 @@ def add_course_view(request, section_id):
 
             if total_credits + selected_course_credit > 12:
                 messages.error(request, f'Total credits cannot be more than 12')
-                return redirect('student-panel-portal')
+                return redirect('student-panel-portal', referer_parameter)
 
     # check section capacity
     if selected_section.total_students < selected_section.section_capacity:
@@ -216,11 +232,13 @@ def add_course_view(request, section_id):
     else:
         messages.error(request, 'Section is full!')
 
-    return redirect('student-panel-portal')
+    return redirect('student-panel-portal', referer_parameter)
 
 
 @login_required
 def drop_course_view(request, section_id):
+    referer_parameter = get_referer_parameter(request)
+
     current_semester_id = Semester.objects.get(advising_status=True).semester_id
     student_id = Student.objects.get(username_id=request.user).student_id
     selected_section = Section.objects.get(section_id=section_id)
@@ -235,7 +253,7 @@ def drop_course_view(request, section_id):
     ).delete()
 
     messages.success(request, f'Dropped Section-{selected_section.section_no} of {selected_section.course.course_code}')
-    return redirect('student-panel-portal')
+    return redirect('student-panel-portal', referer_parameter)
 
 
 @login_required
@@ -498,3 +516,26 @@ def view_grade_report(request):
     }
 
     return render(request, 'advising_portal/grading_report.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty'])
+def courses_list_view(request):
+    courses = Course.objects.all()
+    course_list = []
+
+    for course in courses:
+        formatted_data = {
+            'course_code': course.course_code,
+            'course_title': course.course_title,
+            'credit': course.credit,
+            'department': course.department.department_name,
+            'prerequisite_course': course.prerequisite_course.course_code if course.prerequisite_course else '',
+        }
+        course_list.append(formatted_data)
+
+    context = {
+        'courses': course_list
+    }
+
+    return render(request, 'advising_portal/courses.html', context)
