@@ -32,6 +32,40 @@
 
     </div>
 
+    <div class="row">
+
+        <div class="col-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Grade Frequency</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-bar">
+                        <canvas id="myBarChart"></canvas>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Grade Percentage</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-pie pt-4">
+                        <canvas id="myPieChart"></canvas>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
     {% for semester, value in courses_by_semesters.items %}
         <div class="card shadow p-3 mb-3 mt-3" align="left">
             <h2>{{ value.semester_name }}</h2>
@@ -65,7 +99,6 @@
                 </tbody>
             </table>
         </div>
-
 
     {% endfor %}
 
@@ -236,6 +269,91 @@
                 }
             }
         });
+
+        var ctx3 = document.getElementById("myBarChart");
+        var myBarChart = new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: {{ grades|safe }},
+                datasets: [{
+                    label: "Grade Frequency",
+                    backgroundColor: "#4e73df",
+                    hoverBackgroundColor: "#2e59d9",
+                    borderColor: "#4e73df",
+                    data: {{ grade_frequency }},
+                    maxBarThickness: 25
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 25,
+                        top: 25,
+                        bottom: 0
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            display: false,
+                            drawBorder: false
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            min: 0,
+                            max: {{ maximum_grade_frequency }},
+                        },
+                        gridLines: {
+                            color: "rgb(234, 236, 244)",
+                            zeroLineColor: "rgb(234, 236, 244)",
+                            drawBorder: false,
+                            borderDash: [2],
+                            zeroLineBorderDash: [2]
+                        }
+                    }],
+                },
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    titleMarginBottom: 10,
+                    titleFontColor: '#6e707e',
+                    titleFontSize: 14,
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    caretPadding: 10
+                },
+            }
+        });
+
+        var ctx4 = document.getElementById("myPieChart");
+        var myPieChart = new Chart(ctx4, {
+            type: 'pie',
+            data: {
+                labels: {{ grades|safe }},
+                datasets: [{
+                    data: {{ grade_frequency }},
+                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', 'rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)', '#FF6347', '#800080', ''],
+                    hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                legend: {
+                    display: true
+                }
+            },
+        });
+
 
     </script>
 

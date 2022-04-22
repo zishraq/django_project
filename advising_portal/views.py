@@ -8,7 +8,8 @@ from django.http import HttpResponse
 from django.contrib import messages
 
 from advising_portal.forms import SectionRequestForm
-from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, Routine, TimeSlot, WeekSlot, SectionsRequested
+from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, Routine, TimeSlot, WeekSlot, \
+    SectionsRequested, Grade
 from django.contrib.auth.decorators import login_required
 
 
@@ -52,6 +53,7 @@ def advising_portal_list_view(request):
     filter_condition = request.GET.get('filter', 'recommended')
 
     if filter_condition == 'recommended':
+        ### Get all sections of courses which are not completed
         # get semester ids
         get_semester_ids = Semester.objects.filter(
             advising_status=False
@@ -70,16 +72,12 @@ def advising_portal_list_view(request):
             ).values('course_id').all()
         )
 
-        # exclude courses without pre-requisite completion
+        ### exclude courses without pre-requisite completion
+
         sections = sections.exclude(
             course_id__in=Course.objects.filter(
                 prerequisite_course_id__in=Section.objects.exclude(
-                    section_id__in=CoursesTaken.objects.filter(
-                        student_id=student,
-                        semester_id__in=Semester.objects.filter(
-                            advising_status=False
-                        ).values('semester_id').all()
-                    ).values('section_id').all()
+                    section_id__in=get_previous_selected_sections
                 ).values('course_id').all()
             ).values('course_id').all()
         ).order_by('course__course_code')
@@ -420,6 +418,12 @@ def view_grade_report(request):
     total_cgpa = 0
     total_credit = 0
 
+    grades = list(Grade.objects.all().values('grade').distinct().order_by('-grade_point'))
+
+    grade_frequency = {
+        grade['grade']: 0 for grade in grades
+    }
+
     for course in courses_taken:
         total_cgpa += (course.grade.grade_point * course.section.course.credit)
         total_credit += course.section.course.credit
@@ -471,6 +475,10 @@ def view_grade_report(request):
         term_gpa_list.append(semester['term_gpa'])
         semesters_list.append(semester['semester_name'])
 
+    for semester in courses_by_semesters.values():
+        for course in semester['courses']:
+            grade_frequency[course['grade']] += 1
+
     if total_credit != 0:
         cgpa = total_cgpa / total_credit
         cgpa = round(cgpa, 2)
@@ -483,7 +491,10 @@ def view_grade_report(request):
         'courses_by_semesters': courses_by_semesters,
         'semester_list': semesters_list,
         'cgpa_progress_list': cgpa_progress_list,
-        'term_gpa_list': term_gpa_list
+        'term_gpa_list': term_gpa_list,
+        'grades': list(grade_frequency.keys()),
+        'grade_frequency': list(grade_frequency.values()),
+        'maximum_grade_frequency': max(list(grade_frequency.values())) + 3
     }
 
     return render(request, 'advising_portal/grading_report.html', context)
