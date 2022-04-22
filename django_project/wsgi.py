@@ -18,9 +18,25 @@ application = get_wsgi_application()
 
 if __name__ == '__main__':
     from advising_portal.models import WeekSlot, TimeSlot, Routine, Department, Course, Faculty, Section, Student, Semester, Grade, CoursesTaken
-    from django.contrib.auth.models import User
+    from django.contrib.auth.models import User, Group
     import datetime
     from django.utils import timezone
+
+    groups = [
+        {
+            'name': 'student',
+        },
+        {
+            'name': 'faculty',
+        },
+        {
+            'name': 'chairman',
+        }
+    ]
+
+    for g in groups:
+        group = Group.objects.create(**g)
+        group.save()
 
     users = [
         {
