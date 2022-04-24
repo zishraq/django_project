@@ -7,6 +7,52 @@ from django.utils import timezone
 
 
 if __name__ == '__main__':
+    from advising_portal.models import WeekSlot, TimeSlot, Routine, Department, Course, Faculty, Section, Student, Semester, Grade, CoursesTaken
+    from django.contrib.auth.models import User, Group
+    import datetime
+    from django.utils import timezone
+
+    groups = [
+        {
+            'name': 'student',
+        },
+        {
+            'name': 'faculty',
+        },
+        {
+            'name': 'chairman',
+        }
+    ]
+
+    for g in groups:
+        group = Group.objects.create(**g)
+        group.save()
+
+    users = [
+        {
+            'username': 'admin',
+            'password': 'admin',
+            'is_superuser': True,
+            'is_staff': True
+        },
+        {
+            'username': '2020-1-65-001',
+            'password': '123456Seven',
+        },
+        {
+            'username': 'amit',
+            'password': '123456Seven',
+        },
+        {
+            'username': 'tuhin',
+            'password': '123456Seven',
+        }
+    ]
+
+    for u in users:
+        user = User.objects.create_user(**u)
+        user.save()
+
     departments = [
         {
             'department_id': 'CSE',
@@ -30,8 +76,8 @@ if __name__ == '__main__':
         {
             'semester_id': 1,
             'semester_name': 'Summer 2019',
-            'semester_starts_on': datetime.datetime(year=2019, month=5, day=4),
-            'semester_ends_on': datetime.datetime(year=2019, month=8, day=18),
+            'semester_starts_at': datetime.datetime(year=2019, month=5, day=4),
+            'semester_ends_at': datetime.datetime(year=2019, month=8, day=18),
             'created_at': timezone.now(),
             'created_by_id': User.objects.get(username='admin').pk,
             'advising_status': False
@@ -39,8 +85,8 @@ if __name__ == '__main__':
         {
             'semester_id': 2,
             'semester_name': 'Fall 2019',
-            'semester_starts_on': datetime.datetime(year=2019, month=9, day=1),
-            'semester_ends_on': datetime.datetime(year=2019, month=12, day=17),
+            'semester_starts_at': datetime.datetime(year=2019, month=9, day=1),
+            'semester_ends_at': datetime.datetime(year=2019, month=12, day=17),
             'created_at': timezone.now(),
             'created_by_id': User.objects.get(username='admin').pk,
             'advising_status': False
@@ -48,8 +94,8 @@ if __name__ == '__main__':
         {
             'semester_id': 3,
             'semester_name': 'Spring 2020',
-            'semester_starts_on': datetime.datetime(year=2020, month=1, day=3),
-            'semester_ends_on': datetime.datetime(year=2020, month=4, day=20),
+            'semester_starts_at': datetime.datetime(year=2020, month=1, day=3),
+            'semester_ends_at': datetime.datetime(year=2020, month=4, day=20),
             'created_at': timezone.now(),
             'created_by_id': User.objects.get(username='admin').pk,
             'advising_status': False
@@ -57,8 +103,8 @@ if __name__ == '__main__':
         {
             'semester_id': 4,
             'semester_name': 'Summer 2020',
-            'semester_starts_on': datetime.datetime(year=2020, month=5, day=7),
-            'semester_ends_on': datetime.datetime(year=2020, month=8, day=15),
+            'semester_starts_at': datetime.datetime(year=2020, month=5, day=7),
+            'semester_ends_at': datetime.datetime(year=2020, month=8, day=15),
             'created_at': timezone.now(),
             'created_by_id': User.objects.get(username='admin').pk,
             'advising_status': False
@@ -66,8 +112,8 @@ if __name__ == '__main__':
         {
             'semester_id': 5,
             'semester_name': 'Fall 2020',
-            'semester_starts_on': datetime.datetime(year=2020, month=9, day=6),
-            'semester_ends_on': datetime.datetime(year=2020, month=12, day=17),
+            'semester_starts_at': datetime.datetime(year=2020, month=9, day=6),
+            'semester_ends_at': datetime.datetime(year=2020, month=12, day=17),
             'created_at': timezone.now(),
             'created_by_id': User.objects.get(username='admin').pk,
             'advising_status': False
@@ -75,8 +121,8 @@ if __name__ == '__main__':
         {
             'semester_id': 6,
             'semester_name': 'Spring 2021',
-            'semester_starts_on': datetime.datetime(year=2021, month=1, day=9),
-            'semester_ends_on': datetime.datetime(year=2021, month=4, day=19),
+            'semester_starts_at': datetime.datetime(year=2021, month=1, day=9),
+            'semester_ends_at': datetime.datetime(year=2021, month=4, day=19),
             'created_at': timezone.now(),
             'created_by_id': User.objects.get(username='admin').pk,
             'advising_status': False
@@ -84,8 +130,8 @@ if __name__ == '__main__':
         {
             'semester_id': 7,
             'semester_name': 'Summer 2021',
-            'semester_starts_on': datetime.datetime(year=2021, month=5, day=12),
-            'semester_ends_on': datetime.datetime(year=2021, month=8, day=24),
+            'semester_starts_at': datetime.datetime(year=2021, month=5, day=12),
+            'semester_ends_at': datetime.datetime(year=2021, month=8, day=24),
             'created_at': timezone.now(),
             'created_by_id': User.objects.get(username='admin').pk,
             'advising_status': False
@@ -93,8 +139,8 @@ if __name__ == '__main__':
         {
             'semester_id': 8,
             'semester_name': 'Fall 2021',
-            'semester_starts_on': datetime.datetime(year=2021, month=9, day=9),
-            'semester_ends_on': datetime.datetime(year=2021, month=12, day=19),
+            'semester_starts_at': datetime.datetime(year=2021, month=9, day=9),
+            'semester_ends_at': datetime.datetime(year=2021, month=12, day=19),
             'created_at': timezone.now(),
             'created_by_id': User.objects.get(username='admin').pk,
             'advising_status': False
@@ -102,11 +148,12 @@ if __name__ == '__main__':
         {
             'semester_id': 9,
             'semester_name': 'Spring 2022',
-            'semester_starts_on': datetime.datetime(year=2022, month=2, day=6),
-            'semester_ends_on': datetime.datetime(year=2022, month=5, day=18),
+            'semester_starts_at': datetime.datetime(year=2022, month=2, day=6),
+            'semester_ends_at': datetime.datetime(year=2022, month=5, day=18),
             'created_at': timezone.now(),
             'created_by_id': User.objects.get(username='admin').pk,
-            'advising_status': True
+            'advising_status': True,
+            'is_active': True
         },
     ]
 
@@ -274,6 +321,15 @@ if __name__ == '__main__':
             'course_title': 'Engineering Physics-I (Introductory Classical Physics)',
             'department_id': Department.objects.get(pk='GEN').pk,
             'prerequisite_course_id': 'MAT205',
+            'credit': 4,
+            'created_by_id': User.objects.get(username='admin').pk
+        },
+        {
+            'course_id': 'CSE207',
+            'course_code': 'CSE207',
+            'course_title': 'Data Structures',
+            'department_id': Department.objects.get(pk='CSE').pk,
+            'prerequisite_course_id': "CSE110",
             'credit': 4,
             'created_by_id': User.objects.get(username='admin').pk
         },
@@ -1252,19 +1308,38 @@ if __name__ == '__main__':
     students = [
         {
             'student_id': '2019-2-60-022',
-            'name': 'Alex Steiner',
+            'name': 'Zuhair Ishraq Zareef',
             'advisor_id': Faculty.objects.get(faculty_id='AKD').pk,
-            'username_id': User.objects.get(username='alex').pk
         },
         {
-            'student_id': '2019-2-60-021',
-            'name': 'Zuhair Ishraq Zareef',
+            'student_id': '2019-2-60-015',
+            'name': 'Nusrat Maisha',
             'advisor_id': Faculty.objects.get(faculty_id='RDA').pk,
-            'username_id': User.objects.get(username='ishraq').pk
+        },
+        {
+            'student_id': '2019-2-60-025',
+            'name': 'Md. Tanvir Mobasshir',
+            'advisor_id': Faculty.objects.get(faculty_id='RDA').pk
+        },
+        {
+            'student_id': '2018-2-60-127',
+            'name': 'A. K. M. Sadat',
+            'advisor_id': Faculty.objects.get(faculty_id='RDA').pk
+        },
+        {
+            'student_id': '2020-1-60-226',
+            'name': 'Sofia Noor Rafa',
+            'advisor_id': Faculty.objects.get(faculty_id='RDA').pk,
+        },
+        {
+            'student_id': '2020-1-65-001',
+            'name': 'Komol Kunty Rajib',
+            'advisor_id': Faculty.objects.get(faculty_id='RDA').pk,
+            'username_id': User.objects.get(username='2020-1-65-001').pk
         },
         {
             'student_id': 'admin',
-            'name': 'Zuhair Ishraq Zareef',
+            'name': 'admin',
             'advisor_id': Faculty.objects.get(faculty_id='admin').pk,
             'username_id': User.objects.get(username='admin').pk
         }
@@ -1347,165 +1422,334 @@ if __name__ == '__main__':
             'maximum': 60,
             'minimum': 0,
         },
+        {
+            'grade': 'W',
+            'grade_point': 0.0,
+            'maximum': 0,
+            'minimum': 0,
+        },
+        {
+            'grade': 'R',
+            'grade_point': 0.0,
+            'maximum': 0,
+            'minimum': 0,
+        }
     ]
 
     for grade in grades:
         g = Grade(**grade)
         g.save()
 
-    grade_reports = [
+    grade_reports1 = [
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=1),
             'section': Section.objects.get(section_id='CSE1031'),
             'grade': Grade.objects.get(grade='A-')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=1),
             'section': Section.objects.get(section_id='ENG1011'),
             'grade': Grade.objects.get(grade='A')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=1),
             'section': Section.objects.get(section_id='MAT1011'),
             'grade': Grade.objects.get(grade='C+')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=2),
             'section': Section.objects.get(section_id='CSE1061'),
             'grade': Grade.objects.get(grade='B')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=2),
             'section': Section.objects.get(section_id='ENG1021'),
             'grade': Grade.objects.get(grade='A-')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=2),
             'section': Section.objects.get(section_id='MAT1021'),
             'grade': Grade.objects.get(grade='B')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=3),
             'section': Section.objects.get(section_id='CSE1101'),
             'grade': Grade.objects.get(grade='B+')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=3),
             'section': Section.objects.get(section_id='MAT1041'),
             'grade': Grade.objects.get(grade='D+')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=3),
             'section': Section.objects.get(section_id='CHE1091'),
             'grade': Grade.objects.get(grade='C+')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=4),
             'section': Section.objects.get(section_id='CSE2091'),
             'grade': Grade.objects.get(grade='A-')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=4),
             'section': Section.objects.get(section_id='GEN2261'),
             'grade': Grade.objects.get(grade='B')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=4),
             'section': Section.objects.get(section_id='ECO1011'),
             'grade': Grade.objects.get(grade='A-')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=5),
             'section': Section.objects.get(section_id='CSE2511'),
             'grade': Grade.objects.get(grade='B')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=5),
             'section': Section.objects.get(section_id='STA1021'),
             'grade': Grade.objects.get(grade='B-')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=5),
             'section': Section.objects.get(section_id='PHY1091'),
             'grade': Grade.objects.get(grade='C-')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=6),
             'section': Section.objects.get(section_id='CSE2071'),
             'grade': Grade.objects.get(grade='B+')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=6),
             'section': Section.objects.get(section_id='BUS2311'),
             'grade': Grade.objects.get(grade='A')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=6),
             'section': Section.objects.get(section_id='MAT2051'),
             'grade': Grade.objects.get(grade='B')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=7),
             'section': Section.objects.get(section_id='CSE2461'),
             'grade': Grade.objects.get(grade='A-')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=7),
             'section': Section.objects.get(section_id='CSE3251'),
             'grade': Grade.objects.get(grade='B')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=7),
             'section': Section.objects.get(section_id='PHY2091'),
             'grade': Grade.objects.get(grade='B+')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=8),
             'section': Section.objects.get(section_id='CSE2001'),
             'grade': Grade.objects.get(grade='B+')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=8),
             'section': Section.objects.get(section_id='CSE3021'),
             'grade': Grade.objects.get(grade='B')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=8),
             'section': Section.objects.get(section_id='CSE3451'),
             'grade': Grade.objects.get(grade='B-')
         },
         {
-            'student': Student.objects.get(student_id='2019-2-60-022'),
+            'student': Student.objects.get(student_id='2020-1-65-001'),
             'semester': Semester.objects.get(semester_id=8),
             'section': Section.objects.get(section_id='CSE3601'),
             'grade': Grade.objects.get(grade='C')
         }
     ]
 
-    for grade_report in grade_reports:
+    for grade_report in grade_reports1:
+        c = CoursesTaken(**grade_report)
+        c.save()
+
+    grade_reports2 = [
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=1),
+        'section': Section.objects.get(section_id='CSE1031'),
+        'grade': Grade.objects.get(grade='C-')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=1),
+        'section': Section.objects.get(section_id='ENG1011'),
+        'grade': Grade.objects.get(grade='A')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=1),
+        'section': Section.objects.get(section_id='MAT1011'),
+        'grade': Grade.objects.get(grade='B')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=2),
+        'section': Section.objects.get(section_id='CSE1061'),
+        'grade': Grade.objects.get(grade='C+')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=2),
+        'section': Section.objects.get(section_id='ENG1021'),
+        'grade': Grade.objects.get(grade='B+')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=2),
+        'section': Section.objects.get(section_id='MAT1021'),
+        'grade': Grade.objects.get(grade='D+')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=3),
+        'section': Section.objects.get(section_id='CSE1101'),
+        'grade': Grade.objects.get(grade='A-')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=3),
+        'section': Section.objects.get(section_id='MAT1041'),
+        'grade': Grade.objects.get(grade='R')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=3),
+        'section': Section.objects.get(section_id='CHE1091'),
+        'grade': Grade.objects.get(grade='B-')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=4),
+        'section': Section.objects.get(section_id='CSE2091'),
+        'grade': Grade.objects.get(grade='C')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=4),
+        'section': Section.objects.get(section_id='GEN2261'),
+        'grade': Grade.objects.get(grade='B')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=4),
+        'section': Section.objects.get(section_id='ECO1011'),
+        'grade': Grade.objects.get(grade='B+')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=5),
+        'section': Section.objects.get(section_id='CSE2511'),
+        'grade': Grade.objects.get(grade='B')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=5),
+        'section': Section.objects.get(section_id='STA1021'),
+        'grade': Grade.objects.get(grade='B-')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=5),
+        'section': Section.objects.get(section_id='PHY1091'),
+        'grade': Grade.objects.get(grade='C+')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=6),
+        'section': Section.objects.get(section_id='CSE2071'),
+        'grade': Grade.objects.get(grade='A')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=6),
+        'section': Section.objects.get(section_id='BUS2311'),
+        'grade': Grade.objects.get(grade='A')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=6),
+        'section': Section.objects.get(section_id='MAT2051'),
+        'grade': Grade.objects.get(grade='A-')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=7),
+        'section': Section.objects.get(section_id='CSE2461'),
+        'grade': Grade.objects.get(grade='A')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=7),
+        'section': Section.objects.get(section_id='CSE3251'),
+        'grade': Grade.objects.get(grade='B-')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=7),
+        'section': Section.objects.get(section_id='PHY2091'),
+        'grade': Grade.objects.get(grade='B')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=8),
+        'section': Section.objects.get(section_id='CSE2001'),
+        'grade': Grade.objects.get(grade='B+')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=8),
+        'section': Section.objects.get(section_id='CSE3021'),
+        'grade': Grade.objects.get(grade='A')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=8),
+        'section': Section.objects.get(section_id='CSE3451'),
+        'grade': Grade.objects.get(grade='B+')
+    },
+    {
+        'student': Student.objects.get(student_id='2019-2-60-022'),
+        'semester': Semester.objects.get(semester_id=8),
+        'section': Section.objects.get(section_id='CSE3601'),
+        'grade': Grade.objects.get(grade='B-')
+    }
+]
+
+    for grade_report in grade_reports2:
         c = CoursesTaken(**grade_report)
         c.save()

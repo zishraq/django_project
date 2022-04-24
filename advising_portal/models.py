@@ -60,6 +60,26 @@ class Student(models.Model):
 class WeekSlot(models.Model):
     routine_id = models.CharField(max_length=100, primary_key=True)
 
+    # def get_routine_slot_chunks(self):
+    #     routine_slot_chunks = [self.routine_id[i:i + 3] for i in range(0, len(self.routine_id), 3)]
+    #     return routine_slot_chunks
+
+    # def save(self, *args, **kwargs):
+    #     if self.routine_id:
+    #         routine_slot_chunks = self.get_routine_slot_chunks()
+    #
+    #         try:
+    #             temp = WeekSlot.objects.get(advising_status=True)
+    #             if self != temp:
+    #                 temp.is_the_chosen_one = False
+    #                 temp.save()
+    #         except Semester.DoesNotExist:
+    #             pass
+    #
+    #
+    #
+    #     super(WeekSlot, self).save(*args, **kwargs)
+
 
 class TimeSlot(models.Model):
     time_slot_id = models.CharField(max_length=100, primary_key=True)
@@ -74,6 +94,11 @@ class TimeSlot(models.Model):
             time_visual_format = time_visual_format[:7] + time_visual_format[10:19]
 
         return time_visual_format
+
+    # def get_conflicts(self):
+    #     conflict_table = {
+    #         'S01': ['S01', ''],
+    #     }
 
 
 class Routine(models.Model):

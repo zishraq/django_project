@@ -58,6 +58,7 @@ def home(request):
 
 
 @login_required
+@allowed_users(allowed_roles=['student'])
 def advising_portal_list_view(request, section_filter):
     print(request.user.groups.all())
 
@@ -157,6 +158,7 @@ def advising_portal_list_view(request, section_filter):
 
 
 @login_required
+@allowed_users(allowed_roles=['student'])
 def add_course_view(request, section_id):
     referer_parameter = get_referer_parameter(request)
 
@@ -236,6 +238,7 @@ def add_course_view(request, section_id):
 
 
 @login_required
+@allowed_users(allowed_roles=['student'])
 def drop_course_view(request, section_id):
     referer_parameter = get_referer_parameter(request)
 
@@ -257,6 +260,7 @@ def drop_course_view(request, section_id):
 
 
 @login_required
+@allowed_users(allowed_roles=['student'])
 def request_section_list_view(request):
     if request.method == 'POST':
         form = SectionRequestForm(request.POST)
@@ -404,6 +408,7 @@ def request_section(request, section_id, reason):
 
 
 @login_required
+@allowed_users(allowed_roles=['student'])
 def revoke_section_request_view(request, section_id):
     current_semester_id = Semester.objects.get(advising_status=True).semester_id
     student_id = Student.objects.get(username_id=request.user).student_id
@@ -420,6 +425,7 @@ def revoke_section_request_view(request, section_id):
 
 
 @login_required
+@allowed_users(allowed_roles=['student'])
 def view_grade_report(request):
     student = Student.objects.get(username_id=User.objects.get(username=request.user).pk)
 
@@ -443,41 +449,48 @@ def view_grade_report(request):
     }
 
     for course in courses_taken:
-        total_cgpa += (course.grade.grade_point * course.section.course.credit)
-        total_credit += course.section.course.credit
+        letter_grade = course.grade.grade
+        if letter_grade not in ['D', 'R']:
+            course_credit = course.section.course.credit
+        else:
+            course_credit = 0
+
+        total_cgpa += (course.grade.grade_point * course_credit)
+
+        total_credit += course_credit
 
         if course.semester_id not in courses_by_semesters:
             courses_by_semesters[course.semester_id] = {
                 'semester_id': course.semester_id,
                 'semester_name': course.semester.semester_name,
-                'total_credit': course.section.course.credit,
+                'total_credit': course_credit,
                 'courses': [
                     {
                         'course_code': course.section.course.course_code,
                         'course_title': re.sub('\(.*\)', '', str(course.section.course.course_title)),
-                        'course_credit': course.section.course.credit,
-                        'grade': course.grade.grade,
-                        'total_gp': course.section.course.credit * 4,
+                        'course_credit': course_credit,
+                        'grade': letter_grade,
+                        'total_gp': course_credit * 4,
                         'grade_point': course.grade.grade_point,
                     }
                 ],
                 'current_cgpa': total_cgpa,
                 'current_total_credit': total_credit,
-                'term_gpa': course.grade.grade_point * course.section.course.credit
+                'term_gpa': course.grade.grade_point * course_credit
             }
 
         else:
-            courses_by_semesters[course.semester_id]['total_credit'] += course.section.course.credit
+            courses_by_semesters[course.semester_id]['total_credit'] += course_credit
             courses_by_semesters[course.semester_id]['current_cgpa'] = total_cgpa
             courses_by_semesters[course.semester_id]['current_total_credit'] = total_credit
-            courses_by_semesters[course.semester_id]['term_gpa'] += (course.grade.grade_point * course.section.course.credit)
+            courses_by_semesters[course.semester_id]['term_gpa'] += (course.grade.grade_point * course_credit)
             courses_by_semesters[course.semester_id]['courses'].append(
                 {
                     'course_code': course.section.course.course_code,
                     'course_title': re.sub('\(.*\)', '', str(course.section.course.course_title)),
-                    'course_credit': course.section.course.credit,
-                    'grade': course.grade.grade,
-                    'total_gp': course.section.course.credit * 4,
+                    'course_credit': course_credit,
+                    'grade': letter_grade,
+                    'total_gp': course_credit * 4,
                     'grade_point': course.grade.grade_point,
                 }
             )
