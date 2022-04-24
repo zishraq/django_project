@@ -12,7 +12,7 @@ urlpatterns = [
     path('revoke-section-request/<section_id>/', views.revoke_section_request_view, name='student-panel-revoke-section-request'),
 
     # path('selected-courses/', views.view_selected_courses, name='advising-portal-selected-courses'),
-    path('grade-report/', views.view_grade_report, name='student-panel-grade-report'),
+    path('grade-report/', views.grade_report_view, name='student-panel-grade-report'),
 
     path('all-courses/', views.courses_list_view, name='student-panel-courses'),
 ]

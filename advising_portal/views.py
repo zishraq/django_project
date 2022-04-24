@@ -426,7 +426,7 @@ def revoke_section_request_view(request, section_id):
 
 @login_required
 @allowed_users(allowed_roles=['student'])
-def view_grade_report(request):
+def grade_report_view(request):
     student = Student.objects.get(username_id=User.objects.get(username=request.user).pk)
 
     courses_taken = CoursesTaken.objects.filter(
@@ -448,12 +448,23 @@ def view_grade_report(request):
         grade['grade']: 0 for grade in grades
     }
 
+    # unique_courses = {
+    #     'course_code': {
+    #         'total_cgpa'
+    #     }
+    # }
+
     for course in courses_taken:
         letter_grade = course.grade.grade
         if letter_grade not in ['D', 'R']:
             course_credit = course.section.course.credit
         else:
             course_credit = 0
+
+        course_code = course.section.course.course_code
+
+        # if course not in unique_courses:
+        #     unique_courses[course]
 
         total_cgpa += (course.grade.grade_point * course_credit)
 
@@ -466,7 +477,7 @@ def view_grade_report(request):
                 'total_credit': course_credit,
                 'courses': [
                     {
-                        'course_code': course.section.course.course_code,
+                        'course_code': course_code,
                         'course_title': re.sub('\(.*\)', '', str(course.section.course.course_title)),
                         'course_credit': course_credit,
                         'grade': letter_grade,
@@ -486,7 +497,7 @@ def view_grade_report(request):
             courses_by_semesters[course.semester_id]['term_gpa'] += (course.grade.grade_point * course_credit)
             courses_by_semesters[course.semester_id]['courses'].append(
                 {
-                    'course_code': course.section.course.course_code,
+                    'course_code': course_code,
                     'course_title': re.sub('\(.*\)', '', str(course.section.course.course_title)),
                     'course_credit': course_credit,
                     'grade': letter_grade,
