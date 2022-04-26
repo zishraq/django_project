@@ -141,7 +141,7 @@ def set_password_view(request, otp_id):
                 return redirect('set_password', otp_id=otp_id)
 
             student_id = otp_data.student_id
-            print(password)
+
             new_user = User.objects.create_user(
                 username=student_id,
                 email=f'{student_id}@std.ewubd.edu',
@@ -201,8 +201,6 @@ def reset_password_view(request, otp_id):
                 return redirect('reset_password', otp_id=otp_id)
 
             student_id = otp_data.student_id
-
-            print(student_id)
 
             update_user = User.objects.get(
                 username=student_id

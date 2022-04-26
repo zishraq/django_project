@@ -60,9 +60,37 @@ class Student(models.Model):
 class WeekSlot(models.Model):
     routine_id = models.CharField(max_length=100, primary_key=True)
 
-    # def get_routine_slot_chunks(self):
-    #     routine_slot_chunks = [self.routine_id[i:i + 3] for i in range(0, len(self.routine_id), 3)]
-    #     return routine_slot_chunks
+    @classmethod
+    def get_routine_slot_chunks(cls, routine_id):
+        routine_slot_chunks = [routine_id[i:i + 3] for i in range(0, len(routine_id), 3)]
+        return routine_slot_chunks
+
+    @classmethod
+    def format_routine(cls, routine_id):
+        get_time_slots = Routine.objects.filter(
+            routine_slot_id=routine_id
+        ).values('time_slot_id').distinct()
+
+        routines = {}
+
+        for routine in get_time_slots:
+            time_slot = TimeSlot.objects.get(time_slot_id=routine['time_slot_id'])
+
+            time_part = str(time_slot)[2:]
+            day_part = str(time_slot)[0]
+
+            if time_part not in routines:
+                routines[time_part] = day_part
+
+            else:
+                routines[time_part] += day_part
+
+        routine_str = ''
+
+        for time, day in routines.items():
+            routine_str += f'{day} {time} \n'
+
+        return routine_str
 
     # def save(self, *args, **kwargs):
     #     if self.routine_id:

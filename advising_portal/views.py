@@ -15,31 +15,6 @@ from django.contrib.auth.decorators import login_required
 from users.decorators import allowed_users
 
 
-def format_routine(routine_id):
-    get_time_slots = Routine.objects.filter(
-        routine_slot_id=routine_id
-    ).values('time_slot_id').distinct()
-
-    routines = {}
-
-    for routine in get_time_slots:
-        time_slot = TimeSlot.objects.get(time_slot_id=routine['time_slot_id'])
-
-        time_part = str(time_slot)[2:]
-        day_part = str(time_slot)[0]
-
-        if time_part not in routines:
-            routines[time_part] = day_part
-
-        else:
-            routines[time_part] += day_part
-
-    routine_str = ''
-
-    for time, day in routines.items():
-        routine_str += f'{day} {time} \n'
-
-    return routine_str
 
 
 def get_referer_parameter(request):
@@ -52,6 +27,7 @@ def get_referer_parameter(request):
 
     return referer_parameter
 
+
 @login_required
 def home(request):
     return render(request, 'advising_portal/student_base.html')
@@ -60,8 +36,6 @@ def home(request):
 @login_required
 @allowed_users(allowed_roles=['student'])
 def advising_portal_list_view(request, section_filter):
-    print(request.user.groups.all())
-
     student = Student.objects.get(username_id=request.user)
 
     if section_filter not in ['recommended', 'retakable']:
@@ -121,7 +95,7 @@ def advising_portal_list_view(request, section_filter):
             'instructor_id': section.instructor.name,
             'course_id': section.course.course_code,
             'credit': section.course.credit,
-            'routine_id': format_routine(section.routine_id)
+            'routine_id': WeekSlot.format_routine(section.routine_id)
         }
 
         view_data.append(formatted_data)
@@ -142,7 +116,7 @@ def advising_portal_list_view(request, section_filter):
             'section_no': course.section.section_no,
             'section_id': course.section_id,
             'credits': course.section.course.credit,
-            'routine_id': format_routine(course.section.routine_id)
+            'routine_id': WeekSlot.format_routine(course.section.routine_id)
             # 'routine': format_routine(course.section.routine_id)
         }
 
@@ -169,7 +143,7 @@ def add_course_view(request, section_id):
     selected_routine_slot = selected_section.routine_id   # store routine id of the selected section
 
     # Split the routine id of the selected section into Time Slots
-    selected_routine_slot_chunks = [selected_routine_slot[i:i+3] for i in range(0, len(selected_routine_slot), 3)]
+    selected_routine_slot_chunks = WeekSlot.get_routine_slot_chunks(selected_routine_slot)
 
     # Check whether the section was already taken
     existence_check = CoursesTaken.objects.filter(
@@ -198,7 +172,7 @@ def add_course_view(request, section_id):
             routine_id = section.section.routine_id   # Get routine id of the comparing section
 
             # Split the routine id of the comparing section into Time Slots
-            section_routine_slot_chunks = [routine_id[i:i+3] for i in range(0, len(routine_id), 3)]
+            section_routine_slot_chunks = WeekSlot.get_routine_slot_chunks(routine_id=routine_id)
 
             # Check for time slot conflict
             for i in section_routine_slot_chunks:
@@ -299,7 +273,7 @@ def request_section_list_view(request):
             'instructor_id': section.instructor.name,
             'course_id': section.course.course_code,
             'credit': section.course.credit,
-            'routine_id': format_routine(section.routine_id)
+            'routine_id': WeekSlot.format_routine(section.routine_id)
         }
 
         view_data.append(formatted_data)
@@ -320,7 +294,7 @@ def request_section_list_view(request):
             'section_no': section.section.section_no,
             'section_id': section.section_id,
             'credits': section.section.course.credit,
-            'routine_id': format_routine(section.section.routine_id)
+            'routine_id': WeekSlot.format_routine(section.section.routine_id)
         }
 
         view_selected_courses_data.append(formatted_data)
