@@ -47,15 +47,15 @@ if __name__ == '__main__':
         },
         {
             'username': '2020-1-65-001',
-            'password': '123456Seven',
+            'password': '123456Seven'
         },
         {
             'username': 'amit',
-            'password': '123456Seven',
+            'password': '123456Seven'
         },
         {
             'username': 'tuhin',
-            'password': '123456Seven',
+            'password': '123456Seven'
         }
     ]
 
