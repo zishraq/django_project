@@ -29,7 +29,7 @@ def get_referer_parameter(request):
 
 @login_required
 def home(request):
-    return render(request, 'advising_portal/student_base.html')
+    return render(request, 'advising_portal/base.html')
 
 
 @login_required

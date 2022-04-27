@@ -1,4 +1,5 @@
-{% extends "advising_portal/student_base.html" %}
+{% extends "advising_portal/base.html" %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
     {#    <div class="fix-width">#}
@@ -76,7 +77,7 @@
                                 <form
                                         class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                                     <div class="input-group custom-search-align">
-                                        <input type="text" id="myInput" onkeyup="myFunction()"
+                                        <input type="text" id="myInput" onkeyup="table_search(7)"
                                                class="form-control bg-light border-0 small" placeholder="Search for..."
                                                aria-label="Search" aria-describedby="basic-addon2">
                                         <div class="input-group-append">
@@ -212,32 +213,6 @@
             </div>
         </div>
     </div>
+    <script src="{% static 'advising_portal/js/my_scripts.js' %}"></script>
 
-    <script>
-        function myFunction() {
-            // Declare variables
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("myInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("myTable");
-            tr = table.getElementsByTagName("tr");
-
-            // Loop through all table rows, and hide those who don't match the search query
-            for (i = 0; i < tr.length; i++) {
-                if (i === 0) {
-                    continue;
-                }
-                td = tr[i].getElementsByTagName("td")[0];
-
-                if (td && td.colSpan !== 7) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }
-            }
-        }
-    </script>
 {% endblock content %}

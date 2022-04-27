@@ -1,4 +1,5 @@
-{% extends "advising_portal/student_base.html" %}
+{% extends "advising_portal/base.html" %}
+{% load static %}
 {% block content %}
     <div class="table-responsive card shadow custom-left-table-align">
                     {#            <div class="table-responsive card shadow">#}
@@ -18,7 +19,7 @@
                     <form
                             class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group custom-search-align">
-                            <input type="text" id="myInput" onkeyup="myFunction()"
+                            <input type="text" id="myInput" onkeyup="table_search(6)"
                                    class="form-control bg-light border-0 small" placeholder="Search for..."
                                    aria-label="Search" aria-describedby="basic-addon2">
                             <div class="input-group-append">
@@ -49,5 +50,6 @@
             </tbody>
         </table>
     </div>
+    <script src="{% static 'advising_portal/js/my_scripts.js' %}"></script>
 
 {% endblock content %}
