@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -92,21 +94,24 @@ class WeekSlot(models.Model):
 
         return routine_str
 
-    # def save(self, *args, **kwargs):
-    #     if self.routine_id:
-    #         routine_slot_chunks = self.get_routine_slot_chunks()
-    #
-    #         try:
-    #             temp = WeekSlot.objects.get(advising_status=True)
-    #             if self != temp:
-    #                 temp.is_the_chosen_one = False
-    #                 temp.save()
-    #         except Semester.DoesNotExist:
-    #             pass
-    #
-    #
-    #
-    #     super(WeekSlot, self).save(*args, **kwargs)
+    @classmethod
+    def is_valid_weekslot(cls, routine_id):
+        week_slot_chunks = WeekSlot.get_routine_slot_chunks(routine_id)
+
+        for time_slot1 in range(len(week_slot_chunks)):
+            for time_slot2 in range(len(week_slot_chunks)):
+                if time_slot1 != time_slot2:
+                    if TimeSlot.does_conflict(week_slot_chunks[time_slot1], week_slot_chunks[time_slot2]):
+                        return False
+
+        return True
+
+    def save(self, *args, **kwargs):
+        if WeekSlot.is_valid_weekslot(routine_id=self.routine_id):
+            super(WeekSlot, self).save(*args, **kwargs)
+
+        else:
+            raise Exception('Invalid week slot')
 
 
 class TimeSlot(models.Model):
@@ -123,10 +128,46 @@ class TimeSlot(models.Model):
 
         return time_visual_format
 
-    # def get_conflicts(self):
-    #     conflict_table = {
-    #         'S01': ['S01', ''],
-    #     }
+    @classmethod
+    def does_conflict(cls, time_slot1, time_slot2):
+        if time_slot1 < time_slot2:
+            # print('here 1')
+            get_time_slot1 = TimeSlot.objects.get(time_slot_id=time_slot1)
+            get_time_slot2 = TimeSlot.objects.get(time_slot_id=time_slot2)
+        else:
+            # print('here 2')
+            get_time_slot1 = TimeSlot.objects.get(time_slot_id=time_slot2)
+            get_time_slot2 = TimeSlot.objects.get(time_slot_id=time_slot1)
+
+        print(get_time_slot1)
+        print(get_time_slot2)
+
+        time_slot1_day = get_time_slot1.day
+        time_slot2_day = get_time_slot2.day
+
+        if time_slot1_day == time_slot2_day:
+            time_slot1_start_time = datetime.strptime(str(get_time_slot1.start_time), '%H:%M:%S')
+            time_slot1_end_time = datetime.strptime(str(get_time_slot1.end_time), '%H:%M:%S')
+
+            time_slot2_start_time = datetime.strptime(str(get_time_slot2.start_time), '%H:%M:%S')
+            time_slot2_end_time = datetime.strptime(str(get_time_slot2.end_time), '%H:%M:%S')
+
+            if time_slot1_end_time == time_slot2_end_time:
+                print('time_slot1_end_time: ', time_slot1_end_time)
+                print('time_slot2_end_time: ', time_slot2_end_time)
+
+                print('here 3')
+                return True
+
+            if time_slot1_start_time == time_slot2_start_time:
+                print('here 4')
+                return True
+
+            if time_slot2_start_time < time_slot1_end_time < time_slot2_end_time:
+                print('here 5')
+                return True
+
+        return False
 
 
 class Routine(models.Model):

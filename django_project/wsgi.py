@@ -923,7 +923,7 @@ if __name__ == '__main__':
             'routine_id': 'M05W05'
         },
         {
-            'routine_id': 'M01W01W06'
+            'routine_id': 'M01W01W07'
         },
         {
             'routine_id': 'M01W01W09'
@@ -942,6 +942,8 @@ if __name__ == '__main__':
     c = 1
 
     for i in routine_slot:
+        print(i)
+
         r = WeekSlot(**i)
         r.save()
 
@@ -1045,7 +1047,7 @@ if __name__ == '__main__':
             'section_capacity': 30,
             'total_students': 0,
             'instructor_id': Faculty.objects.get(pk='RDA').pk,
-            'routine_id': WeekSlot.objects.get(pk='M01W01W06').pk,
+            'routine_id': WeekSlot.objects.get(pk='M01W01W07').pk,
             'course_id': Course.objects.get(pk='CHE109').pk,
         },
         {
@@ -1153,7 +1155,7 @@ if __name__ == '__main__':
             'section_capacity': 30,
             'total_students': 0,
             'instructor_id': Faculty.objects.get(pk='RDA').pk,
-            'routine_id': WeekSlot.objects.get(pk='M01W01W06').pk,
+            'routine_id': WeekSlot.objects.get(pk='M01W01W07').pk,
             'course_id': Course.objects.get(pk='CSE325').pk,
         },
         {
@@ -1288,7 +1290,7 @@ if __name__ == '__main__':
             'section_capacity': 30,
             'total_students': 0,
             'instructor_id': Faculty.objects.get(pk='RDA').pk,
-            'routine_id': WeekSlot.objects.get(pk='M01W01W06').pk,
+            'routine_id': WeekSlot.objects.get(pk='M01W01W07').pk,
             'course_id': Course.objects.get(pk='PHY109').pk,
         },
         {

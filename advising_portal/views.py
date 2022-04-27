@@ -27,30 +27,6 @@ def get_referer_parameter(request):
     return referer_parameter
 
 
-def does_conflict(time_slot1, time_slot2):
-    if time_slot1 < time_slot2:
-        get_time_slot1 = TimeSlot.objects.get(time_slot_id=time_slot1)
-        get_time_slot2 = TimeSlot.objects.get(time_slot_id=time_slot2)
-    else:
-        get_time_slot1 = TimeSlot.objects.get(time_slot_id=time_slot2)
-        get_time_slot2 = TimeSlot.objects.get(time_slot_id=time_slot1)
-
-    time_slot1_start_time = datetime.strptime(str(get_time_slot1.start_time), '%H:%M:%S')
-    time_slot1_end_time = datetime.strptime(str(get_time_slot2.end_time), '%H:%M:%S')
-
-    time_slot2_start_time = datetime.strptime(str(get_time_slot1.start_time), '%H:%M:%S')
-    time_slot2_end_time = datetime.strptime(str(get_time_slot2.end_time), '%H:%M:%S')
-
-    if time_slot1_end_time == time_slot2_end_time:
-        return False
-
-    if time_slot1_start_time == time_slot2_start_time:
-        return False
-
-    if time_slot2_start_time < time_slot1_end_time < time_slot2_end_time:
-        return False
-
-
 @login_required
 def home(request):
     return render(request, 'advising_portal/student_base.html')
@@ -200,9 +176,13 @@ def add_course_view(request, section_id):
             # Check for time slot conflict
             for i in section_routine_slot_chunks:
                 for j in selected_routine_slot_chunks:
-                    if i == j:
+                    if TimeSlot.does_conflict(i, j):
                         messages.error(request, f'Conflicts with {section.section.course.course_code}')
                         return redirect('student-panel-portal', referer_parameter)
+
+                    # if i == j:
+                    #     messages.error(request, f'Conflicts with {section.section.course.course_code}')
+                    #     return redirect('student-panel-portal', referer_parameter)
 
             # Check whether total credits exceed limit
             total_credits = Course.objects.filter(
