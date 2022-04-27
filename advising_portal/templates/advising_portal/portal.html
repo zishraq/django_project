@@ -43,7 +43,7 @@
                                 </button>
                             </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
-                                {#                             <button class="btn btn-outline-primary btn-fix-width" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=recommended'">#}
+                                {# <button class="btn btn-outline-primary btn-fix-width" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=recommended'">#}
                                 <button class="btn btn-outline-primary btn-block" type="submit"
                                         onclick="location.href='{% url 'student-panel-portal' 'recommended' %}">
                                     D/D+
@@ -222,18 +222,12 @@
             table = document.getElementById("myTable");
             tr = table.getElementsByTagName("tr");
 
-            console.log(tr)
-
             // Loop through all table rows, and hide those who don't match the search query
             for (i = 0; i < tr.length; i++) {
                 if (i === 0) {
                     continue;
                 }
                 td = tr[i].getElementsByTagName("td")[0];
-
-                {#console.log(typeof td)#}
-                console.log(td)
-                console.log(td.colSpan)
 
                 if (td && td.colSpan !== 7) {
                     txtValue = td.textContent || td.innerText;
