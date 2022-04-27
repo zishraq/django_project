@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -15,8 +16,6 @@ from django.contrib.auth.decorators import login_required
 from users.decorators import allowed_users
 
 
-
-
 def get_referer_parameter(request):
     referer = str(request.META.get('HTTP_REFERER'))
     split_referer = referer.split('/')
@@ -26,6 +25,30 @@ def get_referer_parameter(request):
         referer_parameter = split_referer[-2]
 
     return referer_parameter
+
+
+def does_conflict(time_slot1, time_slot2):
+    if time_slot1 < time_slot2:
+        get_time_slot1 = TimeSlot.objects.get(time_slot_id=time_slot1)
+        get_time_slot2 = TimeSlot.objects.get(time_slot_id=time_slot2)
+    else:
+        get_time_slot1 = TimeSlot.objects.get(time_slot_id=time_slot2)
+        get_time_slot2 = TimeSlot.objects.get(time_slot_id=time_slot1)
+
+    time_slot1_start_time = datetime.strptime(str(get_time_slot1.start_time), '%H:%M:%S')
+    time_slot1_end_time = datetime.strptime(str(get_time_slot2.end_time), '%H:%M:%S')
+
+    time_slot2_start_time = datetime.strptime(str(get_time_slot1.start_time), '%H:%M:%S')
+    time_slot2_end_time = datetime.strptime(str(get_time_slot2.end_time), '%H:%M:%S')
+
+    if time_slot1_end_time == time_slot2_end_time:
+        return False
+
+    if time_slot1_start_time == time_slot2_start_time:
+        return False
+
+    if time_slot2_start_time < time_slot1_end_time < time_slot2_end_time:
+        return False
 
 
 @login_required
