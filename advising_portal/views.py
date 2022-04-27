@@ -139,10 +139,9 @@ def add_course_view(request, section_id):
     student = Student.objects.get(username_id=request.user)   # get User's student info
     selected_section = Section.objects.get(section_id=section_id)   # get selected section data
     selected_course = selected_section.course   # get course data of the selected section
-    selected_routine_slot = selected_section.routine_id   # store routine id of the selected section
 
-    # Split the routine id of the selected section into Time Slots
-    selected_routine_slot_chunks = WeekSlot.get_routine_slot_chunks(selected_routine_slot)
+    selected_section_routine_id = selected_section.routine_id   # store routine id of the selected section
+    time_slots_of_selected_section = Routine.objects.filter(routine_slot_id=selected_section_routine_id)  # get time slots by routine id
 
     # Check whether the section was already taken
     existence_check = CoursesTaken.objects.filter(
@@ -168,21 +167,15 @@ def add_course_view(request, section_id):
                 messages.error(request, 'Course already added')
                 return redirect('student-panel-portal', referer_parameter)
 
-            routine_id = section.section.routine_id   # Get routine id of the comparing section
-
-            # Split the routine id of the comparing section into Time Slots
-            section_routine_slot_chunks = WeekSlot.get_routine_slot_chunks(routine_id=routine_id)
+            current_section_routine_id = section.section.routine_id   # Get routine id of the comparing section
+            time_slots_of_current_section = Routine.objects.filter(routine_slot_id=current_section_routine_id)  # Get time slots of current section
 
             # Check for time slot conflict
-            for i in section_routine_slot_chunks:
-                for j in selected_routine_slot_chunks:
-                    if TimeSlot.does_conflict(i, j):
+            for i in time_slots_of_current_section:
+                for j in time_slots_of_selected_section:
+                    if i.time_slot.does_conflict(j.time_slot):
                         messages.error(request, f'Conflicts with {section.section.course.course_code}')
                         return redirect('student-panel-portal', referer_parameter)
-
-                    # if i == j:
-                    #     messages.error(request, f'Conflicts with {section.section.course.course_code}')
-                    #     return redirect('student-panel-portal', referer_parameter)
 
             # Check whether total credits exceed limit
             total_credits = Course.objects.filter(
@@ -316,11 +309,10 @@ def request_section(request, section_id, reason):
     current_semester = Semester.objects.get(advising_status=True)   # get current semester
     student = Student.objects.get(username_id=request.user)   # get User's student info
     requested_section = Section.objects.get(section_id=section_id)   # get selected section data
-    selected_course = requested_section.course   # get course data of the selected section
-    selected_routine_slot = requested_section.routine_id   # store routine id of the selected section
+    requested_course = requested_section.course   # get course data of the selected section
 
-    # Split the routine id of the selected section into Time Slots
-    selected_routine_slot_chunks = [selected_routine_slot[i:i+3] for i in range(0, len(selected_routine_slot), 3)]
+    requested_section_routine_id = requested_section.routine_id   # store routine id of the selected section
+    time_slots_of_requested_section = Routine.objects.filter(routine_slot_id=requested_section_routine_id)  # get time slots by routine id
 
     # Check whether the section was already taken
     existence_check = SectionsRequested.objects.filter(
@@ -337,24 +329,22 @@ def request_section(request, section_id, reason):
         # Get current selected sections
         previous_requested_sections = SectionsRequested.objects.filter(
             student_id=student.student_id,
-            semester=current_semester,
+            semester=current_semester
         ).all()
 
         for section in previous_requested_sections:
             # Check if the course of the section is already taken
-            if section.section.course == selected_course:
+            if section.section.course == requested_course:
                 messages.error(request, 'Already requested for this Course')
                 return redirect('student-panel-request-section-list-view')
 
-            routine_id = section.section.routine_id   # Get routine id of the comparing section
-
-            # Split the routine id of the comparing section into Time Slots
-            section_routine_slot_chunks = [routine_id[i:i+3] for i in range(0, len(routine_id), 3)]
+            current_section_routine_id = section.section.routine_id   # Get routine id of the comparing section
+            time_slots_of_current_section = Routine.objects.filter(routine_slot_id=current_section_routine_id)  # Get time slots of current section
 
             # Check for time slot conflict
-            for i in section_routine_slot_chunks:
-                for j in selected_routine_slot_chunks:
-                    if i == j:
+            for i in time_slots_of_current_section:
+                for j in time_slots_of_requested_section:
+                    if i.time_slot.does_conflict(j.time_slot):
                         messages.error(request, f'Conflicts with {section.section.course.course_code}')
                         return redirect('student-panel-request-section-list-view')
 
@@ -364,7 +354,7 @@ def request_section(request, section_id, reason):
             ).aggregate(Sum('credit'))
 
             total_credits = total_credits['credit__sum']
-            selected_course_credit = selected_course.credit
+            selected_course_credit = requested_course.credit
 
             credit_limit = 9
 

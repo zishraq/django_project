@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from django.db import models
@@ -62,10 +63,39 @@ class Student(models.Model):
 class WeekSlot(models.Model):
     routine_id = models.CharField(max_length=100, primary_key=True)
 
-    @classmethod
-    def get_routine_slot_chunks(cls, routine_id):
-        routine_slot_chunks = [routine_id[i:i + 3] for i in range(0, len(routine_id), 3)]
+    def get_time_slots_of_week_slot(self):
+        routine_slot_chunks = [self.routine_id[i:i + 3] for i in range(0, len(self.routine_id), 3)]
         return routine_slot_chunks
+
+    def is_valid_week_slot(self):
+        if not re.match('^([A-Z]\d{2}){1,3}$', self.routine_id):
+            return False
+
+        time_slots_of_week_slot = self.get_time_slots_of_week_slot()
+        time_slot_objects = []
+
+        for time_slot in time_slots_of_week_slot:
+            if not TimeSlot.objects.filter(time_slot_id=time_slot).exists():
+                return False
+
+            time_slot_object = TimeSlot.objects.get(time_slot_id=time_slot)
+            time_slot_objects.append(time_slot_object)
+
+        for time_slot1 in range(len(time_slot_objects)):
+            for time_slot2 in range(len(time_slot_objects)):
+                if time_slot1 != time_slot2:
+                    if time_slot_objects[time_slot1].does_conflict(time_slot_objects[time_slot2]):
+                        print('here 3')
+                        return False
+
+        return True
+
+    def save(self, *args, **kwargs):
+        if self.is_valid_week_slot():
+            super(WeekSlot, self).save(*args, **kwargs)
+
+        else:
+            raise Exception('Invalid week slot')
 
     @classmethod
     def format_routine(cls, routine_id):
@@ -94,25 +124,6 @@ class WeekSlot(models.Model):
 
         return routine_str
 
-    @classmethod
-    def is_valid_weekslot(cls, routine_id):
-        week_slot_chunks = WeekSlot.get_routine_slot_chunks(routine_id)
-
-        for time_slot1 in range(len(week_slot_chunks)):
-            for time_slot2 in range(len(week_slot_chunks)):
-                if time_slot1 != time_slot2:
-                    if TimeSlot.does_conflict(week_slot_chunks[time_slot1], week_slot_chunks[time_slot2]):
-                        return False
-
-        return True
-
-    def save(self, *args, **kwargs):
-        if WeekSlot.is_valid_weekslot(routine_id=self.routine_id):
-            super(WeekSlot, self).save(*args, **kwargs)
-
-        else:
-            raise Exception('Invalid week slot')
-
 
 class TimeSlot(models.Model):
     time_slot_id = models.CharField(max_length=100, primary_key=True)
@@ -128,43 +139,24 @@ class TimeSlot(models.Model):
 
         return time_visual_format
 
-    @classmethod
-    def does_conflict(cls, time_slot1, time_slot2):
-        if time_slot1 < time_slot2:
-            # print('here 1')
-            get_time_slot1 = TimeSlot.objects.get(time_slot_id=time_slot1)
-            get_time_slot2 = TimeSlot.objects.get(time_slot_id=time_slot2)
-        else:
-            # print('here 2')
-            get_time_slot1 = TimeSlot.objects.get(time_slot_id=time_slot2)
-            get_time_slot2 = TimeSlot.objects.get(time_slot_id=time_slot1)
+    def does_conflict(self, compare_time_slot):
+        if self.day == compare_time_slot.day:
+            this_time_slot_start_time = datetime.strptime(str(self.start_time), '%H:%M:%S')
+            this_time_slot_end_time = datetime.strptime(str(self.end_time), '%H:%M:%S')
 
-        print(get_time_slot1)
-        print(get_time_slot2)
+            compare_time_slot_start_time = datetime.strptime(str(compare_time_slot.start_time), '%H:%M:%S')
+            compare_time_slot_end_time = datetime.strptime(str(compare_time_slot.end_time), '%H:%M:%S')
 
-        time_slot1_day = get_time_slot1.day
-        time_slot2_day = get_time_slot2.day
-
-        if time_slot1_day == time_slot2_day:
-            time_slot1_start_time = datetime.strptime(str(get_time_slot1.start_time), '%H:%M:%S')
-            time_slot1_end_time = datetime.strptime(str(get_time_slot1.end_time), '%H:%M:%S')
-
-            time_slot2_start_time = datetime.strptime(str(get_time_slot2.start_time), '%H:%M:%S')
-            time_slot2_end_time = datetime.strptime(str(get_time_slot2.end_time), '%H:%M:%S')
-
-            if time_slot1_end_time == time_slot2_end_time:
-                print('time_slot1_end_time: ', time_slot1_end_time)
-                print('time_slot2_end_time: ', time_slot2_end_time)
-
-                print('here 3')
+            if this_time_slot_end_time == compare_time_slot_end_time:
                 return True
 
-            if time_slot1_start_time == time_slot2_start_time:
-                print('here 4')
+            elif this_time_slot_start_time == compare_time_slot_start_time:
                 return True
 
-            if time_slot2_start_time < time_slot1_end_time < time_slot2_end_time:
-                print('here 5')
+            elif this_time_slot_start_time < compare_time_slot_end_time < this_time_slot_end_time:
+                return True
+
+            elif compare_time_slot_start_time < this_time_slot_end_time < compare_time_slot_end_time:
                 return True
 
         return False

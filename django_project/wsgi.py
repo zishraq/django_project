@@ -63,6 +63,14 @@ if __name__ == '__main__':
         user = User.objects.create_user(**u)
         user.save()
 
+        if user.username == '2020-1-65-001':
+            group = Group.objects.get(name='student')
+            group.user_set.add(user)
+
+        else:
+            group = Group.objects.get(name='faculty')
+            group.user_set.add(user)
+
     departments = [
         {
             'department_id': 'CSE',
