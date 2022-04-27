@@ -85,7 +85,6 @@ class WeekSlot(models.Model):
             for time_slot2 in range(len(time_slot_objects)):
                 if time_slot1 != time_slot2:
                     if time_slot_objects[time_slot1].does_conflict(time_slot_objects[time_slot2]):
-                        print('here 3')
                         return False
 
         return True
@@ -97,10 +96,9 @@ class WeekSlot(models.Model):
         else:
             raise Exception('Invalid week slot')
 
-    @classmethod
-    def format_routine(cls, routine_id):
+    def format_routine(self):
         get_time_slots = Routine.objects.filter(
-            routine_slot_id=routine_id
+            routine_slot_id=self.routine_id
         ).values('time_slot_id').distinct()
 
         routines = {}

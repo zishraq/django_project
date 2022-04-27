@@ -9,7 +9,7 @@
     <div class="container-fluid">
         {#        <div class="row fix-width">#}
         <div class="row">
-            <div class="col-7">
+            <div class="col-md-12 col-lg-7">
                 <div class="btn-self-design">
                     {% if portal_type == 'section_request' %}
                         <div class="card border-left-primary shadow py-2 custom-selection-card-design">
@@ -24,25 +24,25 @@
 
                     {% else %}
                         <div class="row">
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
                                 <button class="btn btn-outline-primary btn-block" type="submit"
                                         onclick="location.href='{% url 'student-panel-portal' 'recommended' %}'">
                                     Recommended
                                 </button>
                             </div>
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
                                 <button class="btn btn-outline-primary btn-block" type="submit"
                                         onclick="location.href='{% url 'student-panel-portal' 'retakable' %}'">
                                     Retakable
                                 </button>
                             </div>
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
                                 <button class="btn btn-outline-primary btn-block" type="submit"
                                         onclick="location.href='{% url 'student-panel-portal' 'recommended' %}">
                                     F-grade
                                 </button>
                             </div>
-                            <div class="col-3">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
                                 {#                             <button class="btn btn-outline-primary btn-fix-width" type="submit" onclick="location.href='{% url 'advising-portal-home' %}?filter=recommended'">#}
                                 <button class="btn btn-outline-primary btn-block" type="submit"
                                         onclick="location.href='{% url 'student-panel-portal' 'recommended' %}">
@@ -95,7 +95,7 @@
                             <tr>
                                 <td class="col-md-1">{{ section.course_id }}</td>
                                 <td class="col-md-1">{{ section.section_no }}</td>
-                                <td class="col-md-1"><small>{{ section.routine_id|linebreaks }}</small></td>
+                                <td class="col-md-1"><small>{{ section.routine|linebreaks }}</small></td>
                                 {# <td class="col-md-1"><small><pre>{{ section.routine_id }}</pre></small></td>#}
                                 <td class="col-md-1">{{ section.credit }}</td>
                                 <td class="col-md-1">{{ section.department_name }}</td>
@@ -156,7 +156,7 @@
                 </div>
             </div>
 
-            <div class="col-5">
+            <div class="custom-margin col-md-12 col-lg-5">
                 <div class="card border-left-primary shadow py-2 custom-selection-card-design">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
@@ -186,7 +186,7 @@
                             <tr>
                                 <td class="col-md-1">{{ course.course_code }}</td>
                                 <td class="col-md-1">{{ course.section_no }}</td>
-                                <td class="col-md-1"><small>{{ course.routine_id|linebreaks }}</small></td>
+                                <td class="col-md-1"><small>{{ course.routine|linebreaks }}</small></td>
                                 {# <td class="col-md-1"><small><pre>{{ course.routine_id }}</pre></small></td>#}
                                 <td class="col-md-1">{{ course.credits }}</td>
                                 <td class="col-md-1">

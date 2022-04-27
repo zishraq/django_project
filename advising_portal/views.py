@@ -94,7 +94,7 @@ def advising_portal_list_view(request, section_filter):
             'instructor_id': section.instructor.name,
             'course_id': section.course.course_code,
             'credit': section.course.credit,
-            'routine_id': WeekSlot.format_routine(section.routine_id)
+            'routine': section.routine.format_routine()
         }
 
         view_data.append(formatted_data)
@@ -115,8 +115,7 @@ def advising_portal_list_view(request, section_filter):
             'section_no': course.section.section_no,
             'section_id': course.section_id,
             'credits': course.section.course.credit,
-            'routine_id': WeekSlot.format_routine(course.section.routine_id)
-            # 'routine': format_routine(course.section.routine_id)
+            'routine': course.section.routine.format_routine()
         }
 
         view_selected_courses_data.append(formatted_data)
@@ -269,7 +268,7 @@ def request_section_list_view(request):
             'instructor_id': section.instructor.name,
             'course_id': section.course.course_code,
             'credit': section.course.credit,
-            'routine_id': WeekSlot.format_routine(section.routine_id)
+            'routine': section.routine.format_routine()
         }
 
         view_data.append(formatted_data)
@@ -290,7 +289,7 @@ def request_section_list_view(request):
             'section_no': section.section.section_no,
             'section_id': section.section_id,
             'credits': section.section.course.credit,
-            'routine_id': WeekSlot.format_routine(section.section.routine_id)
+            'routine': section.section.routine.format_routine()
         }
 
         view_selected_courses_data.append(formatted_data)

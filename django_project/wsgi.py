@@ -950,8 +950,6 @@ if __name__ == '__main__':
     c = 1
 
     for i in routine_slot:
-        print(i)
-
         r = WeekSlot(**i)
         r.save()
 
