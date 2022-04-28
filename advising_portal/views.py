@@ -37,7 +37,7 @@ def home(request):
 def advising_portal_list_view(request, section_filter):
     student = Student.objects.get(username_id=request.user)
 
-    if section_filter not in ['recommended', 'retakable']:
+    if section_filter not in ['recommended', 'retakable', 'f', 'd']:
         section_filter = 'recommended'
 
     if section_filter == 'recommended':
@@ -70,14 +70,38 @@ def advising_portal_list_view(request, section_filter):
             ).values('course_id').all()
         ).order_by('course__course_code')
 
-    else:
+    elif section_filter == 'retakable':
         sections = Section.objects.filter(
             course_id__in=Section.objects.filter(
                 section_id__in=CoursesTaken.objects.filter(
                     student_id=student,
-                    grade_id__in=['C', 'C+', 'C-', 'D', 'D+', 'F']
+                    grade_id__in=['C', 'C+', 'C-']
                 ).values('section_id').all()
             ).values('course_id').all()
+        ).order_by('course__course_code')
+
+    elif section_filter == 'f':
+        sections = Section.objects.filter(
+            course_id__in=Section.objects.filter(
+                section_id__in=CoursesTaken.objects.filter(
+                    student_id=student,
+                    grade_id__in=['F']
+                ).values('section_id').all()
+            ).values('course_id').all()
+        ).order_by('course__course_code')
+
+    else:
+        d_courses = CoursesTaken.objects.filter(
+            student_id=student,
+            grade_id__in=['D+', 'D']
+        ).values('section_id').all()
+
+        get_course_ids = Section.objects.filter(
+            section_id__in=d_courses
+        ).values('course_id').all()
+
+        sections = Section.objects.filter(
+            course_id__in=get_course_ids
         ).order_by('course__course_code')
 
     sections = list(sections)
