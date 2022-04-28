@@ -82,7 +82,7 @@ def advising_portal_list_view(request, section_filter):
 
     sections = list(sections)
 
-    view_data = []
+    view_section_data = []
 
     for section in sections:
         formatted_data = {
@@ -97,7 +97,7 @@ def advising_portal_list_view(request, section_filter):
             'routine': section.routine.format_routine()
         }
 
-        view_data.append(formatted_data)
+        view_section_data.append(formatted_data)
 
     student_id = Student.objects.get(username_id=request.user).pk
     current_semester_id = Semester.objects.get(advising_status=True).pk
@@ -121,7 +121,7 @@ def advising_portal_list_view(request, section_filter):
         view_selected_courses_data.append(formatted_data)
 
     context = {
-        'sections': view_data,
+        'sections': view_section_data,
         'selected_courses': view_selected_courses_data,
         'portal_type': 'course_advising'
     }
@@ -256,7 +256,7 @@ def request_section_list_view(request):
 
     sections = list(sections)
 
-    view_data = []
+    view_section_data = []
 
     for section in sections:
         formatted_data = {
@@ -271,7 +271,7 @@ def request_section_list_view(request):
             'routine': section.routine.format_routine()
         }
 
-        view_data.append(formatted_data)
+        view_section_data.append(formatted_data)
 
     student_id = Student.objects.get(username_id=request.user).pk
     current_semester_id = Semester.objects.get(advising_status=True).pk
@@ -295,7 +295,7 @@ def request_section_list_view(request):
         view_selected_courses_data.append(formatted_data)
 
     context = {
-        'sections': view_data,
+        'sections': view_section_data,
         'selected_courses': view_selected_courses_data,
         'portal_type': 'section_request',
         'form': form
@@ -506,6 +506,42 @@ def grade_report_view(request):
     }
 
     return render(request, 'advising_portal/grading_report.html', context)
+
+
+@login_required()
+@allowed_users(allowed_roles=['student'])
+def view_advised_courses(request):
+    student_id = Student.objects.get(username_id=request.user).pk
+    current_semester_id = Semester.objects.get(advising_status=True).pk
+
+    semesters = list(Semester.objects.all().values_list('semester_name').distinct())
+    print(semesters)
+
+    courses_taken = CoursesTaken.objects.filter(
+        student_id=student_id,
+        semester_id=current_semester_id
+    ).all()
+
+    view_selected_courses_data = []
+
+    for course in courses_taken:
+        formatted_data = {
+            'course_code': course.section.course.course_code,
+            'section_no': course.section.section_no,
+            'section_id': course.section_id,
+            'credits': course.section.course.credit,
+            'routine': course.section.routine.format_routine()
+        }
+
+        view_selected_courses_data.append(formatted_data)
+
+    context = {
+        'selected_courses': view_selected_courses_data,
+        'portal_type': 'course_advising',
+        # 'is_':
+    }
+
+    return render(request, 'advising_portal/advised_courses.html', context)
 
 
 @login_required
