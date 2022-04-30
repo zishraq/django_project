@@ -446,10 +446,7 @@ def grade_report_view(request):
 
     for course in courses_taken:
         letter_grade = course.grade.grade
-        if letter_grade not in ['D', 'R']:
-            course_credit = course.section.course.credit
-        else:
-            course_credit = 0
+        course_credit = course.section.course.credit
 
         course_code = course.section.course.course_code
 
@@ -458,7 +455,12 @@ def grade_report_view(request):
 
         total_cgpa += (course.grade.grade_point * course_credit)
 
-        total_credit += course_credit
+        # total_credit += course_credit
+
+        if letter_grade not in ['W', 'R']:
+            total_credit += course_credit
+        else:
+            total_credit += 0
 
         if course.semester_id not in courses_by_semesters:
             courses_by_semesters[course.semester_id] = {

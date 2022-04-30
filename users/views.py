@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
@@ -157,6 +157,9 @@ def set_password_view(request, otp_id):
             if not student_data.username:
                 student_data.username = new_user
                 student_data.save()
+
+                group = Group.objects.get(name='student')
+                group.user_set.add(new_user)
 
             else:
                 messages.success(request, f'Account already activated for ID {student_id}!')
