@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 
-from advising_portal.forms import SectionRequestForm
+from advising_portal.forms import SectionRequestForm, CreateCourseForm
 from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, Routine, TimeSlot, WeekSlot, \
     SectionsRequested, Grade
 from django.contrib.auth.decorators import login_required
@@ -535,7 +535,7 @@ def grade_report_view(request):
     return render(request, 'advising_portal/grading_report.html', context)
 
 
-@login_required()
+@login_required
 @allowed_users(allowed_roles=['student'])
 def view_advised_courses(request):
     student_id = Student.objects.get(username_id=request.user).pk
@@ -597,3 +597,31 @@ def courses_list_view(request):
     }
 
     return render(request, 'advising_portal/courses.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty'])
+def create_course(request):
+    if request.method == 'POST':
+        form = CreateCourseForm(request.POST)
+
+        if form.is_valid():
+            create_course_data = form.cleaned_data
+            create_course_data['course_id'] = create_course_data['course_code']
+
+            new_course = Course(**create_course_data)
+            new_course.save()
+
+            # form.save()
+
+            messages.success(request, 'Course successfully created!')
+            return redirect('student-panel-courses')
+
+    else:
+        form = CreateCourseForm()
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'advising_portal/create_course.html', context)

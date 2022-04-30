@@ -1,8 +1,12 @@
 {% extends "advising_portal/base.html" %}
 {% load static %}
 {% block content %}
+    <div align="right">
+        <a href="{% url 'student-panel-create-course' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-download fa-sm text-white-50"></i>Create Course</a>
+    </div>
+
     <div class="table-responsive card shadow custom-left-table-align">
-                    {#            <div class="table-responsive card shadow">#}
         <table id="myTable" class="table table-striped">
             <tbody>
             <tr>

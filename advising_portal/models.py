@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 class Department(models.Model):
     department_id = models.CharField(max_length=100, primary_key=True)
-    department_name = models.TextField()
+    department_name = models.CharField(max_length=50)
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
@@ -16,7 +16,7 @@ class Department(models.Model):
 class Course(models.Model):
     course_id = models.CharField(max_length=100, primary_key=True)
     course_code = models.CharField(max_length=10)
-    course_title = models.TextField()
+    course_title = models.CharField(max_length=50)
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True)
     prerequisite_course = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     credit = models.FloatField()
@@ -26,7 +26,7 @@ class Course(models.Model):
 
 class Semester(models.Model):
     semester_id = models.IntegerField(primary_key=True)
-    semester_name = models.TextField()
+    semester_name = models.CharField(max_length=50)
     semester_starts_at = models.DateField()
     semester_ends_at = models.DateField()
     created_at = models.DateTimeField(default=timezone.now)
@@ -49,7 +49,7 @@ class Semester(models.Model):
 class Faculty(models.Model):
     faculty_id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=30)
-    initials = models.TextField()
+    initials = models.CharField(max_length=10)
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
 
 

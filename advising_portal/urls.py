@@ -15,5 +15,6 @@ urlpatterns = [
     path('advised-courses/', views.view_advised_courses, name='student-panel-advised-courses'),
     path('grade-report/', views.grade_report_view, name='student-panel-grade-report'),
 
-    path('all-courses/', views.courses_list_view, name='student-panel-courses')
+    path('all-courses/', views.courses_list_view, name='student-panel-courses'),
+    path('create-course/', views.create_course, name='student-panel-create-course')
 ]
