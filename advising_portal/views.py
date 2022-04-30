@@ -536,14 +536,20 @@ def grade_report_view(request):
 @allowed_users(allowed_roles=['student'])
 def view_advised_courses(request):
     student_id = Student.objects.get(username_id=request.user).pk
-    current_semester_id = Semester.objects.get(advising_status=True).pk
+    semester_id = request.GET.get('semester_id', '')
 
-    semesters = list(Semester.objects.all().values_list('semester_name').distinct())
-    print(semesters)
+    if not semester_id:
+        semester_id = Semester.objects.get(advising_status=True).pk
+
+    semester = Semester.objects.get(semester_id=semester_id)
+
+    print(semester)
+
+    semesters = list(Semester.objects.all().order_by('-semester_id'))
 
     courses_taken = CoursesTaken.objects.filter(
         student_id=student_id,
-        semester_id=current_semester_id
+        semester_id=semester.semester_id
     ).all()
 
     view_selected_courses_data = []
@@ -562,7 +568,8 @@ def view_advised_courses(request):
     context = {
         'selected_courses': view_selected_courses_data,
         'portal_type': 'course_advising',
-        # 'is_':
+        'semesters': semesters,
+        'is_advising_semester': semester.advising_status
     }
 
     return render(request, 'advising_portal/advised_courses.html', context)

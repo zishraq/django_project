@@ -2,25 +2,17 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
-    {#    <div class="fix-width">#}
-    {#        <button type="button" class="btn btn-outline-primary">Primary</button>#}
-    {#        <button type="button" class="btn btn-outline-secondary">Secondary</button>#}
-    {#    </div>#}
-
     <div class="container-fluid">
-        {#        <div class="row fix-width">#}
         <div class="row">
             <div class="semesters-dropdown-menu col-12">
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle w-50" type="button" id="dropdownMenuButton"
-                            data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
+                    <button class="btn btn-secondary dropdown-toggle w-50" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Semesters
                     </button>
                     <div class="dropdown-menu w-50" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
+                        {% for semester in semesters %}
+                            <a class="dropdown-item" href="{% url 'student-panel-advised-courses' %}?semester_id={{ semester.semester_id }}">{{ semester.semester_name }}</a>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -48,7 +40,9 @@
                             <th class="col-md-2"><b>Section</b></th>
                             <th class="col-md-3"><b>Timing</b></th>
                             <th class="col-md-3"><b>Credits</b></th>
-                            <th class="col-md-3"><b>Drop</b></th>
+                            {% if is_advising_semester %}
+                                <th class="col-md-3"><b>Drop</b></th>
+                            {% endif %}
                         </tr>
 
                         {% for course in selected_courses %}
@@ -58,20 +52,14 @@
                                 <td class="col-md-1"><small>{{ course.routine|linebreaks }}</small></td>
                                 {# <td class="col-md-1"><small><pre>{{ course.routine_id }}</pre></small></td>#}
                                 <td class="col-md-1">{{ course.credits }}</td>
-                                <td class="col-md-1">
-                                    {% if portal_type == 'section_request' %}
-                                        <button class="btn btn-outline-danger" type="submit"
-                                                onclick="location.href='{% url 'student-panel-revoke-section-request' course.section_id %}'">
-                                            Revoke
-                                        </button>
-                                    {% else %}
+                                {% if is_advising_semester %}
+                                    <td class="col-md-1">
                                         <button class="btn btn-outline-danger" type="submit"
                                                 onclick="location.href='{% url 'student-panel-drop-course' course.section_id %}'">
                                             Drop
                                         </button>
-                                    {% endif %}
-
-                                </td>
+                                    </td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
 
@@ -81,6 +69,5 @@
             </div>
         </div>
     </div>
-    {#    <script src="{% static 'advising_portal/js/my_scripts.js' %}"></script>#}
 
 {% endblock content %}
