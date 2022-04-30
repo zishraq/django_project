@@ -208,8 +208,10 @@ def add_course_view(request, section_id):
             total_credits = total_credits['credit__sum']
             selected_course_credit = selected_course.credit
 
-            if total_credits + selected_course_credit > 12:
-                messages.error(request, f'Total credits cannot be more than 12')
+            credit_limit = 15
+
+            if total_credits + selected_course_credit > credit_limit:
+                messages.error(request, f'Total credits cannot be more than {credit_limit}')
                 return redirect('student-panel-portal', referer_parameter)
 
     # check section capacity
@@ -377,11 +379,11 @@ def request_section(request, section_id, reason):
             ).aggregate(Sum('credit'))
 
             total_credits = total_credits['credit__sum']
-            selected_course_credit = requested_course.credit
+            requested_course_credit = requested_course.credit
 
             credit_limit = 9
 
-            if total_credits + selected_course_credit > credit_limit:
+            if total_credits + requested_course_credit > credit_limit:
                 messages.error(request, f'Cannot request for more than {credit_limit} credits')
                 return redirect('student-panel-request-section-list-view')
 
