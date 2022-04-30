@@ -72,7 +72,7 @@ courses = [
         'course_title': 'Co-ordinate Geometry & Vector Analysis',
         'department_id': Department.objects.get(pk='GEN').pk,
         'prerequisite_course_id': "MAT101",
-        'credit': 4.5,
+        'credit': 3,
         'created_by_id': User.objects.get(username='admin').pk
     },
     {
@@ -81,7 +81,7 @@ courses = [
         'course_title': 'Engineering Chemistry-I',
         'department_id': Department.objects.get(pk='GEN').pk,
         'prerequisite_course_id': None,
-        'credit': 3,
+        'credit': 4,
         'created_by_id': User.objects.get(username='admin').pk
     },
     {
@@ -126,7 +126,7 @@ courses = [
         'course_title': 'Electronic Circuits',
         'department_id': Department.objects.get(pk='CSE').pk,
         'prerequisite_course_id': 'CSE209',
-        'credit': 4.5,
+        'credit': 4,
         'created_by_id': User.objects.get(username='admin').pk
     },
     {
@@ -162,7 +162,7 @@ courses = [
         'course_title': 'Engineering Physics-I (Introductory Classical Physics)',
         'department_id': Department.objects.get(pk='GEN').pk,
         'prerequisite_course_id': 'MAT205',
-        'credit': 4,
+        'credit': 3,
         'created_by_id': User.objects.get(username='admin').pk
     },
     {
@@ -181,15 +181,6 @@ courses = [
         'department_id': Department.objects.get(pk='CSE').pk,
         'prerequisite_course_id': 'CSE207',
         'credit': 4.5,
-        'created_by_id': User.objects.get(username='admin').pk
-    },
-    {
-        'course_id': 'CSE207',
-        'course_code': 'CSE207',
-        'course_title': 'Data Structures',
-        'department_id': Department.objects.get(pk='CSE').pk,
-        'prerequisite_course_id': "CSE110",
-        'credit': 4,
         'created_by_id': User.objects.get(username='admin').pk
     },
     {

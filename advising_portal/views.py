@@ -438,29 +438,24 @@ def grade_report_view(request):
         grade['grade']: 0 for grade in grades
     }
 
-    # unique_courses = {
-    #     'course_code': {
-    #         'total_cgpa'
-    #     }
-    # }
+    retake_courses = []
 
     for course in courses_taken:
         letter_grade = course.grade.grade
-        course_credit = course.section.course.credit
+        grade_point = course.grade.grade_point
 
         course_code = course.section.course.course_code
+        course_credit = course.section.course.credit
 
-        # if course not in unique_courses:
-        #     unique_courses[course]
-
-        total_cgpa += (course.grade.grade_point * course_credit)
-
-        # total_credit += course_credit
-
-        if letter_grade not in ['W', 'R']:
-            total_credit += course_credit
-        else:
+        if course_code in retake_courses:
             total_credit += 0
+        else:
+            total_credit += course_credit
+
+        if letter_grade == 'R':
+            retake_courses.append(course_code)
+
+        total_cgpa += (grade_point * course_credit)
 
         if course.semester_id not in courses_by_semesters:
             courses_by_semesters[course.semester_id] = {
@@ -474,19 +469,22 @@ def grade_report_view(request):
                         'course_credit': course_credit,
                         'grade': letter_grade,
                         'total_gp': course_credit * 4,
-                        'grade_point': course.grade.grade_point,
+                        # 'grade_point': course.grade.grade_point,
+                        'grade_point': grade_point,
                     }
                 ],
                 'current_cgpa': total_cgpa,
                 'current_total_credit': total_credit,
-                'term_gpa': course.grade.grade_point * course_credit
+                # 'term_gpa': course.grade.grade_point * course_credit
+                'term_gpa': grade_point * course_credit
             }
 
         else:
             courses_by_semesters[course.semester_id]['total_credit'] += course_credit
             courses_by_semesters[course.semester_id]['current_cgpa'] = total_cgpa
             courses_by_semesters[course.semester_id]['current_total_credit'] = total_credit
-            courses_by_semesters[course.semester_id]['term_gpa'] += (course.grade.grade_point * course_credit)
+            # courses_by_semesters[course.semester_id]['term_gpa'] += (course.grade.grade_point * course_credit)
+            courses_by_semesters[course.semester_id]['term_gpa'] += (grade_point * course_credit)
             courses_by_semesters[course.semester_id]['courses'].append(
                 {
                     'course_code': course_code,
@@ -494,7 +492,8 @@ def grade_report_view(request):
                     'course_credit': course_credit,
                     'grade': letter_grade,
                     'total_gp': course_credit * 4,
-                    'grade_point': course.grade.grade_point,
+                    # 'grade_point': course.grade.grade_point,
+                    'grade_point': grade_point,
                 }
             )
 
@@ -544,8 +543,6 @@ def view_advised_courses(request):
         semester_id = Semester.objects.get(advising_status=True).pk
 
     semester = Semester.objects.get(semester_id=semester_id)
-
-    print(semester)
 
     semesters = list(Semester.objects.all().order_by('-semester_id'))
 
