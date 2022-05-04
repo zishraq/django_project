@@ -7,8 +7,9 @@ from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
+from django.utils import timezone
 
-from advising_portal.forms import SectionRequestForm, CreateCourseForm
+from advising_portal.forms import SectionRequestForm, CreateCourseForm, CreateSemesterForm
 from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, Routine, TimeSlot, WeekSlot, \
     SectionsRequested, Grade
 from django.contrib.auth.decorators import login_required
@@ -627,54 +628,73 @@ def create_course(request):
     return render(request, 'advising_portal/create_course.html', context)
 
 
-# @login_required
-# @allowed_users(allowed_roles=['faculty'])
-# def semesters_list_view(request):
-#     semesters = Semester.objects.all()
-#     semester_list = []
-#
-#     for semester in semesters:
-#         formatted_data = {
-#             'semester_id': semester.,
-#             'semester_name': semester.course_title,
-#             'semester_starts_at': semester.credit,
-#             'semester_ends_at': semester.department.department_name,
-#             'advising_status': semester.prerequisite_course.course_code if semester.prerequisite_course else '',
-#             'add_drop_status': semester.prerequisite_course.course_code if semester.prerequisite_course else '',
-#             'is_active': semester.prerequisite_course.course_code if semester.prerequisite_course else '',
-#         }
-#         semester_list.append(formatted_data)
-#
-#     context = {
-#         'courses': semester_list
-#     }
-#
-#     return render(request, 'advising_portal/courses.html', context)
-#
-#
-# @login_required
-# @allowed_users(allowed_roles=['faculty'])
-# def semester_course(request):
-#     if request.method == 'POST':
-#         form = CreateCourseForm(request.POST)
-#
-#         if form.is_valid():
-#             create_course_data = form.cleaned_data
-#             create_course_data['course_id'] = create_course_data['course_code']
-#
-#             new_course = Course(**create_course_data)
-#             new_course.save()
-#
-#             # form.save()
-#
-#             messages.success(request, 'Course successfully created!')
-#             return redirect('student-panel-courses')
-#
-#     else:
-#         form = CreateCourseForm()
-#
-#     context = {
-#         'form': form,
-#     }
-#
-#     return render(request, 'advising_portal/create_course.html', context)
+@login_required
+@allowed_users(allowed_roles=['faculty'])
+def semesters_list_view(request):
+    semesters = Semester.objects.all().order_by('-semester_id')
+    semester_list = []
+
+    for semester in semesters:
+        formatted_data = {
+            'semester_name': semester.semester_name,
+            'semester_starts_at': semester.semester_starts_at,
+            'semester_ends_at': semester.semester_ends_at,
+            'advising_status': 'Yes' if semester.advising_status else 'No',
+            'add_drop_status': 'Yes' if semester.add_drop_status else 'No',
+            'is_active': 'Yes' if semester.is_active else 'No'
+        }
+        semester_list.append(formatted_data)
+
+    context = {
+        'semesters': semester_list
+    }
+
+    return render(request, 'advising_portal/semesters.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty'])
+def semester_detail_view(request, semester_id):
+    print(semester_id)
+
+    semester = Semester.objects.get(semester_id=semester_id)
+    semester_list = []
+
+    print(semester)
+    print()
+
+    semester_data = semester.__dict__
+    semester_data.pop('_state')
+
+    context = {
+        'semester': semester_data
+    }
+
+    return render(request, 'advising_portal/semester_detail.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty'])
+def create_semester(request):
+    if request.method == 'POST':
+        form = CreateSemesterForm(request.POST)
+
+        if form.is_valid():
+            create_semester_data = form.cleaned_data
+            create_semester_data['created_at'] = timezone.now()
+            create_semester_data['created_by'] = request.user
+
+            new_semester = Semester(**create_semester_data)
+            new_semester.save()
+
+            messages.success(request, 'Semester successfully created!')
+            return redirect('student-panel-semesters')
+
+    else:
+        form = CreateSemesterForm()
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'advising_portal/create_semester.html', context)

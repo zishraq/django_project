@@ -16,5 +16,8 @@ urlpatterns = [
     path('grade-report/', views.grade_report_view, name='student-panel-grade-report'),
 
     path('all-courses/', views.courses_list_view, name='student-panel-courses'),
-    path('create-course/', views.create_course, name='student-panel-create-course')
+    path('create-course/', views.create_course, name='student-panel-create-course'),
+    path('all-semesters/', views.semesters_list_view, name='student-panel-semesters'),
+    path('semester-detial/<semester_id>', views.semester_detail_view, name='student-panel-semester-detail'),
+    path('create-semester/', views.create_semester, name='student-panel-create-semester')
 ]

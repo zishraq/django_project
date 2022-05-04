@@ -1,1 +1,7 @@
 Django~=4.0.2
+django-crispy
+django-crispy-forms
+Pillow
+pytz==2018.5
+requests==2.19.1
+urllib3==1.23

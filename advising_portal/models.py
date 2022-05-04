@@ -1,6 +1,7 @@
 import re
 from datetime import datetime
 
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -25,14 +26,14 @@ class Course(models.Model):
 
 
 class Semester(models.Model):
-    semester_id = models.IntegerField(primary_key=True)
-    semester_name = models.CharField(max_length=50)
+    semester_id = models.AutoField(primary_key=True)
+    semester_name = models.CharField(max_length=50, validators=[RegexValidator(r'(Spring|Summer|Fall)\-[0-9]{4}')])
     semester_starts_at = models.DateField()
     semester_ends_at = models.DateField()
     created_at = models.DateTimeField(default=timezone.now)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='semester_creator')
     updated_at = models.DateTimeField(null=True)
-    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='semester_updater')
     advising_status = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     add_drop_status = models.BooleanField(default=False)
@@ -53,14 +54,36 @@ class Faculty(models.Model):
     faculty_id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=30)
     initials = models.CharField(max_length=10)
+    profile_picture = models.ImageField(default='male_default.svg', upload_to='profile_pics')
+    gender = models.CharField(max_length=10, validators=[RegexValidator(r'(male|female|other)')])
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.gender == 'male':
+            self.profile_picture = 'male_default.jpg'
+
+        else:
+            self.profile_picture = 'female_default.jpg'
+
+        super(Faculty, self).save(*args, **kwargs)
 
 
 class Student(models.Model):
     student_id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=30)
     advisor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
+    profile_picture = models.ImageField(default='male_default.svg', upload_to='profile_pics')
+    gender = models.CharField(max_length=10, validators=[RegexValidator(r'(male|female|other)')])
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.gender == 'male':
+            self.profile_picture = 'male_default.jpg'
+
+        else:
+            self.profile_picture = 'female_default.jpg'
+
+        super(Student, self).save(*args, **kwargs)
 
 
 class WeekSlot(models.Model):
@@ -177,9 +200,9 @@ class Section(models.Model):
     routine = models.ForeignKey(WeekSlot, on_delete=models.SET_NULL, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(default=timezone.now)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='creator')
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='section_creator')
     updated_at = models.DateTimeField(default=timezone.now)
-    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='updater')
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='section_updater')
 
 
 class Grade(models.Model):
