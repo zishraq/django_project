@@ -31,8 +31,11 @@ class Semester(models.Model):
     semester_ends_at = models.DateField()
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    updated_at = models.DateTimeField(null=True)
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     advising_status = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    add_drop_status = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.advising_status:

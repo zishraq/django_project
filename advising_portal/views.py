@@ -625,3 +625,56 @@ def create_course(request):
     }
 
     return render(request, 'advising_portal/create_course.html', context)
+
+
+# @login_required
+# @allowed_users(allowed_roles=['faculty'])
+# def semesters_list_view(request):
+#     semesters = Semester.objects.all()
+#     semester_list = []
+#
+#     for semester in semesters:
+#         formatted_data = {
+#             'semester_id': semester.,
+#             'semester_name': semester.course_title,
+#             'semester_starts_at': semester.credit,
+#             'semester_ends_at': semester.department.department_name,
+#             'advising_status': semester.prerequisite_course.course_code if semester.prerequisite_course else '',
+#             'add_drop_status': semester.prerequisite_course.course_code if semester.prerequisite_course else '',
+#             'is_active': semester.prerequisite_course.course_code if semester.prerequisite_course else '',
+#         }
+#         semester_list.append(formatted_data)
+#
+#     context = {
+#         'courses': semester_list
+#     }
+#
+#     return render(request, 'advising_portal/courses.html', context)
+#
+#
+# @login_required
+# @allowed_users(allowed_roles=['faculty'])
+# def semester_course(request):
+#     if request.method == 'POST':
+#         form = CreateCourseForm(request.POST)
+#
+#         if form.is_valid():
+#             create_course_data = form.cleaned_data
+#             create_course_data['course_id'] = create_course_data['course_code']
+#
+#             new_course = Course(**create_course_data)
+#             new_course.save()
+#
+#             # form.save()
+#
+#             messages.success(request, 'Course successfully created!')
+#             return redirect('student-panel-courses')
+#
+#     else:
+#         form = CreateCourseForm()
+#
+#     context = {
+#         'form': form,
+#     }
+#
+#     return render(request, 'advising_portal/create_course.html', context)
