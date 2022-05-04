@@ -488,18 +488,21 @@ if __name__ == '__main__':
             'faculty_id': 'RDA',
             'name': 'Rashedul Amin Tuhin',
             'initials': 'RDA',
+            'gender': 'male',
             'username_id': User.objects.get(username='tuhin').pk
         },
         {
             'faculty_id': 'AKD',
             'name': 'Amit Kumar Das',
             'initials': 'AKD',
+            'gender': 'male',
             'username_id': User.objects.get(username='amit').pk
         },
         {
             'faculty_id': 'admin',
             'name': 'admin',
             'initials': 'admin',
+            'gender': 'male',
             'username_id': User.objects.get(username='admin').pk
         }
     ]
@@ -1224,7 +1227,7 @@ if __name__ == '__main__':
             'section_capacity': 45,
             'total_students': 0,
             'instructor_id': None,
-            'routine_id': WeekSlot.objects.get(pk='M01W01W09').pk,
+            'routine_id': WeekSlot.objects.get(pk='M01W01').pk,
             'course_id': Course.objects.get(pk='CSE360').pk,
         },
         {

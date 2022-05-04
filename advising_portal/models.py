@@ -13,6 +13,9 @@ class Department(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
+    def __str__(self):
+        return self.department_name
+
 
 class Course(models.Model):
     course_id = models.CharField(max_length=100, primary_key=True)
@@ -23,6 +26,17 @@ class Course(models.Model):
     credit = models.FloatField()
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.course_code
+
+
+# class CoursePrerequisites(models.Model):
+#     class Meta:
+#         unique_together = (('course_code', 'prerequisite_course_code'),)
+#
+#     course_code = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_code')
+#     prerequisite_course_code = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='prerequisite_course_code')
 
 
 class Semester(models.Model):
@@ -38,15 +52,37 @@ class Semester(models.Model):
     is_active = models.BooleanField(default=False)
     add_drop_status = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.semester_name
+
     def save(self, *args, **kwargs):
         if self.advising_status:
             try:
                 temp = Semester.objects.get(advising_status=True)
                 if self != temp:
-                    temp.is_the_chosen_one = False
+                    temp.advising_status = False
                     temp.save()
             except Semester.DoesNotExist:
                 pass
+
+        if self.is_active:
+            try:
+                temp = Semester.objects.get(is_active=True)
+                if self != temp:
+                    temp.is_active = False
+                    temp.save()
+            except Semester.DoesNotExist:
+                pass
+
+        if self.add_drop_status:
+            try:
+                temp = Semester.objects.get(add_drop_status=True)
+                if self != temp:
+                    temp.add_drop_status = False
+                    temp.save()
+            except Semester.DoesNotExist:
+                pass
+
         super(Semester, self).save(*args, **kwargs)
 
 
@@ -58,12 +94,15 @@ class Faculty(models.Model):
     gender = models.CharField(max_length=10, validators=[RegexValidator(r'(male|female|other)')])
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
 
+    def __str__(self):
+        return self.initials
+
     def save(self, *args, **kwargs):
         if self.gender == 'male':
-            self.profile_picture = 'male_default.jpg'
+            self.profile_picture = 'male_default.svg'
 
         else:
-            self.profile_picture = 'female_default.jpg'
+            self.profile_picture = 'female_default.svg'
 
         super(Faculty, self).save(*args, **kwargs)
 
@@ -78,10 +117,10 @@ class Student(models.Model):
 
     def save(self, *args, **kwargs):
         if self.gender == 'male':
-            self.profile_picture = 'male_default.jpg'
+            self.profile_picture = 'male_default.svg'
 
         else:
-            self.profile_picture = 'female_default.jpg'
+            self.profile_picture = 'female_default.svg'
 
         super(Student, self).save(*args, **kwargs)
 
@@ -110,7 +149,7 @@ class WeekSlot(models.Model):
         for time_slot1 in range(len(time_slot_objects)):
             for time_slot2 in range(len(time_slot_objects)):
                 if time_slot1 != time_slot2:
-                    if time_slot_objects[time_slot1].does_conflict(time_slot_objects[time_slot2]):
+                    if time_slot_objects[time_slot1].does_conflict_with_time_slot(time_slot_objects[time_slot2]):
                         return False
 
         return True
@@ -122,7 +161,7 @@ class WeekSlot(models.Model):
         else:
             raise Exception('Invalid week slot')
 
-    def format_routine(self):
+    def __str__(self):
         get_time_slots = Routine.objects.filter(
             routine_slot_id=self.routine_id
         ).values('time_slot_id').distinct()
@@ -163,7 +202,7 @@ class TimeSlot(models.Model):
 
         return time_visual_format
 
-    def does_conflict(self, compare_time_slot):
+    def does_conflict_with_time_slot(self, compare_time_slot):
         if self.day == compare_time_slot.day:
             this_time_slot_start_time = datetime.strptime(str(self.start_time), '%H:%M:%S')
             this_time_slot_end_time = datetime.strptime(str(self.end_time), '%H:%M:%S')
@@ -203,6 +242,22 @@ class Section(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='section_creator')
     updated_at = models.DateTimeField(default=timezone.now)
     updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='section_updater')
+
+    def does_conflict_with_section(self, compare_section):
+        time_slots_of_current_section = Routine.objects.filter(routine_slot=self.routine)
+
+        compare_section_routine = compare_section.routine  # Get routine id of the comparing section
+        time_slots_of_compare_section = Routine.objects.filter(
+            routine_slot=compare_section_routine
+        )  # Get time slots of current section
+
+        # Check for time slot conflict
+        for i in time_slots_of_compare_section:
+            for j in time_slots_of_current_section:
+                if i.time_slot.does_conflict_with_time_slot(j.time_slot):
+                    return True
+
+        return False
 
 
 class Grade(models.Model):
@@ -246,3 +301,8 @@ class SectionsRequested(models.Model):
     # advisor_text = models.TextField()
     # instructor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
     # instructor_text = models.TextField()
+
+
+# class AssignedCourses(models.Model):
+#     course_assignment_record_id = models.AutoField(primary_key=True)
+#     instructor =

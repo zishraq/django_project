@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
     <div align="right">
-        <a href="{% url 'student-panel-create-semester' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+        <a href="{% url 'student-panel-semester-create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
             <i class="fas fa-download fa-sm text-white-50"></i>Create semester</a>
     </div>
 
@@ -24,7 +24,7 @@
                     <form
                             class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group custom-search-align">
-                            <input type="text" id="myInput" onkeyup="table_search(6)"
+                            <input type="text" id="myInput" onkeyup="table_search(7)"
                                    class="form-control bg-light border-0 small" placeholder="Search for..."
                                    aria-label="Search" aria-describedby="basic-addon2">
                             <div class="input-group-append">
@@ -47,7 +47,7 @@
                     <td class="col-md-1">{{ semester.add_drop_status }}</td>
                     <td class="col-md-1">{{ semester.is_active }}</td>
                     <td class="col-md-1">
-                        <button class="btn btn-outline-danger" type="submit">
+                        <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'student-panel-semester-detail' semester.semester_id %}'">
                             Detail
                         </button>
                     </td>
@@ -56,6 +56,5 @@
             </tbody>
         </table>
     </div>
-    <script src="{% static 'advising_portal/js/my_scripts.js' %}"></script>
 
 {% endblock content %}

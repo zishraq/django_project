@@ -83,7 +83,7 @@
 
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'student-panel-courses' %}">
+                    <a class="nav-link" href="{% url 'student-panel-course-list' %}">
                         <i class="fas fa-fw fa-tachometer-alt"></i>
                         Courses
                     </a>
@@ -91,9 +91,17 @@
                 <hr class="sidebar-divider">
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'student-panel-semesters' %}">
+                    <a class="nav-link" href="{% url 'student-panel-semester-list' %}">
                         <i class="fas fa-fw fa-tachometer-alt"></i>
                         Semesters
+                    </a>
+                </li>
+                <hr class="sidebar-divider">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'student-panel-assigned-sections' %}">
+                        <i class="fas fa-fw fa-tachometer-alt"></i>
+                        Assigned Courses
                     </a>
                 </li>
                 <hr class="sidebar-divider">
@@ -215,8 +223,14 @@
                                         <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ user.faculty.name }}</span>
                                     {% endif %}
                                 </span>
-                                <img class="img-profile rounded-circle"
-                                    src="{% static 'advising_portal/img/undraw_profile.svg' %}">
+{#                                <img class="img-profile rounded-circle" src="{% static 'advising_portal/img/undraw_profile.svg' %}">#}
+
+                                {% if user|has_group:"student" %}
+                                    <img class="img-profile rounded-circle" src="{{ user.student.profile_picture.url }}">
+                                {% else %}
+                                    <img class="img-profile rounded-circle" src="{{ user.faculty.profile_picture.url }}">
+                                {% endif %}
+
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -293,6 +307,9 @@
 
     <!-- Custom scripts for all pages-->
     <script src="{% static 'advising_portal/js/sb-admin-2.min.js' %}"></script>
+
+    <!-- My scripts for all pages-->
+    <script src="{% static 'advising_portal/js/my_scripts.js' %}"></script>
 
 </body>
 

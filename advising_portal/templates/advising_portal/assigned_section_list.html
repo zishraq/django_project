@@ -1,0 +1,46 @@
+{% extends "advising_portal/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-left-primary shadow py-2 custom-selection-card-design">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Assigned Courses
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive card shadow right-table-align">
+                    <table class="table table-striped">
+                        <tbody>
+                        <tr>
+                            <th class="col-md-1"><b>Course</b></th>
+                            <th class="col-md-1"><b>Section</b></th>
+                            <th class="col-md-1"><b>Timing</b></th>
+                            <th class="col-md-1"><b>Capacity</b></th>
+                            <th class="col-md-1"><b>Credits</b></th>
+                        </tr>
+
+                        {% for section in sections %}
+                            <tr>
+                                <td class="col-md-1">{{ section.course_code }}</td>
+                                <td class="col-md-1">{{ section.section_no }}</td>
+                                <td class="col-md-1"><small>{{ section.routine|linebreaks }}</small></td>
+                                <td class="col-md-1">{{ section.total_students }} / {{ section.section_capacity }}</td>
+                                <td class="col-md-1">{{ section.credit }}</td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

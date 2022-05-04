@@ -11,13 +11,23 @@ urlpatterns = [
     # path('make-section-request/<section_id>/', views.request_section, name='advising-portal-make-section-request'),
     path('revoke-section-request/<section_id>/', views.revoke_section_request_view, name='student-panel-revoke-section-request'),
 
-    # path('selected-courses/', views.view_selected_courses, name='advising-portal-selected-courses'),
-    path('advised-courses/', views.view_advised_courses, name='student-panel-advised-courses'),
+    path('advised-courses/', views.advised_course_list_view, name='student-panel-advised-courses'),
     path('grade-report/', views.grade_report_view, name='student-panel-grade-report'),
 
-    path('all-courses/', views.courses_list_view, name='student-panel-courses'),
-    path('create-course/', views.create_course, name='student-panel-create-course'),
-    path('all-semesters/', views.semesters_list_view, name='student-panel-semesters'),
+    path('course-list/', views.course_list_view, name='student-panel-course-list'),
+    path('course-detail/<course_id>', views.course_detail_view, name='student-panel-course-detail'),
+    path('course-create/', views.course_create_view, name='student-panel-course-create'),
+
+    path('section-create/<course_code>', views.section_create_view, name='student-panel-section-create'),
+    path('section-detail/<section_id>', views.section_detail_view, name='student-panel-section-detail'),
+
+    path('semester-list/', views.semester_list_view, name='student-panel-semester-list'),
     path('semester-detial/<semester_id>', views.semester_detail_view, name='student-panel-semester-detail'),
-    path('create-semester/', views.create_semester, name='student-panel-create-semester')
+    path('semester-create/', views.semester_create, name='student-panel-semester-create'),
+
+    # path('student-list/', views.semester_list_view, name='student-panel-semester-list'),
+    # path('student-detial/<semester_id>', views.semester_detail_view, name='student-panel-semester-detail'),
+    # path('student-create/', views.semester_create, name='student-panel-semester-create'),
+
+    path('assigned-sections/', views.assigned_sections, name='student-panel-assigned-sections')
 ]

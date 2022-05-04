@@ -5,7 +5,8 @@ from django.contrib.auth.forms import UserCreationForm
 # from .models import Profile
 from django.forms import DateInput
 
-from advising_portal.models import Student, Faculty, Course, Semester
+from advising_portal.models import Student, Faculty, Course, Semester, Section
+
 
 # from bootstrap_modal_forms.mixins import PopRequestMixin, CreateUpdateAjaxMixin
 
@@ -19,9 +20,6 @@ class CreateCourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ('course_code', 'course_title', 'department', 'prerequisite_course', 'credit')
-        # widgets = {
-        #     'prerequisite_course': forms.Select
-        # }
 
     def __init__(self, *args, **kwargs):
         super(CreateCourseForm, self).__init__(*args, **kwargs)
@@ -42,3 +40,25 @@ class CreateSemesterForm(forms.ModelForm):
         self.fields['advising_status'].required = False
         self.fields['is_active'].required = False
         self.fields['add_drop_status'].required = False
+
+
+class CreateSectionForm(forms.ModelForm):
+    class Meta:
+        model = Section
+        fields = ('section_no', 'section_capacity', 'instructor', 'routine')
+
+    def __init__(self, *args, **kwargs):
+        super(CreateSectionForm, self).__init__(*args, **kwargs)
+        self.fields['instructor'].required = False
+
+
+class UpdateSectionForm(forms.ModelForm):
+    class Meta:
+        model = Section
+        fields = ('section_capacity', 'instructor', 'routine')
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateSectionForm, self).__init__(*args, **kwargs)
+        self.fields['section_capacity'].required = False
+        self.fields['instructor'].required = False
+        self.fields['routine'].required = False

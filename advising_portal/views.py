@@ -9,9 +9,10 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.utils import timezone
 
-from advising_portal.forms import SectionRequestForm, CreateCourseForm, CreateSemesterForm
+from advising_portal.forms import SectionRequestForm, CreateCourseForm, CreateSemesterForm, UpdateSectionForm, \
+    CreateSectionForm
 from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, Routine, TimeSlot, WeekSlot, \
-    SectionsRequested, Grade
+    SectionsRequested, Grade, Faculty
 from django.contrib.auth.decorators import login_required
 
 from users.decorators import allowed_users
@@ -116,10 +117,9 @@ def advising_portal_list_view(request, section_filter):
             'section_capacity': section.section_capacity,
             'total_students': section.total_students,
             'department_name': section.course.department.department_name,
-            'instructor_id': section.instructor.name,
             'course_id': section.course.course_code,
             'credit': section.course.credit,
-            'routine': section.routine.format_routine()
+            'routine': section.routine
         }
 
         view_section_data.append(formatted_data)
@@ -140,7 +140,7 @@ def advising_portal_list_view(request, section_filter):
             'section_no': course.section.section_no,
             'section_id': course.section_id,
             'credits': course.section.course.credit,
-            'routine': course.section.routine.format_routine()
+            'routine': course.section.routine
         }
 
         view_selected_courses_data.append(formatted_data)
@@ -164,9 +164,6 @@ def add_course_view(request, section_id):
     selected_section = Section.objects.get(section_id=section_id)   # get selected section data
     selected_course = selected_section.course   # get course data of the selected section
 
-    selected_section_routine_id = selected_section.routine_id   # store routine id of the selected section
-    time_slots_of_selected_section = Routine.objects.filter(routine_slot_id=selected_section_routine_id)  # get time slots by routine id
-
     # Check whether the section was already taken
     existence_check = CoursesTaken.objects.filter(
         student=student,
@@ -185,21 +182,15 @@ def add_course_view(request, section_id):
             semester=current_semester,
         ).all()
 
-        for section in previous_selected_sections:
+        for previous_section in previous_selected_sections:
             # Check if the course of the section is already taken
-            if section.section.course == selected_course:
+            if previous_section.section.course == selected_course:
                 messages.error(request, 'Course already added')
                 return redirect('student-panel-portal', referer_parameter)
 
-            current_section_routine_id = section.section.routine_id   # Get routine id of the comparing section
-            time_slots_of_current_section = Routine.objects.filter(routine_slot_id=current_section_routine_id)  # Get time slots of current section
-
-            # Check for time slot conflict
-            for i in time_slots_of_current_section:
-                for j in time_slots_of_selected_section:
-                    if i.time_slot.does_conflict(j.time_slot):
-                        messages.error(request, f'Conflicts with {section.section.course.course_code}')
-                        return redirect('student-panel-portal', referer_parameter)
+            if selected_section.does_conflict_with_section(previous_section.section):
+                messages.error(request, f'Conflicts with {previous_section.section.course.course_code}')
+                return redirect('student-panel-portal', referer_parameter)
 
             # Check whether total credits exceed limit
             total_credits = Course.objects.filter(
@@ -292,10 +283,9 @@ def request_section_list_view(request):
             'section_capacity': section.section_capacity,
             'total_students': section.total_students,
             'department_name': section.course.department.department_name,
-            'instructor_id': section.instructor.name,
             'course_id': section.course.course_code,
             'credit': section.course.credit,
-            'routine': section.routine.format_routine()
+            'routine': section.routine
         }
 
         view_section_data.append(formatted_data)
@@ -316,7 +306,7 @@ def request_section_list_view(request):
             'section_no': section.section.section_no,
             'section_id': section.section_id,
             'credits': section.section.course.credit,
-            'routine': section.section.routine.format_routine()
+            'routine': section.section.routine
         }
 
         view_selected_courses_data.append(formatted_data)
@@ -358,21 +348,15 @@ def request_section(request, section_id, reason):
             semester=current_semester
         ).all()
 
-        for section in previous_requested_sections:
+        for previous_section in previous_requested_sections:
             # Check if the course of the section is already taken
-            if section.section.course == requested_course:
+            if previous_section.section.course == requested_course:
                 messages.error(request, 'Already requested for this Course')
                 return redirect('student-panel-request-section-list-view')
 
-            current_section_routine_id = section.section.routine_id   # Get routine id of the comparing section
-            time_slots_of_current_section = Routine.objects.filter(routine_slot_id=current_section_routine_id)  # Get time slots of current section
-
-            # Check for time slot conflict
-            for i in time_slots_of_current_section:
-                for j in time_slots_of_requested_section:
-                    if i.time_slot.does_conflict(j.time_slot):
-                        messages.error(request, f'Conflicts with {section.section.course.course_code}')
-                        return redirect('student-panel-request-section-list-view')
+            if requested_section.does_conflict_with_section(previous_section.section):
+                messages.error(request, f'Conflicts with {previous_section.section.course.course_code}')
+                return redirect('student-panel-request-section-list-view')
 
             # Check whether total credits exceed limit
             total_credits = Course.objects.filter(
@@ -538,7 +522,7 @@ def grade_report_view(request):
 
 @login_required
 @allowed_users(allowed_roles=['student'])
-def view_advised_courses(request):
+def advised_course_list_view(request):
     student_id = Student.objects.get(username_id=request.user).pk
     semester_id = request.GET.get('semester_id', '')
 
@@ -562,7 +546,7 @@ def view_advised_courses(request):
             'section_no': course.section.section_no,
             'section_id': course.section_id,
             'credits': course.section.course.credit,
-            'routine': course.section.routine.format_routine()
+            'routine': course.section.routine
         }
 
         view_selected_courses_data.append(formatted_data)
@@ -574,17 +558,18 @@ def view_advised_courses(request):
         'is_advising_semester': semester.advising_status
     }
 
-    return render(request, 'advising_portal/advised_courses.html', context)
+    return render(request, 'advising_portal/advised_course_list.html', context)
 
 
 @login_required
 @allowed_users(allowed_roles=['faculty'])
-def courses_list_view(request):
+def course_list_view(request):
     courses = Course.objects.all()
     course_list = []
 
     for course in courses:
         formatted_data = {
+            'course_id': course.course_id,
             'course_code': course.course_code,
             'course_title': course.course_title,
             'credit': course.credit,
@@ -597,12 +582,69 @@ def courses_list_view(request):
         'courses': course_list
     }
 
-    return render(request, 'advising_portal/courses.html', context)
+    return render(request, 'advising_portal/course_list.html', context)
 
 
 @login_required
 @allowed_users(allowed_roles=['faculty'])
-def create_course(request):
+def course_detail_view(request, course_id):
+    course_data = Course.objects.get(
+        course_id=course_id
+    )
+
+    if request.method == 'POST':
+        form = CreateCourseForm(request.POST, instance=course_data)
+
+        if form.is_valid():
+            create_course_data = form.cleaned_data
+            create_course_data['course_id'] = create_course_data['course_code']
+
+            new_course = Course(**create_course_data)
+            new_course.save()
+
+            messages.success(request, 'Course successfully updated!')
+            return redirect('student-panel-course-detail')
+
+    else:
+        form = CreateCourseForm(instance=course_data)
+
+    sections = Section.objects.filter(course_id=course_id)
+    section_list = []
+
+    for section in sections:
+        if section.instructor:
+            instructor_initials = section.instructor.initials
+            instructor_name = section.instructor.name
+        else:
+            instructor_initials = ''
+            instructor_name = ''
+
+        formatted_data = {
+            'section_id': section.section_id,
+            'section_no': section.section_no,
+            'section_capacity': section.section_capacity,
+            'total_students': section.total_students,
+            'instructor_initials': instructor_initials,
+            'instructor_name': instructor_name,
+            'formatted_routine': section.routine
+        }
+
+        section_list.append(formatted_data)
+
+    print(course_data.course_code)
+
+    context = {
+        'form': form,
+        'sections': section_list,
+        'course_code': course_data.course_code
+    }
+
+    return render(request, 'advising_portal/course_detail.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty'])
+def course_create_view(request):
     if request.method == 'POST':
         form = CreateCourseForm(request.POST)
 
@@ -613,10 +655,8 @@ def create_course(request):
             new_course = Course(**create_course_data)
             new_course.save()
 
-            # form.save()
-
             messages.success(request, 'Course successfully created!')
-            return redirect('student-panel-courses')
+            return redirect('student-panel-course-list')
 
     else:
         form = CreateCourseForm()
@@ -630,12 +670,85 @@ def create_course(request):
 
 @login_required
 @allowed_users(allowed_roles=['faculty'])
-def semesters_list_view(request):
+def section_detail_view(request, section_id):
+    section_data = Section.objects.get(
+        section_id=section_id
+    )
+
+    if request.method == 'POST':
+        form = UpdateSectionForm(request.POST, instance=section_data)
+
+        if form.is_valid():
+            instructor = form.cleaned_data['instructor']
+
+            instructors_sections = Section.objects.filter(
+                instructor=instructor
+            )
+
+            for section in instructors_sections:
+                if section_data.does_conflict_with_section(section):
+                    messages.error(request, f'Instructor assigned to Section-{section.section_no} of Course {section.course.course_code}!')
+                    return redirect('student-panel-section-detail', section_id)
+
+            form.save()
+
+            messages.success(request, 'Section successfully updated!')
+            return redirect('student-panel-course-detail', section_data.course_id)
+
+    else:
+        form = UpdateSectionForm(instance=section_data)
+
+    context = {
+        'form': form,
+        'course_code': section_data.course.course_code,
+        'section_no': section_data.section_no
+    }
+
+    return render(request, 'advising_portal/section_detail.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty'])
+def section_create_view(request, course_code):
+    if request.method == 'POST':
+        form = CreateSectionForm(request.POST)
+
+        if form.is_valid():
+            course_data = Course.objects.get(
+                course_code=course_code
+            )
+
+            create_section_data = form.cleaned_data
+            create_section_data['section_id'] = course_code + str(create_section_data['section_no'])
+            create_section_data['course'] = course_data
+            create_section_data['created_at'] = timezone.now()
+            create_section_data['created_by'] = request.user
+
+            new_section = Section(**create_section_data)
+            new_section.save()
+
+            messages.success(request, 'Section successfully added!')
+            return redirect('student-panel-course-detail', course_code)
+
+    else:
+        form = CreateSectionForm()
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'advising_portal/section_create.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty'])
+def semester_list_view(request):
     semesters = Semester.objects.all().order_by('-semester_id')
     semester_list = []
 
     for semester in semesters:
         formatted_data = {
+            'semester_id': semester.semester_id,
             'semester_name': semester.semester_name,
             'semester_starts_at': semester.semester_starts_at,
             'semester_ends_at': semester.semester_ends_at,
@@ -649,25 +762,35 @@ def semesters_list_view(request):
         'semesters': semester_list
     }
 
-    return render(request, 'advising_portal/semesters.html', context)
+    return render(request, 'advising_portal/semester_list.html', context)
 
 
 @login_required
 @allowed_users(allowed_roles=['faculty'])
 def semester_detail_view(request, semester_id):
-    print(semester_id)
+    semester_data = Semester.objects.get(
+        semester_id=semester_id
+    )
 
-    semester = Semester.objects.get(semester_id=semester_id)
-    semester_list = []
+    if request.method == 'POST':
+        form = CreateSemesterForm(request.POST, instance=semester_data)
 
-    print(semester)
-    print()
+        if form.is_valid():
+            update_semester_data = form.cleaned_data
+            update_semester_data['updated_at'] = timezone.now()
+            update_semester_data['updated_by'] = request.user
 
-    semester_data = semester.__dict__
-    semester_data.pop('_state')
+            updated_semester = Semester(**update_semester_data)
+            updated_semester.save()
+
+            messages.success(request, 'Semester successfully updated!')
+            return redirect('student-panel-semester-list')
+
+    else:
+        form = CreateSemesterForm(instance=semester_data)
 
     context = {
-        'semester': semester_data
+        'form': form
     }
 
     return render(request, 'advising_portal/semester_detail.html', context)
@@ -675,7 +798,7 @@ def semester_detail_view(request, semester_id):
 
 @login_required
 @allowed_users(allowed_roles=['faculty'])
-def create_semester(request):
+def semester_create(request):
     if request.method == 'POST':
         form = CreateSemesterForm(request.POST)
 
@@ -688,7 +811,7 @@ def create_semester(request):
             new_semester.save()
 
             messages.success(request, 'Semester successfully created!')
-            return redirect('student-panel-semesters')
+            return redirect('student-panel-semester-list')
 
     else:
         form = CreateSemesterForm()
@@ -698,3 +821,37 @@ def create_semester(request):
     }
 
     return render(request, 'advising_portal/create_semester.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty'])
+def assigned_sections(request):
+    get_faculty = Faculty.objects.get(username=request.user)
+
+    instructors_sections = Section.objects.filter(
+        instructor=get_faculty
+    )
+
+    print(instructors_sections)
+
+    view_section_data = []
+
+    for section in instructors_sections:
+        formatted_data = {
+            'section_id': section.section_id,
+            'section_no': section.section_no,
+            'section_capacity': section.section_capacity,
+            'total_students': section.total_students,
+            'department_name': section.course.department.department_name,
+            'course_code': section.course.course_code,
+            'credit': section.course.credit,
+            'routine': section.routine
+        }
+
+        view_section_data.append(formatted_data)
+
+    context = {
+        'sections': view_section_data,
+    }
+
+    return render(request, 'advising_portal/assigned_section_list.html', context)

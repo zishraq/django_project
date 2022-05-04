@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
     <div align="right">
-        <a href="{% url 'student-panel-create-course' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+        <a href="{% url 'student-panel-course-create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
             <i class="fas fa-download fa-sm text-white-50"></i>Create Course</a>
     </div>
 
@@ -45,7 +45,8 @@
                     <td class="col-md-1">{{ course.department }}</td>
                     <td class="col-md-1">{{ course.prerequisite_course }}</td>
                     <td class="col-md-1">
-                        <button class="btn btn-outline-danger" type="submit">
+{#                        <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'student-panel-course-detail' course.course_id %}'">#}
+                        <button class="btn btn-outline-danger" type="submit" onclick="window.open('{% url 'student-panel-course-detail' course.course_id %}')">
                             Detail
                         </button>
                     </td>
@@ -54,6 +55,5 @@
             </tbody>
         </table>
     </div>
-    <script src="{% static 'advising_portal/js/my_scripts.js' %}"></script>
 
 {% endblock content %}

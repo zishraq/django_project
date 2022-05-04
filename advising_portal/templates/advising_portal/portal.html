@@ -102,8 +102,7 @@
                                 <td class="col-md-1">{{ section.department_name }}</td>
 
                                 {% if portal_type == 'course_advising' %}
-                                    <td class="col-md-1">{{ section.total_students }}
-                                        / {{ section.section_capacity }}</td>
+                                    <td class="col-md-1">{{ section.total_students }} / {{ section.section_capacity }}</td>
                                 {% endif %}
 
                                 <td class="col-md-1">
@@ -213,6 +212,4 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'advising_portal/js/my_scripts.js' %}"></script>
-
 {% endblock content %}
