@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from django.utils import timezone
+from django.contrib.admin.models import LogEntry, ADDITION
 
 from advising_portal.forms import SectionRequestForm, CreateCourseForm, CreateSemesterForm, UpdateSectionForm, \
     CreateSectionForm
@@ -592,18 +593,22 @@ def course_detail_view(request, course_id):
         course_id=course_id
     )
 
+    print(course_data.history.all())
+
     if request.method == 'POST':
         form = CreateCourseForm(request.POST, instance=course_data)
 
         if form.is_valid():
-            create_course_data = form.cleaned_data
-            create_course_data['course_id'] = create_course_data['course_code']
+            # create_course_data = form.cleaned_data
+            # create_course_data['course_id'] = create_course_data['course_code']
+            #
+            # new_course = Course(**create_course_data)
+            # new_course.save()
 
-            new_course = Course(**create_course_data)
-            new_course.save()
+            form.save()
 
             messages.success(request, 'Course successfully updated!')
-            return redirect('student-panel-course-detail')
+            return redirect('student-panel-course-detail', course_id)
 
     else:
         form = CreateCourseForm(instance=course_data)
@@ -636,7 +641,8 @@ def course_detail_view(request, course_id):
     context = {
         'form': form,
         'sections': section_list,
-        'course_code': course_data.course_code
+        'course_code': course_data.course_code,
+        'course_id': course_data.course_id
     }
 
     return render(request, 'advising_portal/course_detail.html', context)
@@ -666,6 +672,19 @@ def course_create_view(request):
     }
 
     return render(request, 'advising_portal/create_course.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty'])
+def course_delete_view(request, course_id):
+    course_data = Course.objects.get(course_id=course_id)
+
+    Course.objects.filter(
+        course_id=course_id
+    ).delete()
+
+    messages.success(request, f'Deleted course {course_data.course_code}')
+    return redirect('student-panel-course-list')
 
 
 @login_required
@@ -701,7 +720,8 @@ def section_detail_view(request, section_id):
     context = {
         'form': form,
         'course_code': section_data.course.course_code,
-        'section_no': section_data.section_no
+        'section_no': section_data.section_no,
+        'section_id': section_data.section_id
     }
 
     return render(request, 'advising_portal/section_detail.html', context)
@@ -738,6 +758,19 @@ def section_create_view(request, course_code):
     }
 
     return render(request, 'advising_portal/section_create.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty'])
+def section_delete_view(request, section_id):
+    section_data = Section.objects.get(section_id=section_id)
+
+    Section.objects.filter(
+        section_id=section_id
+    ).delete()
+
+    messages.success(request, f'Deleted section-{section_data.section_no} of course {section_data.course.course_code}')
+    return redirect('student-panel-course-detail', section_data.course.course_code)
 
 
 @login_required

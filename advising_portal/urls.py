@@ -17,9 +17,11 @@ urlpatterns = [
     path('course-list/', views.course_list_view, name='student-panel-course-list'),
     path('course-detail/<course_id>', views.course_detail_view, name='student-panel-course-detail'),
     path('course-create/', views.course_create_view, name='student-panel-course-create'),
+    path('course-delete/<course_id>', views.course_delete_view, name='student-panel-course-delete'),
 
-    path('section-create/<course_code>', views.section_create_view, name='student-panel-section-create'),
     path('section-detail/<section_id>', views.section_detail_view, name='student-panel-section-detail'),
+    path('section-create/<course_code>', views.section_create_view, name='student-panel-section-create'),
+    path('section-delete/<section_id>', views.section_delete_view, name='student-panel-section-delete'),
 
     path('semester-list/', views.semester_list_view, name='student-panel-semester-list'),
     path('semester-detial/<semester_id>', views.semester_detail_view, name='student-panel-semester-detail'),

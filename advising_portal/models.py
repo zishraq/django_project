@@ -5,6 +5,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from simple_history.models import HistoricalRecords
 
 
 class Department(models.Model):
@@ -26,6 +27,7 @@ class Course(models.Model):
     credit = models.FloatField()
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.course_code

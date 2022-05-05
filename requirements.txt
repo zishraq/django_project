@@ -4,3 +4,4 @@ Pillow
 pytz
 requests
 urllib3
+django-simple-history
