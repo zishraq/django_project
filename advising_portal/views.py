@@ -8,6 +8,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from django.utils import timezone
+from django.utils.encoding import force_str
+from django.apps import apps
 from django.contrib.admin.models import LogEntry, ADDITION
 
 from advising_portal.forms import SectionRequestForm, CreateCourseForm, CreateSemesterForm, UpdateSectionForm, \
@@ -17,6 +19,7 @@ from advising_portal.models import Course, Section, CoursesTaken, Semester, Stud
 from django.contrib.auth.decorators import login_required
 
 from users.decorators import allowed_users
+
 
 
 def get_referer_parameter(request):
@@ -32,7 +35,10 @@ def get_referer_parameter(request):
 
 @login_required
 def home(request):
-    return render(request, 'advising_portal/base.html')
+    context = {
+        'room_name': 'broadcast'
+    }
+    return render(request, 'advising_portal/base.html', context)
 
 
 @login_required
@@ -637,6 +643,11 @@ def course_detail_view(request, course_id):
         section_list.append(formatted_data)
 
     print(course_data.course_code)
+
+    HistoricalCourse = apps.get_model('advising_portal', 'HistoricalCourse')
+
+    course_history = HistoricalCourse.objects.all()
+    print(course_history)
 
     context = {
         'form': form,

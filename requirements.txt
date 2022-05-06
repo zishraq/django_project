@@ -1,7 +1,10 @@
 Django~=4.0.2
+django-crispy
 django-crispy-forms
 Pillow
 pytz
 requests
 urllib3
 django-simple-history
+channels
+channels-redis

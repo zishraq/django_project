@@ -5,9 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
 from advising_portal.models import Student
-from .forms import ProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm, UserUpdateFrom
-from .models import OTPmodel
-from .send_otp import send_otp, store_otp
+from users.forms import ProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm, UserUpdateFrom
+from users.models import OTPmodel
+from users.send_otp import send_otp, store_otp
 
 
 def activate_student_profile_view(request):

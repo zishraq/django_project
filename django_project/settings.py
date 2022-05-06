@@ -32,16 +32,18 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'advising_portal.apps.AdvisingPortalConfig',
-    'users.apps.UsersConfig',
     'crispy_forms',
     'simple_history',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'advising_portal.apps.AdvisingPortalConfig',
+    'users.apps.UsersConfig',
+    'notification_system.apps.NotificationSystemConfig',
 ]
 
 MIDDLEWARE = [
@@ -75,6 +77,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'django_project.wsgi.application'
+ASGI_APPLICATION = 'django_project.asgi.application'
 
 
 # Database
@@ -141,3 +144,14 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = 'student-panel-home'
 LOGIN_URL = 'login'
+
+
+# channels
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [{'127.0.0.1', 6379}]
+        }
+    }
+}

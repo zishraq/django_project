@@ -13,6 +13,7 @@ class Department(models.Model):
     department_name = models.CharField(max_length=50)
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.department_name
@@ -53,6 +54,7 @@ class Semester(models.Model):
     advising_status = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     add_drop_status = models.BooleanField(default=False)
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.semester_name
@@ -95,6 +97,7 @@ class Faculty(models.Model):
     profile_picture = models.ImageField(default='male_default.svg', upload_to='profile_pics')
     gender = models.CharField(max_length=10, validators=[RegexValidator(r'(male|female|other)')])
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.initials
@@ -116,6 +119,7 @@ class Student(models.Model):
     profile_picture = models.ImageField(default='male_default.svg', upload_to='profile_pics')
     gender = models.CharField(max_length=10, validators=[RegexValidator(r'(male|female|other)')])
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
+    history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
         if self.gender == 'male':
@@ -244,6 +248,7 @@ class Section(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='section_creator')
     updated_at = models.DateTimeField(default=timezone.now)
     updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='section_updater')
+    history = HistoricalRecords()
 
     def does_conflict_with_section(self, compare_section):
         time_slots_of_current_section = Routine.objects.filter(routine_slot=self.routine)
@@ -308,3 +313,10 @@ class SectionsRequested(models.Model):
 # class AssignedCourses(models.Model):
 #     course_assignment_record_id = models.AutoField(primary_key=True)
 #     instructor =
+
+
+#
+#
+# @admin.register(HistoricalCourse)
+# class HistoricalCourseAdmin(admin.ModelAdmin):
+#     pass
