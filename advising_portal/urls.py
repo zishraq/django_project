@@ -3,6 +3,8 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='student-panel-home'),
+    path('test/', views.test, name='student-panel-test'),
+
     path('advising/<section_filter>/', views.advising_portal_list_view, name='student-panel-portal'),
     path('select-section/<section_id>/', views.add_course_view, name='student-panel-select-course'),
     path('drop-section/<section_id>/', views.drop_course_view, name='student-panel-drop-course'),

@@ -21,7 +21,6 @@ from django.contrib.auth.decorators import login_required
 from users.decorators import allowed_users
 
 
-
 def get_referer_parameter(request):
     referer = str(request.META.get('HTTP_REFERER'))
     split_referer = referer.split('/')
@@ -33,12 +32,27 @@ def get_referer_parameter(request):
     return referer_parameter
 
 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 @login_required
 def home(request):
     context = {
         'room_name': 'broadcast'
     }
     return render(request, 'advising_portal/base.html', context)
+
+
+def test(request):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        'notification_broadcast',
+        {
+            'type': 'send_notification',
+            'message': 'Notification'
+        }
+    )
+    return HttpResponse("Done")
 
 
 @login_required

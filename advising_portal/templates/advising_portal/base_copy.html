@@ -173,7 +173,6 @@
                                 style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate3d(-70px, 42px, 0px);">
 
                                 {% for i in notifications %}
-                                    <li class="dropdown-item">{{i.broadcast_at}}</li>
                                     <li class="dropdown-item">{{i.message}}</li>
                                     <hr class="dropdown-divider">
                                 {% endfor %}
@@ -181,66 +180,52 @@
                                 <hr class="dropdown-divider"> {% endcomment %}
 
                             </ul>
+                        
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+                                
+                            </div>
 
-{#                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">#}
-{#                                <h6 class="dropdown-header">Notifications</h6>#}
-{##}
-{#                                {% for i in notifications %}#}
-{#                                    <a class="dropdown-item d-flex align-items-center" href="#">#}
-{#                                        <div class="mr-3">#}
-{#                                            <div class="icon-circle bg-primary">#}
-{#                                                <i class="fas fa-file-alt text-white"></i>#}
-{#                                            </div>#}
-{#                                        </div>#}
-{#                                        <div>#}
-{#                                            <div class="small text-gray-500">December 12, 2019</div>#}
-{#                                            <span class="font-weight-bold">{{ i.message }}</span>#}
-{#                                        </div>#}
-{#                                    </a>#}
-{#                                {% endfor %}#}
-{##}
-{#                            </div>#}
 
-{#                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"#}
-{#                                aria-labelledby="alertsDropdown">#}
-{#                                <h6 class="dropdown-header">#}
-{#                                    Alerts Center#}
-{#                                </h6>#}
-{#                                <a class="dropdown-item d-flex align-items-center" href="#">#}
-{#                                    <div class="mr-3">#}
-{#                                        <div class="icon-circle bg-primary">#}
-{#                                            <i class="fas fa-file-alt text-white"></i>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                    <div>#}
-{#                                        <div class="small text-gray-500">December 12, 2019</div>#}
-{#                                        <span class="font-weight-bold">A new monthly report is ready to download!</span>#}
-{#                                    </div>#}
-{#                                </a>#}
-{#                                <a class="dropdown-item d-flex align-items-center" href="#">#}
-{#                                    <div class="mr-3">#}
-{#                                        <div class="icon-circle bg-success">#}
-{#                                            <i class="fas fa-donate text-white"></i>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                    <div>#}
-{#                                        <div class="small text-gray-500">December 7, 2019</div>#}
-{#                                        $290.29 has been deposited into your account!#}
-{#                                    </div>#}
-{#                                </a>#}
-{#                                <a class="dropdown-item d-flex align-items-center" href="#">#}
-{#                                    <div class="mr-3">#}
-{#                                        <div class="icon-circle bg-warning">#}
-{#                                            <i class="fas fa-exclamation-triangle text-white"></i>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                    <div>#}
-{#                                        <div class="small text-gray-500">December 2, 2019</div>#}
-{#                                        Spending Alert: We've noticed unusually high spending for your account.#}
-{#                                    </div>#}
-{#                                </a>#}
-{#                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>#}
-{#                            </div>#}
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="alertsDropdown">
+                                <h6 class="dropdown-header">
+                                    Alerts Center
+                                </h6>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-file-alt text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">December 12, 2019</div>
+                                        <span class="font-weight-bold">A new monthly report is ready to download!</span>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-success">
+                                            <i class="fas fa-donate text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">December 7, 2019</div>
+                                        $290.29 has been deposited into your account!
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-exclamation-triangle text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">December 2, 2019</div>
+                                        Spending Alert: We've noticed unusually high spending for your account.
+                                    </div>
+                                </a>
+                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                            </div>
 
                         </li>
 
@@ -361,7 +346,7 @@
         notificationSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             console.log(data);
-            document.getElementById("notifications-dropdown").innerHTML = "<li class='dropdown-item'>" + data.message + "</li><hr class='dropdown-divider'>" + document.getElementById("notifications-dropdown").innerHTML;
+            document.getElementById("notifications-dropdown").innerHTML = "<li class='dropdown-item'>" + data + "</li><hr class='dropdown-divider'>" + document.getElementById("notifications-dropdown").innerHTML;
             document.getElementById("notification-badge").innerHTML = parseInt(document.getElementById("notification-badge").innerHTML) + 1;
             // document.querySelector('#chat-log').value += (data.message + '\n');
         };

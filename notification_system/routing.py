@@ -1,6 +1,6 @@
 from django.urls import re_path
 
-from notification_system import consumers
+from . import consumers
 
 
 websocket_urlpatterns = [
