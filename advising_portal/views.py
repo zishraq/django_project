@@ -32,27 +32,13 @@ def get_referer_parameter(request):
     return referer_parameter
 
 
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-
 @login_required
 def home(request):
     context = {
-        'room_name': 'broadcast'
+        # 'room_name': 'broadcast'
+        'room_name': request.user.username
     }
     return render(request, 'advising_portal/base.html', context)
-
-
-def test(request):
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        'notification_broadcast',
-        {
-            'type': 'send_notification',
-            'message': 'Notification'
-        }
-    )
-    return HttpResponse("Done")
 
 
 @login_required
@@ -600,7 +586,8 @@ def course_list_view(request):
         course_list.append(formatted_data)
 
     context = {
-        'courses': course_list
+        'courses': course_list,
+        'room_name': 'broadcast'
     }
 
     return render(request, 'advising_portal/course_list.html', context)
@@ -913,3 +900,13 @@ def assigned_sections(request):
     }
 
     return render(request, 'advising_portal/assigned_section_list.html', context)
+
+
+def insert_dummy_data(request):
+    from advising_portal.models import Course
+    import json
+
+    result = Course.objects.first()
+    print(json.dumps(result.created_at, default=str))
+
+    return HttpResponse("Done")

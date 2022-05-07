@@ -18,7 +18,7 @@ class BroadcastNotification(models.Model):
 
 @receiver(post_save, sender=BroadcastNotification)
 def notification_handler(sender, instance, created, **kwargs):
-    # call group_send function directly to send notificatoions or you can create a dynamic task in celery beat
+    # call group_send function directly to send notifications or you can create a dynamic task in celery beat
 
     if created:
         schedule, created = CrontabSchedule.objects.get_or_create(

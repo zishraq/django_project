@@ -10,7 +10,6 @@ from celery.exceptions import Ignore
 import asyncio
 
 
-
 @shared_task(bind=True)
 def broadcast_notification(self, data):
     print(data)
@@ -22,12 +21,15 @@ def broadcast_notification(self, data):
             notification = notification.first()
             channel_layer = get_channel_layer()
             loop = asyncio.new_event_loop()
+
+            broadcast_at = notification.broadcast_at.strftime('%B %#d, %Y')
+
             loop.run_until_complete(
                 channel_layer.group_send(
                     'notification_broadcast',
                     {
                         'type': 'send_notification',
-                        'broadcast_at': json.dumps(notification.broadcast_at),
+                        'broadcast_at': json.dumps(broadcast_at),
                         'message': json.dumps(notification.message)
                     }
                 )
