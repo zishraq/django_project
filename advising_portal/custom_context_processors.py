@@ -1,6 +1,3 @@
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import AnonymousUser
-
 from notification_system.models import BroadcastNotification
 
 
@@ -8,7 +5,10 @@ def notifications(request):
     view_notifications = []
 
     if request.user.is_authenticated:
-        all_notifications = BroadcastNotification.objects.filter(notification_to=request.user)[:5]
+        all_notifications = BroadcastNotification.objects.filter(
+            notification_to=request.user,
+            sent=True
+        )[:5]
 
         for notification in all_notifications:
             formatted_data = {

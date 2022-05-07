@@ -34,9 +34,10 @@ def get_referer_parameter(request):
 
 @login_required
 def home(request):
+    user_id = request.user.id
+
     context = {
-        # 'room_name': 'broadcast'
-        'room_name': request.user.username
+        'room_name': str(user_id)
     }
     return render(request, 'advising_portal/base.html', context)
 
@@ -45,6 +46,7 @@ def home(request):
 @allowed_users(allowed_roles=['student'])
 def advising_portal_list_view(request, section_filter):
     student = Student.objects.get(username_id=request.user)
+    user_id = request.user.id
 
     if section_filter not in ['recommended', 'retakable', 'f', 'd']:
         section_filter = 'recommended'
@@ -155,7 +157,8 @@ def advising_portal_list_view(request, section_filter):
     context = {
         'sections': view_section_data,
         'selected_courses': view_selected_courses_data,
-        'portal_type': 'course_advising'
+        'portal_type': 'course_advising',
+        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/portal.html', context)
@@ -256,6 +259,8 @@ def drop_course_view(request, section_id):
 @login_required
 @allowed_users(allowed_roles=['student'])
 def request_section_list_view(request):
+    user_id = request.user.id
+
     if request.method == 'POST':
         form = SectionRequestForm(request.POST)
 
@@ -322,7 +327,8 @@ def request_section_list_view(request):
         'sections': view_section_data,
         'selected_courses': view_selected_courses_data,
         'portal_type': 'section_request',
-        'form': form
+        'form': form,
+        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/portal.html', context)
@@ -412,6 +418,7 @@ def revoke_section_request_view(request, section_id):
 @allowed_users(allowed_roles=['student'])
 def grade_report_view(request):
     student = Student.objects.get(username_id=User.objects.get(username=request.user).pk)
+    user_id = request.user.id
 
     courses_taken = CoursesTaken.objects.filter(
         student_id=student.student_id,
@@ -463,13 +470,11 @@ def grade_report_view(request):
                         'course_credit': course_credit,
                         'grade': letter_grade,
                         'total_gp': course_credit * 4,
-                        # 'grade_point': course.grade.grade_point,
                         'grade_point': grade_point,
                     }
                 ],
                 'current_cgpa': total_cgpa,
                 'current_total_credit': total_credit,
-                # 'term_gpa': course.grade.grade_point * course_credit
                 'term_gpa': grade_point * course_credit
             }
 
@@ -477,7 +482,6 @@ def grade_report_view(request):
             courses_by_semesters[course.semester_id]['total_credit'] += course_credit
             courses_by_semesters[course.semester_id]['current_cgpa'] = total_cgpa
             courses_by_semesters[course.semester_id]['current_total_credit'] = total_credit
-            # courses_by_semesters[course.semester_id]['term_gpa'] += (course.grade.grade_point * course_credit)
             courses_by_semesters[course.semester_id]['term_gpa'] += (grade_point * course_credit)
             courses_by_semesters[course.semester_id]['courses'].append(
                 {
@@ -486,7 +490,6 @@ def grade_report_view(request):
                     'course_credit': course_credit,
                     'grade': letter_grade,
                     'total_gp': course_credit * 4,
-                    # 'grade_point': course.grade.grade_point,
                     'grade_point': grade_point,
                 }
             )
@@ -521,7 +524,8 @@ def grade_report_view(request):
         'term_gpa_list': term_gpa_list,
         'grades': list(grade_frequency.keys()),
         'grade_frequency': list(grade_frequency.values()),
-        'maximum_grade_frequency': max(list(grade_frequency.values())) + 3
+        'maximum_grade_frequency': max(list(grade_frequency.values())) + 3,
+        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/grading_report.html', context)
@@ -530,6 +534,7 @@ def grade_report_view(request):
 @login_required
 @allowed_users(allowed_roles=['student'])
 def advised_course_list_view(request):
+    user_id = request.user.id
     student_id = Student.objects.get(username_id=request.user).pk
     semester_id = request.GET.get('semester_id', '')
 
@@ -562,7 +567,8 @@ def advised_course_list_view(request):
         'selected_courses': view_selected_courses_data,
         'portal_type': 'course_advising',
         'semesters': semesters,
-        'is_advising_semester': semester.advising_status
+        'is_advising_semester': semester.advising_status,
+        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/advised_course_list.html', context)
@@ -572,6 +578,7 @@ def advised_course_list_view(request):
 @allowed_users(allowed_roles=['faculty'])
 def course_list_view(request):
     courses = Course.objects.all()
+    user_id = request.user.id
     course_list = []
 
     for course in courses:
@@ -587,7 +594,7 @@ def course_list_view(request):
 
     context = {
         'courses': course_list,
-        'room_name': 'broadcast'
+        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/course_list.html', context)
@@ -596,22 +603,16 @@ def course_list_view(request):
 @login_required
 @allowed_users(allowed_roles=['faculty'])
 def course_detail_view(request, course_id):
+    user_id = request.user.id
+
     course_data = Course.objects.get(
         course_id=course_id
     )
-
-    print(course_data.history.all())
 
     if request.method == 'POST':
         form = CreateCourseForm(request.POST, instance=course_data)
 
         if form.is_valid():
-            # create_course_data = form.cleaned_data
-            # create_course_data['course_id'] = create_course_data['course_code']
-            #
-            # new_course = Course(**create_course_data)
-            # new_course.save()
-
             form.save()
 
             messages.success(request, 'Course successfully updated!')
@@ -643,18 +644,16 @@ def course_detail_view(request, course_id):
 
         section_list.append(formatted_data)
 
-    print(course_data.course_code)
-
     HistoricalCourse = apps.get_model('advising_portal', 'HistoricalCourse')
 
     course_history = HistoricalCourse.objects.all()
-    print(course_history)
 
     context = {
         'form': form,
         'sections': section_list,
         'course_code': course_data.course_code,
-        'course_id': course_data.course_id
+        'course_id': course_data.course_id,
+        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/course_detail.html', context)
@@ -663,6 +662,8 @@ def course_detail_view(request, course_id):
 @login_required
 @allowed_users(allowed_roles=['faculty'])
 def course_create_view(request):
+    user_id = request.user.id
+
     if request.method == 'POST':
         form = CreateCourseForm(request.POST)
 
@@ -681,6 +682,7 @@ def course_create_view(request):
 
     context = {
         'form': form,
+        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/create_course.html', context)
@@ -702,6 +704,8 @@ def course_delete_view(request, course_id):
 @login_required
 @allowed_users(allowed_roles=['faculty'])
 def section_detail_view(request, section_id):
+    user_id = request.user.id
+
     section_data = Section.objects.get(
         section_id=section_id
     )
@@ -733,7 +737,8 @@ def section_detail_view(request, section_id):
         'form': form,
         'course_code': section_data.course.course_code,
         'section_no': section_data.section_no,
-        'section_id': section_data.section_id
+        'section_id': section_data.section_id,
+        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/section_detail.html', context)
@@ -742,6 +747,8 @@ def section_detail_view(request, section_id):
 @login_required
 @allowed_users(allowed_roles=['faculty'])
 def section_create_view(request, course_code):
+    user_id = request.user.id
+
     if request.method == 'POST':
         form = CreateSectionForm(request.POST)
 
@@ -767,6 +774,7 @@ def section_create_view(request, course_code):
 
     context = {
         'form': form,
+        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/section_create.html', context)
@@ -788,6 +796,7 @@ def section_delete_view(request, section_id):
 @login_required
 @allowed_users(allowed_roles=['faculty'])
 def semester_list_view(request):
+    user_id = request.user.id
     semesters = Semester.objects.all().order_by('-semester_id')
     semester_list = []
 
@@ -804,7 +813,8 @@ def semester_list_view(request):
         semester_list.append(formatted_data)
 
     context = {
-        'semesters': semester_list
+        'semesters': semester_list,
+        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/semester_list.html', context)
@@ -813,6 +823,8 @@ def semester_list_view(request):
 @login_required
 @allowed_users(allowed_roles=['faculty'])
 def semester_detail_view(request, semester_id):
+    user_id = request.user.id
+
     semester_data = Semester.objects.get(
         semester_id=semester_id
     )
@@ -835,7 +847,8 @@ def semester_detail_view(request, semester_id):
         form = CreateSemesterForm(instance=semester_data)
 
     context = {
-        'form': form
+        'form': form,
+        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/semester_detail.html', context)
@@ -844,6 +857,8 @@ def semester_detail_view(request, semester_id):
 @login_required
 @allowed_users(allowed_roles=['faculty'])
 def semester_create(request):
+    user_id = request.user.id
+
     if request.method == 'POST':
         form = CreateSemesterForm(request.POST)
 
@@ -863,6 +878,7 @@ def semester_create(request):
 
     context = {
         'form': form,
+        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/create_semester.html', context)
@@ -871,13 +887,12 @@ def semester_create(request):
 @login_required
 @allowed_users(allowed_roles=['faculty'])
 def assigned_sections(request):
+    user_id = request.user.id
     get_faculty = Faculty.objects.get(username=request.user)
 
     instructors_sections = Section.objects.filter(
         instructor=get_faculty
     )
-
-    print(instructors_sections)
 
     view_section_data = []
 
@@ -897,12 +912,13 @@ def assigned_sections(request):
 
     context = {
         'sections': view_section_data,
+        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/assigned_section_list.html', context)
 
 
-def insert_dummy_data(request):
+def insert_test_data(request):
     from advising_portal.models import WeekSlot, TimeSlot, Routine, Department, Course, Faculty, Section, Student, Semester, Grade, CoursesTaken
     from django.contrib.auth.models import User, Group
     import datetime

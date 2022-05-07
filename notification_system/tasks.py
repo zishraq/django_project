@@ -1,4 +1,5 @@
 import json
+import re
 
 from celery import shared_task
 from channels.layers import get_channel_layer
@@ -24,12 +25,14 @@ def broadcast_notification(self, data):
 
             broadcast_at = notification.broadcast_at.strftime('%B %#d, %Y')
 
+            user_id = str(notification.notification_to.id)
+
             loop.run_until_complete(
                 channel_layer.group_send(
-                    # 'notification_broadcast',
-                    f'notification_{notification.notification_to.username}',
+                    f'notification_{user_id}',
                     {
                         'type': 'send_notification',
+                        'user': json.dumps(user_id),
                         'broadcast_at': json.dumps(broadcast_at),
                         'message': json.dumps(notification.message)
                     }

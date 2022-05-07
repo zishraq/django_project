@@ -23,8 +23,7 @@ from notification_system.routing import websocket_urlpatterns
 application = ProtocolTypeRouter(
     {
         'http': get_asgi_application(),
-        # 'websocket': AuthMiddlewareStack(
-        'websocket': AuthMiddleware(
+        'websocket': AuthMiddlewareStack(
             URLRouter(
                 websocket_urlpatterns
             )
