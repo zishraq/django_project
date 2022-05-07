@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -11,6 +12,9 @@ class BroadcastNotification(models.Model):
     message = models.TextField()
     broadcast_at = models.DateTimeField()
     sent = models.BooleanField(default=False)
+    notification_to = models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True, related_name='notification_to')
+    notification_from = models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True, related_name='notification_from'),
+    link = models.TextField(default=None, null=True)
 
     class Meta:
         ordering = ['-broadcast_at']

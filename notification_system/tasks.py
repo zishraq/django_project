@@ -26,7 +26,8 @@ def broadcast_notification(self, data):
 
             loop.run_until_complete(
                 channel_layer.group_send(
-                    'notification_broadcast',
+                    # 'notification_broadcast',
+                    f'notification_{notification.notification_to.username}',
                     {
                         'type': 'send_notification',
                         'broadcast_at': json.dumps(broadcast_at),
