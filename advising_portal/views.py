@@ -35,8 +35,7 @@ def get_referer_parameter(request):
 @login_required
 def home(request):
     context = {
-        # 'room_name': 'broadcast'
-        'room_name': request.user.username
+        'room_name': 'broadcast'
     }
     return render(request, 'advising_portal/base.html', context)
 
