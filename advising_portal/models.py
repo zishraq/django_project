@@ -299,15 +299,18 @@ class SectionsRequested(models.Model):
     # semester = models.ForeignKey(StudentRecordsBySemester, on_delete=models.SET_NULL, null=True)
     section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True)
     reason = models.TextField()
-    approved_by = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
 
-    # is_approved = models.BooleanField(default=False)
-    # chairman = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
-    # chairmans_text = models.TextField()
-    # advisor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
-    # advisor_text = models.TextField()
-    # instructor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
-    # instructor_text = models.TextField()
+    advisor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True, related_name='advisor')
+    is_approved_by_advisor = models.BooleanField(default=False)
+    advisor_text = models.TextField()
+
+    chairman = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True, related_name='chairman')
+    is_approved_by_chairman = models.TextField()
+    chairman_text = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
+
+    instructor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True, related_name='instructor')
+    is_approved_by_instructor = models.TextField()
+    instructor_text = models.TextField()
 
 
 # class AssignedCourses(models.Model):
