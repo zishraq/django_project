@@ -1,9 +1,11 @@
 import json
+import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 from django_celery_beat.models import PeriodicTask, CrontabSchedule
 
@@ -18,6 +20,12 @@ class BroadcastNotification(models.Model):
 
     class Meta:
         ordering = ['-broadcast_at']
+
+    def save(self, *args, **kwargs):
+        if self.broadcast_at <= timezone.now():
+            self.broadcast_at = timezone.now() + datetime.timedelta(minutes=1)
+
+        super(BroadcastNotification, self).save(*args, **kwargs)
 
 
 @receiver(post_save, sender=BroadcastNotification)
