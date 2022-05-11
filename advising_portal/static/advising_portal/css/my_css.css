@@ -71,3 +71,7 @@
 .semesters-dropdown-menu {
     padding-bottom: 30px;
 }
+
+.no-click {
+    pointer-events: none;
+}

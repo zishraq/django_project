@@ -29,6 +29,9 @@ urlpatterns = [
     path('semester-detial/<semester_id>', views.semester_detail_view, name='student-panel-semester-detail'),
     path('semester-create/', views.semester_create, name='student-panel-semester-create'),
 
+    path('section-request-list/', views.section_request_list_view, name='student-panel-section-request-list'),
+    path('section-request-detial/<request_id>', views.section_request_detail_view, name='student-panel-section-request-detail'),
+
     # path('student-list/', views.semester_list_view, name='student-panel-semester-list'),
     # path('student-detial/<semester_id>', views.semester_detail_view, name='student-panel-semester-detail'),
     # path('student-create/', views.semester_create, name='student-panel-semester-create'),

@@ -1,5 +1,5 @@
 {% extends "advising_portal/base.html" %}
-{#{% load crispy_forms_tags %}#}
+{% load crispy_forms_tags %}
 {% block content %}
     <div class="content-section">
         <div align="right">
@@ -29,74 +29,11 @@
             </div>
         </div>
 
-{#        <form method="POST">#}
-{#            {% csrf_token %}#}
-{#            <fieldset class="form-group">#}
-{#                <legend class="border-bottom mb-4"><strong>Course Details</strong></legend>#}
-{#                {{ form|crispy }}#}
-{#            </fieldset>#}
-{#            <div class="form-group">#}
-{#                <button class="btn btn-outline-info" type="submit">Update</button>#}
-{#            </div>#}
-{#        </form>#}
-
-
         <form method="POST">
             {% csrf_token %}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4"><strong>Course Details</strong></legend>
-
-
-                <div id="div_id_course_code" class="form-group">
-                    <label for="id_course_code" class=" requiredField">
-                        Course code<span class="asteriskField">*</span>
-                    </label>
-                    <div>
-                        <input type="text" name="course_code" value="{{ form.course_code.value|default_if_none:"" }}" maxlength="10" class="textinput textInput form-control" required id="id_course_code">
-                    </div>
-                </div>
-
-                <div id="div_id_course_title" class="form-group">
-                    <label for="id_course_title" class=" requiredField">
-                        Course title<span class="asteriskField">*</span>
-                    </label>
-                    <div>
-                        <input type="text" name="course_title" value="{{ form.course_title.value|default_if_none:"" }}" maxlength="50" class="textinput textInput form-control" required id="id_course_title">
-                    </div>
-                </div>
-
-                <div id="div_id_department" class="form-group">
-                    <label for="id_department" class=" requiredField">
-                        Department<span class="asteriskField">*</span>
-                    </label>
-                    <div>
-                        <select name="department" class="select form-control" required id="id_department">
-                            <option value="">---------</option>
-                            <option value="CSE" selected>Computer Science and Engineering</option>
-                            <option value="GEN">General</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="div_id_prerequisite_course" class="form-group">
-                    <label for="id_prerequisite_course" class="">
-                        Prerequisite course
-                    </label>
-                    <div>
-                        <select name="prerequisite_course" class="select form-control" id="id_prerequisite_course">
-
-                        </select>
-                    </div>
-                </div>
-
-                <div id="div_id_credit" class="form-group">
-                    <label for="id_credit" class=" requiredField">
-                        Credit<span class="asteriskField">*</span>
-                    </label>
-                    <div>
-                        <input type="number" name="credit" value="{{ form.credit.value|default_if_none:"" }}" step="any" class="numberinput form-control" required id="id_credit">
-                    </div>
-                </div>
-
+                {{ form|crispy }}
             </fieldset>
             <div class="form-group">
                 <button class="btn btn-outline-info" type="submit">Update</button>

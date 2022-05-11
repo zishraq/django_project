@@ -12,7 +12,10 @@ class Department(models.Model):
     department_id = models.CharField(max_length=100, primary_key=True)
     department_name = models.CharField(max_length=50)
     created_at = models.DateTimeField(default=timezone.now)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='department_creator')
+    updated_at = models.DateTimeField(default=timezone.now)
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='department_updater')
+    chairman = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, related_name='department_chairman')
     history = HistoricalRecords()
 
     def __str__(self):
@@ -284,6 +287,14 @@ class Grade(models.Model):
 
 
 class CoursesTaken(models.Model):
+    ADDED = 'added'
+    DROPPED = 'dropped'
+
+    STATUS = (
+        (ADDED, ADDED),
+        (DROPPED, DROPPED)
+    )
+
     course_record_id = models.AutoField(primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     semester = models.ForeignKey(Semester, on_delete=models.SET_NULL, null=True)
@@ -291,8 +302,23 @@ class CoursesTaken(models.Model):
     section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True)
     grade = models.ForeignKey(Grade, on_delete=models.SET_NULL, null=True)
 
+    added_at = models.DateTimeField(default=datetime.now())
+    dropped_at = models.DateTimeField()
+    status = models.CharField(max_length=10, choices=STATUS, default=ADDED)
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
 
 class SectionsRequested(models.Model):
+    PENDING = 'pending'
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
+
+    APPROVAL_STATUS = (
+        (PENDING, PENDING),
+        (APPROVED, APPROVED),
+        (REJECTED, REJECTED)
+    )
+
     request_id = models.AutoField(primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     semester = models.ForeignKey(Semester, on_delete=models.SET_NULL, null=True)
@@ -301,25 +327,16 @@ class SectionsRequested(models.Model):
     reason = models.TextField()
 
     advisor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True, related_name='advisor')
-    is_approved_by_advisor = models.BooleanField(default=False)
+    advisor_approval_status = models.CharField(max_length=10, choices=APPROVAL_STATUS, default=PENDING)
     advisor_text = models.TextField()
 
     chairman = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True, related_name='chairman')
-    is_approved_by_chairman = models.TextField()
-    chairman_text = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
+    chairman_approval_status = models.CharField(max_length=10, choices=APPROVAL_STATUS, default=PENDING)
+    chairman_text = models.TextField()
 
     instructor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True, related_name='instructor')
-    is_approved_by_instructor = models.TextField()
+    instructor_approval_status = models.CharField(max_length=10, choices=APPROVAL_STATUS, default=PENDING)
     instructor_text = models.TextField()
 
-
-# class AssignedCourses(models.Model):
-#     course_assignment_record_id = models.AutoField(primary_key=True)
-#     instructor =
-
-
-#
-#
-# @admin.register(HistoricalCourse)
-# class HistoricalCourseAdmin(admin.ModelAdmin):
-#     pass
+    # requested_at =
+    # updated_at =

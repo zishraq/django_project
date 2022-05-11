@@ -85,7 +85,6 @@
         {% else %}
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'student-panel-course-list' %}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
                     Courses
                 </a>
             </li>
@@ -93,7 +92,6 @@
 
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'student-panel-semester-list' %}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
                     Semesters
                 </a>
             </li>
@@ -101,8 +99,14 @@
 
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'student-panel-assigned-sections' %}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
                     Assigned Courses
+                </a>
+            </li>
+            <hr class="sidebar-divider">
+
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'student-panel-section-request-list' %}">
+                    Seat Requests
                 </a>
             </li>
             <hr class="sidebar-divider">

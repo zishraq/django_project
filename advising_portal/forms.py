@@ -3,9 +3,9 @@ from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 # from .models import Profile
-from django.forms import DateInput
+from django.forms import DateInput, BooleanField
 
-from advising_portal.models import Student, Faculty, Course, Semester, Section
+from advising_portal.models import Student, Faculty, Course, Semester, Section, SectionsRequested
 
 
 # from bootstrap_modal_forms.mixins import PopRequestMixin, CreateUpdateAjaxMixin
@@ -62,3 +62,40 @@ class UpdateSectionForm(forms.ModelForm):
         self.fields['section_capacity'].required = False
         self.fields['instructor'].required = False
         self.fields['routine'].required = False
+
+
+# class UpdateSectionRequestForm(forms.ModelForm):
+#     class Meta:
+#         model = SectionsRequested
+#         fields = ['is_approved_by_advisor', 'advisor_text', 'is_approved_by_chairman', 'chairman_text', 'is_approved_by_instructor', 'instructor_text']
+#         labels = {
+#             'is_approved_by_advisor': 'Approve',
+#             'advisor_text': 'Text',
+#             'is_approved_by_chairman': 'Approve',
+#             'chairman_text': 'Text',
+#             'is_approved_by_instructor': 'Approve',
+#             'instructor_text': 'Text',
+#         }
+#
+#     def __init__(self, *args, **kwargs):
+#         self.request = kwargs.pop('request')
+#         print(self.request.user)
+#
+#         super(UpdateSectionRequestForm, self).__init__(*args, **kwargs)
+#
+#         print(self.instance.student.name)
+#
+#         self.fields['advisor_text'].required = False
+
+
+class UpdateSectionRequestForm(forms.Form):
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
+
+    APPROVAL_STATUS = (
+        (APPROVED, APPROVED),
+        (REJECTED, REJECTED)
+    )
+
+    is_approved = forms.ChoiceField(label='Status', choices=APPROVAL_STATUS, widget=forms.RadioSelect)
+    text = forms.CharField(label='Text', max_length=500, widget=forms.Textarea)

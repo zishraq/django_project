@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
@@ -13,11 +13,12 @@ from django.apps import apps
 from django.contrib.admin.models import LogEntry, ADDITION
 
 from advising_portal.forms import SectionRequestForm, CreateCourseForm, CreateSemesterForm, UpdateSectionForm, \
-    CreateSectionForm
+    CreateSectionForm, UpdateSectionRequestForm
 from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, Routine, TimeSlot, WeekSlot, \
     SectionsRequested, Grade, Faculty
 from django.contrib.auth.decorators import login_required
 
+from advising_portal.utilities import student_id_regex
 from users.decorators import allowed_users
 
 
@@ -30,6 +31,19 @@ def get_referer_parameter(request):
         referer_parameter = split_referer[-2]
 
     return referer_parameter
+
+
+def text_shorten(text: str, length):
+    if length >= len(text):
+        return text
+
+    filtered_text = text[:length]
+
+    last_full_word = filtered_text.rfind(' ')
+    filtered_text = str(
+        text[:last_full_word] + ' ...'
+    ).strip()
+    return filtered_text
 
 
 @login_required
@@ -138,7 +152,8 @@ def advising_portal_list_view(request, section_filter):
 
     courses_taken = CoursesTaken.objects.filter(
         student_id=student_id,
-        semester_id=current_semester_id
+        semester_id=current_semester_id,
+        status='added'
     ).all()
 
     view_selected_courses_data = []
@@ -178,7 +193,8 @@ def add_course_view(request, section_id):
     existence_check = CoursesTaken.objects.filter(
         student=student,
         semester=current_semester,
-        section=selected_section
+        section=selected_section,
+        status='added'
     ).exists()
 
     if existence_check:
@@ -190,6 +206,7 @@ def add_course_view(request, section_id):
         previous_selected_sections = CoursesTaken.objects.filter(
             student_id=student.student_id,
             semester=current_semester,
+            status='added'
         ).all()
 
         for previous_section in previous_selected_sections:
@@ -224,7 +241,7 @@ def add_course_view(request, section_id):
         course_selected = CoursesTaken(
             student=student,
             semester=current_semester,
-            section=selected_section,
+            section=selected_section
         )
         course_selected.save()
         messages.success(request, f'Successfully added Section-{selected_section.section_no} of {selected_section.course.course_code}')
@@ -238,6 +255,7 @@ def add_course_view(request, section_id):
 @allowed_users(allowed_roles=['student'])
 def drop_course_view(request, section_id):
     referer_parameter = get_referer_parameter(request)
+    current_time = timezone.now()
 
     current_semester_id = Semester.objects.get(advising_status=True).semester_id
     student_id = Student.objects.get(username_id=request.user).student_id
@@ -246,11 +264,16 @@ def drop_course_view(request, section_id):
     selected_section.total_students = selected_section.total_students - 1
     selected_section.save()
 
-    CoursesTaken.objects.filter(
+    delete_course = CoursesTaken.objects.get(
         student_id=student_id,
         semester_id=current_semester_id,
-        section_id=selected_section.section_id
-    ).delete()
+        section_id=selected_section.section_id,
+        status='added'
+    )
+
+    delete_course.dropped_at = current_time
+    delete_course.status = 'dropped'
+    delete_course.updated_by = request.user
 
     messages.success(request, f'Dropped Section-{selected_section.section_no} of {selected_section.course.course_code}')
     return redirect('student-panel-portal', referer_parameter)
@@ -280,7 +303,8 @@ def request_section_list_view(request):
             student=student,
             semester_id__in=Semester.objects.filter(
                 advising_status=False
-            ).values('semester_id').all()
+            ).values('semester_id').all(),
+            status='added'
         ).values('section_id').all()
     ).order_by('course__course_code')
 
@@ -422,7 +446,8 @@ def grade_report_view(request):
 
     courses_taken = CoursesTaken.objects.filter(
         student_id=student.student_id,
-        semester__advising_status=False
+        semester__is_active=False,
+        status='added'
     ).all()
 
     courses_by_semesters = {}
@@ -547,7 +572,8 @@ def advised_course_list_view(request):
 
     courses_taken = CoursesTaken.objects.filter(
         student_id=student_id,
-        semester_id=semester.semester_id
+        semester_id=semester.semester_id,
+        status='added'
     ).all()
 
     view_selected_courses_data = []
@@ -918,6 +944,116 @@ def assigned_sections(request):
     return render(request, 'advising_portal/assigned_section_list.html', context)
 
 
+@login_required
+@allowed_users(allowed_roles=['faculty'])
+def section_request_list_view(request):
+    user_id = request.user.id
+    user = request.user
+
+    # section_requests = SectionsRequested.objects.all()
+    #
+    # section_requests = SectionsRequested.objects.filter(
+    #     student__advisor__username=user,
+    #     # student__advisor__username_id=user_id,
+    #     # section__instructor__username_id=user_id
+    #     section__instructor__username=user
+    # )
+
+    section_requests = SectionsRequested.objects.filter(
+        Q(student__advisor__username_id=user_id) | Q(section__instructor__username=user_id)
+    )
+
+    section_requests_list = []
+
+    for section_request in section_requests:
+        print(user_id)
+        print(section_request.student.advisor.username.id)
+        # print(section_request['student__advisor__username_id'])
+        # print(section_request['section__instructor__username_id'])
+
+        formatted_data = {
+            'request_id': section_request.request_id,
+            'student_id': section_request.student.student_id,
+            'student_name': section_request.student.name,
+            'course_code': section_request.section.course.course_code,
+            'section_no': section_request.section.section_no,
+            'reason': text_shorten(text=section_request.reason, length=100),
+            'is_approved_by_advisor': section_request.advisor_approval_status,
+            'is_approved_by_chairman': section_request.chairman_approval_status,
+            'is_approved_by_instructor': section_request.instructor_approval_status
+        }
+        section_requests_list.append(formatted_data)
+
+    context = {
+        'section_requests': section_requests_list,
+        'room_name': str(user_id)
+    }
+
+    return render(request, 'advising_portal/section_request_list.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty'])
+def section_request_detail_view(request, request_id):
+    user_id = request.user.id
+    user = request.user
+
+    section_request_data = SectionsRequested.objects.get(
+        request_id=request_id
+    )
+
+    is_faculty = False
+    is_advisor = False
+    is_chairman = False
+
+    current_faculty_data = Faculty.objects.get(
+        username__id=user_id
+    )
+
+    student_advisor = section_request_data.student.advisor.username
+    section_instructor = section_request_data.section.instructor.username
+    department_chairman = section_request_data.section.course.department.chairman
+
+    if request.method == 'POST':
+        form = UpdateSectionRequestForm(request.POST)
+
+        if form.is_valid():
+            update_semester_data = form.cleaned_data
+
+            if current_faculty_data == student_advisor:
+                section_request_data.advisor = current_faculty_data
+                section_request_data.advisor_approval_status = update_semester_data['is_approved']
+                section_request_data.advisor_text = update_semester_data['text']
+
+            if current_faculty_data == section_instructor:
+                section_request_data.instructor = current_faculty_data
+                section_request_data.instructor_approval_status = update_semester_data['is_approved']
+                section_request_data.instructor_text = update_semester_data['text']
+
+            if current_faculty_data == department_chairman:
+                section_request_data.chairman = current_faculty_data
+                section_request_data.chairman_approval_status = update_semester_data['is_approved']
+                section_request_data.chairman_text = update_semester_data['text']
+
+            # if section_request_data.advisor_approval_status == section_request_data.instructor_approval_status == section_request_data.chairman_approval_status == 'approved':
+
+
+            section_request_data.save()
+
+            messages.success(request, 'Semester successfully updated!')
+            return redirect('student-panel-section-request-list')
+
+    else:
+        form = UpdateSectionRequestForm()
+
+    context = {
+        'form': form,
+        'room_name': str(user_id)
+    }
+
+    return render(request, 'advising_portal/section_request_detail.html', context)
+
+
 def insert_test_data(request):
     from advising_portal.models import WeekSlot, TimeSlot, Routine, Department, Course, Faculty, Section, Student, Semester, Grade, CoursesTaken
     from django.contrib.auth.models import User, Group
@@ -952,11 +1088,43 @@ def insert_test_data(request):
             'password': '123456Seven'
         },
         {
-            'username': 'amit',
+            'username': '2019-2-60-015',
             'password': '123456Seven'
         },
         {
-            'username': 'tuhin',
+            'username': '2019-2-60-022',
+            'password': '123456Seven'
+        },
+        {
+            'username': '2019-2-60-025',
+            'password': '123456Seven'
+        },
+        {
+            'username': '2018-2-60-127',
+            'password': '123456Seven'
+        },
+        {
+            'username': '2020-1-60-226',
+            'password': '123456Seven'
+        },
+        {
+            'username': 'ishraq',
+            'password': '123456Seven'
+        },
+        {
+            'username': 'nusrat',
+            'password': '123456Seven'
+        },
+        {
+            'username': 'tanvir',
+            'password': '123456Seven'
+        },
+        {
+            'username': 'rajib',
+            'password': '123456Seven'
+        },
+        {
+            'username': 'sadat',
             'password': '123456Seven'
         }
     ]
@@ -965,7 +1133,7 @@ def insert_test_data(request):
         user = User.objects.create_user(**u)
         user.save()
 
-        if user.username == '2020-1-65-001':
+        if re.match(student_id_regex, user.username):
             group = Group.objects.get(name='student')
             group.user_set.add(user)
 
@@ -978,13 +1146,15 @@ def insert_test_data(request):
             'department_id': 'CSE',
             'department_name': 'Computer Science and Engineering',
             'created_at': timezone.now(),
-            'created_by_id': User.objects.get(username='admin').pk
+            'created_by_id': User.objects.get(username='admin').pk,
+            'chairman_id': User.objects.get(username='nusrat').pk
         },
         {
             'department_id': 'GEN',
             'department_name': 'General',
             'created_at': timezone.now(),
-            'created_by_id': User.objects.get(username='admin').pk
+            'created_by_id': User.objects.get(username='admin').pk,
+            'chairman_id': User.objects.get(username='tanvir').pk
         }
     ]
 
@@ -1387,18 +1557,39 @@ def insert_test_data(request):
 
     faculties = [
         {
-            'faculty_id': 'RDA',
-            'name': 'Rashedul Amin Tuhin',
-            'initials': 'RDA',
+            'faculty_id': 'ZI',
+            'name': 'Zuhair Ishraq',
+            'initials': 'ZI',
             'gender': 'male',
-            'username_id': User.objects.get(username='tuhin').pk
+            'username_id': User.objects.get(username='ishraq').pk
         },
         {
-            'faculty_id': 'AKD',
-            'name': 'Amit Kumar Das',
-            'initials': 'AKD',
+            'faculty_id': 'NM',
+            'name': 'Nusrat Maisha',
+            'initials': 'NM',
             'gender': 'male',
-            'username_id': User.objects.get(username='amit').pk
+            'username_id': User.objects.get(username='nusrat').pk
+        },
+        {
+            'faculty_id': 'TM',
+            'name': 'Tanvir Mobasshir',
+            'initials': 'TM',
+            'gender': 'male',
+            'username_id': User.objects.get(username='tanvir').pk
+        },
+        {
+            'faculty_id': 'RR',
+            'name': 'Rajib Raiyat',
+            'initials': 'RR',
+            'gender': 'male',
+            'username_id': User.objects.get(username='rajib').pk
+        },
+        {
+            'faculty_id': 'AKMS',
+            'name': 'AKM Sadat',
+            'initials': 'AKMS',
+            'gender': 'male',
+            'username_id': User.objects.get(username='sadat').pk
         },
         {
             'faculty_id': 'admin',
@@ -2251,37 +2442,41 @@ def insert_test_data(request):
             'student_id': '2019-2-60-022',
             'name': 'Zuhair Ishraq Zareef',
             'gender': 'male',
-            'advisor_id': Faculty.objects.get(faculty_id='AKD').pk,
+            'advisor_id': Faculty.objects.get(faculty_id='ZI').pk,
+            'username_id': User.objects.get(username='2019-2-60-022').pk
         },
         {
             'student_id': '2019-2-60-015',
             'name': 'Nusrat Maisha',
             'gender': 'female',
-            'advisor_id': Faculty.objects.get(faculty_id='RDA').pk,
+            'advisor_id': Faculty.objects.get(faculty_id='NM').pk,
+            'username_id': User.objects.get(username='2019-2-60-015').pk
         },
         {
             'student_id': '2019-2-60-025',
             'name': 'Md. Tanvir Mobasshir',
             'gender': 'male',
-            'advisor_id': Faculty.objects.get(faculty_id='RDA').pk
+            'advisor_id': Faculty.objects.get(faculty_id='TM').pk,
+            'username_id': User.objects.get(username='2019-2-60-025').pk
         },
         {
             'student_id': '2018-2-60-127',
             'name': 'A. K. M. Sadat',
             'gender': 'male',
-            'advisor_id': Faculty.objects.get(faculty_id='RDA').pk
+            'advisor_id': Faculty.objects.get(faculty_id='ZI').pk,
+            'username_id': User.objects.get(username='2018-2-60-127').pk
         },
         {
             'student_id': '2020-1-60-226',
             'name': 'Sofia Noor Rafa',
             'gender': 'female',
-            'advisor_id': Faculty.objects.get(faculty_id='RDA').pk,
+            'advisor_id': Faculty.objects.get(faculty_id='NM').pk,
         },
         {
             'student_id': '2020-1-65-001',
             'name': 'Komol Kunty Rajib',
             'gender': 'male',
-            'advisor_id': Faculty.objects.get(faculty_id='RDA').pk,
+            'advisor_id': Faculty.objects.get(faculty_id='TM').pk,
             'username_id': User.objects.get(username='2020-1-65-001').pk
         },
         {
