@@ -18,7 +18,7 @@ from advising_portal.models import Course, Section, CoursesTaken, Semester, Stud
     SectionsRequested, Grade, Faculty
 from django.contrib.auth.decorators import login_required
 
-from advising_portal.utilities import student_id_regex
+from advising_portal.utilities import student_id_regex, ADDED, DROPPED
 from users.decorators import allowed_users
 
 
@@ -41,7 +41,7 @@ def text_shorten(text: str, length):
 
     last_full_word = filtered_text.rfind(' ')
     filtered_text = str(
-        text[:last_full_word] + ' ...'
+        text[:last_full_word] + '...'
     ).strip()
     return filtered_text
 
@@ -153,7 +153,7 @@ def advising_portal_list_view(request, section_filter):
     courses_taken = CoursesTaken.objects.filter(
         student_id=student_id,
         semester_id=current_semester_id,
-        status='added'
+        status=ADDED
     ).all()
 
     view_selected_courses_data = []
@@ -194,7 +194,7 @@ def add_course_view(request, section_id):
         student=student,
         semester=current_semester,
         section=selected_section,
-        status='added'
+        status=ADDED
     ).exists()
 
     if existence_check:
@@ -206,7 +206,7 @@ def add_course_view(request, section_id):
         previous_selected_sections = CoursesTaken.objects.filter(
             student_id=student.student_id,
             semester=current_semester,
-            status='added'
+            status=ADDED
         ).all()
 
         for previous_section in previous_selected_sections:
@@ -241,7 +241,8 @@ def add_course_view(request, section_id):
         course_selected = CoursesTaken(
             student=student,
             semester=current_semester,
-            section=selected_section
+            section=selected_section,
+            status=ADDED
         )
         course_selected.save()
         messages.success(request, f'Successfully added Section-{selected_section.section_no} of {selected_section.course.course_code}')
@@ -264,19 +265,62 @@ def drop_course_view(request, section_id):
     selected_section.total_students = selected_section.total_students - 1
     selected_section.save()
 
-    delete_course = CoursesTaken.objects.get(
+    drop_course = CoursesTaken.objects.get(
         student_id=student_id,
         semester_id=current_semester_id,
         section_id=selected_section.section_id,
-        status='added'
+        status=ADDED
     )
 
-    delete_course.dropped_at = current_time
-    delete_course.status = 'dropped'
-    delete_course.updated_by = request.user
+    drop_course.dropped_at = current_time
+    drop_course.status = DROPPED
+    drop_course.updated_by = request.user
+    drop_course.save()
 
     messages.success(request, f'Dropped Section-{selected_section.section_no} of {selected_section.course.course_code}')
     return redirect('student-panel-portal', referer_parameter)
+
+
+@login_required
+@allowed_users(allowed_roles=['student'])
+def requested_section_conflict_checker(request, section_id):
+    referer_parameter = get_referer_parameter(request)
+
+    current_semester = Semester.objects.get(advising_status=True)   # get current semester
+    student = Student.objects.get(username_id=request.user)   # get User's student info
+    selected_section = Section.objects.get(section_id=section_id)   # get selected section data
+    selected_course = selected_section.course   # get course data of the selected section
+
+    # Check whether the section was already taken
+    existence_check = CoursesTaken.objects.filter(
+        student=student,
+        semester=current_semester,
+        section=selected_section,
+        status=ADDED
+    ).exists()
+
+    if existence_check:
+        messages.error(request, 'Section already added')
+        return redirect('student-panel-portal', referer_parameter)
+
+    elif not existence_check:
+        # Get current selected sections
+        previous_selected_sections = CoursesTaken.objects.filter(
+            student_id=student.student_id,
+            semester=current_semester,
+            status=ADDED
+        ).all()
+
+        for previous_section in previous_selected_sections:
+            # Check if the course of the section is already taken
+            if previous_section.section.course == selected_course:
+                messages.error(request, 'Course already added')
+                return redirect('student-panel-portal', referer_parameter)
+
+            if selected_section.does_conflict_with_section(previous_section.section):
+                messages.error(request, f'Conflicts with {previous_section.section.course.course_code}')
+                return redirect('student-panel-portal', referer_parameter)
+
 
 
 @login_required
@@ -304,7 +348,7 @@ def request_section_list_view(request):
             semester_id__in=Semester.objects.filter(
                 advising_status=False
             ).values('semester_id').all(),
-            status='added'
+            status=ADDED
         ).values('section_id').all()
     ).order_by('course__course_code')
 
@@ -447,7 +491,7 @@ def grade_report_view(request):
     courses_taken = CoursesTaken.objects.filter(
         student_id=student.student_id,
         semester__is_active=False,
-        status='added'
+        status=ADDED
     ).all()
 
     courses_by_semesters = {}
@@ -573,7 +617,7 @@ def advised_course_list_view(request):
     courses_taken = CoursesTaken.objects.filter(
         student_id=student_id,
         semester_id=semester.semester_id,
-        status='added'
+        status=ADDED
     ).all()
 
     view_selected_courses_data = []

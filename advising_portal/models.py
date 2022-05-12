@@ -7,6 +7,8 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from simple_history.models import HistoricalRecords
 
+from advising_portal.utilities import ADDED, DROPPED
+
 
 class Department(models.Model):
     department_id = models.CharField(max_length=100, primary_key=True)
@@ -287,9 +289,6 @@ class Grade(models.Model):
 
 
 class CoursesTaken(models.Model):
-    ADDED = 'added'
-    DROPPED = 'dropped'
-
     STATUS = (
         (ADDED, ADDED),
         (DROPPED, DROPPED)
@@ -303,7 +302,7 @@ class CoursesTaken(models.Model):
     grade = models.ForeignKey(Grade, on_delete=models.SET_NULL, null=True)
 
     added_at = models.DateTimeField(default=datetime.now())
-    dropped_at = models.DateTimeField()
+    dropped_at = models.DateTimeField(default=None, null=True)
     status = models.CharField(max_length=10, choices=STATUS, default=ADDED)
     updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 

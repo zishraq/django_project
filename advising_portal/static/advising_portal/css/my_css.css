@@ -62,11 +62,11 @@
     font-weight: bold;
 }
 
-@media (min-device-width: 100px) and (max-device-width: 1280px) {
-    .custom-margin {
-        padding-top: 30px;
-    }
-}
+/*@media (min-device-width: 100px) and (max-device-width: 1280px) {*/
+/*    .custom-margin {*/
+/*        padding-top: 30px;*/
+/*    }*/
+/*}*/
 
 .semesters-dropdown-menu {
     padding-bottom: 30px;

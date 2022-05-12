@@ -26,5 +26,5 @@ def debug_task(self):
     print(f'Request: {self.request!r}')
 
 
-# celery -A django_project.celery worker --pool=solo -l info
+# celery -A django_project.celery_connection worker --pool=solo -l info
 # celery -A django_project beat -l INFO

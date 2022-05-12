@@ -23,7 +23,7 @@ class BroadcastNotification(models.Model):
 
     def save(self, *args, **kwargs):
         if self.broadcast_at <= timezone.now():
-            self.broadcast_at = timezone.now() + datetime.timedelta(minutes=1)
+            self.broadcast_at = timezone.now() + timezone.timedelta(seconds=10)
 
         super(BroadcastNotification, self).save(*args, **kwargs)
 
