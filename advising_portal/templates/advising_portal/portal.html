@@ -107,12 +107,52 @@
 
                                 <td class="col-md-1">
                                     {% if portal_type == 'section_request' or section.total_students == section.section_capacity %}
-                                        <button class="btn btn-outline-info" type="submit" data-toggle="modal"
-                                                data-target="#{{ section.section_id }}">
-                                            Request
-                                        </button>
+                                        {% if section.conflicting_sections|length > 0 %}
+                                            <button class="btn btn-outline-info" type="submit" data-toggle="modal"
+                                                    data-target="#validate-request-{{ section.section_id }}">
+                                                Request
+                                            </button>
 
-                                        <div class="modal" tabindex="-1" id="{{ section.section_id }}">
+                                        {% else %}
+                                            <button class="btn btn-outline-info" type="submit" data-toggle="modal"
+                                                    data-target="#confirm-request-{{ section.section_id }}">
+                                                Request
+                                            </button>
+
+                                        {% endif %}
+
+                                        <div class="modal" tabindex="-1" role="dialog" id="validate-request-{{ section.section_id }}">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="alert alert-warning modal-header">
+                                                        <h5 class="modal-title">Warning!</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+{#                                                        <p>{{ section.conflicting_sections_message }}</p>#}
+                                                        <p>The section that you are trying to take conflicts with: </p>
+
+                                                        <ul>
+                                                            {% for course, course_section in section.conflicting_sections.items %}
+                                                                <li>Section-{{ course_section }} of {{ course }}</li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                        <p>These sections will be dropped once your request is approved. Are you sure you want to proceed? </p>
+
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#confirm-request-{{ section.section_id }}" data-dismiss="modal">
+                                                            Yes
+                                                        </button>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal" tabindex="-1" id="confirm-request-{{ section.section_id }}">
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
@@ -127,12 +167,12 @@
                                                             {% csrf_token %}
                                                             <fieldset class="form-group">
                                                                 {{ form|crispy }}
-                                                                <input type="hidden" name="section"
-                                                                       value="{{ section.section_id }}">
+                                                                <input type="hidden" name="section" value="{{ section.section_id }}">
 
                                                             </fieldset>
                                                             <div class="form-group modal-footer">
-                                                                <button type="submit" class="btn btn-primary">Submit
+                                                                <button type="submit" class="btn btn-primary" data-dismiss="modal">
+                                                                    Submit
                                                                 </button>
                                                             </div>
                                                         </form>

@@ -99,3 +99,15 @@ class UpdateSectionRequestForm(forms.Form):
 
     is_approved = forms.ChoiceField(label='Status', choices=APPROVAL_STATUS, widget=forms.RadioSelect)
     text = forms.CharField(label='Text', max_length=500, widget=forms.Textarea)
+
+
+class StudentUpdateForm(forms.Form):
+    class Meta:
+        model = Student
+        # readonly_fields = ('name', 'advisor', 'gender',)
+        fields = ('name', 'advisor', 'profile_picture', 'gender')
+
+    def __init__(self, *args, **kwargs):
+        super(StudentUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs['readonly'] = True
+        self.fields['advisor'].widget.attrs['readonly'] = True

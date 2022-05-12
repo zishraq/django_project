@@ -12,6 +12,7 @@ urlpatterns = [
     path('request-section/', views.request_section_list_view, name='student-panel-request-section-list-view'),
     # path('make-section-request/<section_id>/', views.request_section, name='advising-portal-make-section-request'),
     path('revoke-section-request/<section_id>/', views.revoke_section_request_view, name='student-panel-revoke-section-request'),
+    path('requested-section-conflict-check/<section_id>/', views.get_conflicting_sections_with_requested_section, name='requested-section-conflict-check'),
 
     path('advised-courses/', views.advised_course_list_view, name='student-panel-advised-courses'),
     path('grade-report/', views.grade_report_view, name='student-panel-grade-report'),
