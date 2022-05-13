@@ -19,7 +19,8 @@ from advising_portal.models import Course, Section, CoursesTaken, Semester, Stud
 from django.contrib.auth.decorators import login_required
 
 from advising_portal.utilities import student_id_regex, ADDED, DROPPED, get_referer_parameter, \
-    get_conflicting_sections_with_requested_section, text_shorten
+    get_conflicting_sections_with_requested_section, text_shorten, APPROVED, REJECTED, PENDING
+from notification_system.models import BroadcastNotification
 from users.decorators import allowed_users
 
 
@@ -57,39 +58,38 @@ def advising_portal_list_view(request, section_filter):
 
         # exclude previously completed courses
         sections = Section.objects.exclude(
-            course_id__in=Section.objects.filter(
+            course__course_code__in=Section.objects.filter(
                 section_id__in=get_previous_selected_sections
-            ).values('course_id').all()
+            ).values('course__course_code').all()
         )
 
         ### exclude courses without pre-requisite completion
-
         sections = sections.exclude(
-            course_id__in=Course.objects.filter(
-                prerequisite_course_id__in=Section.objects.exclude(
+            course__course_code__in=Course.objects.filter(
+                prerequisite_course__course_code__in=Section.objects.exclude(
                     section_id__in=get_previous_selected_sections
-                ).values('course_id').all()
-            ).values('course_id').all()
-        ).order_by('course__course_code')
+                ).values('course__course_code').all()
+            ).values('course_code').all()
+        )
 
     elif section_filter == 'retakable':
         sections = Section.objects.filter(
-            course_id__in=Section.objects.filter(
+            course__course_code__in=Section.objects.filter(
                 section_id__in=CoursesTaken.objects.filter(
                     student_id=student,
                     grade_id__in=['C', 'C+', 'C-']
                 ).values('section_id').all()
-            ).values('course_id').all()
+            ).values('course__course_code').all()
         ).order_by('course__course_code')
 
     elif section_filter == 'f':
         sections = Section.objects.filter(
-            course_id__in=Section.objects.filter(
+            course__course_code__in=Section.objects.filter(
                 section_id__in=CoursesTaken.objects.filter(
                     student_id=student,
                     grade_id__in=['F']
                 ).values('section_id').all()
-            ).values('course_id').all()
+            ).values('course__course_code').all()
         ).order_by('course__course_code')
 
     else:
@@ -100,10 +100,10 @@ def advising_portal_list_view(request, section_filter):
 
         get_course_ids = Section.objects.filter(
             section_id__in=d_courses
-        ).values('course_id').all()
+        ).values('course__course_code').all()
 
         sections = Section.objects.filter(
-            course_id__in=get_course_ids
+            course__course_code__in=get_course_ids
         ).order_by('course__course_code')
 
     sections = list(sections)
@@ -212,9 +212,6 @@ def add_course_view(request, section_id):
 
     # check section capacity
     if selected_section.total_students < selected_section.section_capacity:
-        selected_section.total_students = selected_section.total_students + 1
-        selected_section.save()
-
         course_selected = CoursesTaken(
             student=student,
             semester=current_semester,
@@ -238,9 +235,6 @@ def drop_course_view(request, section_id):
     current_semester_id = Semester.objects.get(advising_status=True).semester_id
     student_id = Student.objects.get(username_id=request.user).student_id
     selected_section = Section.objects.get(section_id=section_id)
-
-    selected_section.total_students = selected_section.total_students - 1
-    selected_section.save()
 
     drop_course = CoursesTaken.objects.get(
         student_id=student_id,
@@ -313,7 +307,7 @@ def request_section_list_view(request):
             'course_id': section.course.course_code,
             'credit': section.course.credit,
             'routine': section.routine,
-            'conflicting_sections': conflicting_sections,
+            'conflicting_sections': conflicting_sections['conflicting_sections'],
         }
 
         view_section_data.append(formatted_data)
@@ -323,7 +317,8 @@ def request_section_list_view(request):
 
     sections_requested = SectionsRequested.objects.filter(
         student_id=student_id,
-        semester_id=current_semester_id
+        semester_id=current_semester_id,
+        status=PENDING
     ).all()
 
     view_selected_courses_data = []
@@ -593,9 +588,20 @@ def advised_course_list_view(request):
 
 
 @login_required
-@allowed_users(allowed_roles=['faculty'])
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def course_list_view(request):
-    courses = Course.objects.all()
+    semester_id = request.GET.get('semester_id', '')
+
+    if not semester_id:
+        semester_id = Semester.objects.get(advising_status=True).pk
+
+    semester = Semester.objects.get(semester_id=semester_id)
+
+    semesters = list(Semester.objects.all().order_by('-semester_id'))
+
+    courses = Course.objects.filter(
+        semester=semester
+    )
     user_id = request.user.id
     course_list = []
 
@@ -612,6 +618,7 @@ def course_list_view(request):
 
     context = {
         'courses': course_list,
+        'semesters': semesters,
         'room_name': str(user_id)
     }
 
@@ -619,7 +626,7 @@ def course_list_view(request):
 
 
 @login_required
-@allowed_users(allowed_roles=['faculty'])
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def course_detail_view(request, course_id):
     user_id = request.user.id
 
@@ -678,7 +685,7 @@ def course_detail_view(request, course_id):
 
 
 @login_required
-@allowed_users(allowed_roles=['faculty'])
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def course_create_view(request):
     user_id = request.user.id
 
@@ -707,7 +714,7 @@ def course_create_view(request):
 
 
 @login_required
-@allowed_users(allowed_roles=['faculty'])
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def course_delete_view(request, course_id):
     course_data = Course.objects.get(course_id=course_id)
 
@@ -720,7 +727,7 @@ def course_delete_view(request, course_id):
 
 
 @login_required
-@allowed_users(allowed_roles=['faculty'])
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def section_detail_view(request, section_id):
     user_id = request.user.id
 
@@ -751,9 +758,27 @@ def section_detail_view(request, section_id):
     else:
         form = UpdateSectionForm(instance=section_data)
 
+    students = Student.objects.filter(
+        student_id__in=CoursesTaken.objects.filter(
+            section__course__course_code=section_data.course.course_code,
+        ).values('student__student_id')
+    )
+
+    student_list = []
+
+    for student in students:
+        formatted_data = {
+            'student_id': student.student_id,
+            'name': student.name,
+            'advisor': student.advisor.name,
+        }
+
+        student_list.append(formatted_data)
+
     context = {
         'form': form,
         'course_code': section_data.course.course_code,
+        'students': students,
         'section_no': section_data.section_no,
         'section_id': section_data.section_id,
         'room_name': str(user_id)
@@ -763,7 +788,7 @@ def section_detail_view(request, section_id):
 
 
 @login_required
-@allowed_users(allowed_roles=['faculty'])
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def section_create_view(request, course_code):
     user_id = request.user.id
 
@@ -799,7 +824,7 @@ def section_create_view(request, course_code):
 
 
 @login_required
-@allowed_users(allowed_roles=['faculty'])
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def section_delete_view(request, section_id):
     section_data = Section.objects.get(section_id=section_id)
 
@@ -812,7 +837,7 @@ def section_delete_view(request, section_id):
 
 
 @login_required
-@allowed_users(allowed_roles=['faculty'])
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def semester_list_view(request):
     user_id = request.user.id
     semesters = Semester.objects.all().order_by('-semester_id')
@@ -839,7 +864,7 @@ def semester_list_view(request):
 
 
 @login_required
-@allowed_users(allowed_roles=['faculty'])
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def semester_detail_view(request, semester_id):
     user_id = request.user.id
 
@@ -873,7 +898,7 @@ def semester_detail_view(request, semester_id):
 
 
 @login_required
-@allowed_users(allowed_roles=['faculty'])
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def semester_create(request):
     user_id = request.user.id
 
@@ -903,7 +928,7 @@ def semester_create(request):
 
 
 @login_required
-@allowed_users(allowed_roles=['faculty'])
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def assigned_sections(request):
     user_id = request.user.id
     get_faculty = Faculty.objects.get(username=request.user)
@@ -937,32 +962,24 @@ def assigned_sections(request):
 
 
 @login_required
-@allowed_users(allowed_roles=['faculty'])
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def section_request_list_view(request):
     user_id = request.user.id
     user = request.user
 
-    # section_requests = SectionsRequested.objects.all()
-    #
-    # section_requests = SectionsRequested.objects.filter(
-    #     student__advisor__username=user,
-    #     # student__advisor__username_id=user_id,
-    #     # section__instructor__username_id=user_id
-    #     section__instructor__username=user
-    # )
+    if user.groups.filter(name='chairman'):
+        section_requests = SectionsRequested.objects.filter(
+            section__course__department__chairman=user
+        )
 
-    section_requests = SectionsRequested.objects.filter(
-        Q(student__advisor__username_id=user_id) | Q(section__instructor__username=user_id)
-    )
+    else:
+        section_requests = SectionsRequested.objects.filter(
+            Q(student__advisor__username_id=user_id) | Q(section__instructor__username=user_id)
+        )
 
     section_requests_list = []
 
     for section_request in section_requests:
-        print(user_id)
-        print(section_request.student.advisor.username.id)
-        # print(section_request['student__advisor__username_id'])
-        # print(section_request['section__instructor__username_id'])
-
         formatted_data = {
             'request_id': section_request.request_id,
             'student_id': section_request.student.student_id,
@@ -985,25 +1002,22 @@ def section_request_list_view(request):
 
 
 @login_required
-@allowed_users(allowed_roles=['faculty'])
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def section_request_detail_view(request, request_id):
+    current_time = timezone.now()
     user_id = request.user.id
-    user = request.user
 
     section_request_data = SectionsRequested.objects.get(
         request_id=request_id
     )
 
-    is_faculty = False
-    is_advisor = False
-    is_chairman = False
+    requested_section_data = section_request_data.section
 
     current_faculty_data = Faculty.objects.get(
         username__id=user_id
     )
 
     student_advisor = section_request_data.student.advisor.username
-    section_instructor = section_request_data.section.instructor.username
     department_chairman = section_request_data.section.course.department.chairman
 
     if request.method == 'POST':
@@ -1012,27 +1026,86 @@ def section_request_detail_view(request, request_id):
         if form.is_valid():
             update_semester_data = form.cleaned_data
 
-            if current_faculty_data == student_advisor:
+            if update_semester_data['approval_status'] == REJECTED:
+                section_request_data.status = REJECTED
+                section_request_data.save()
+
+                messages.success(request, 'Request rejected!')
+                return redirect('student-panel-section-request-list')
+
+            if current_faculty_data.username == student_advisor:
+
                 section_request_data.advisor = current_faculty_data
-                section_request_data.advisor_approval_status = update_semester_data['is_approved']
+                section_request_data.advisor_approval_status = update_semester_data['approval_status']
                 section_request_data.advisor_text = update_semester_data['text']
 
-            if current_faculty_data == section_instructor:
-                section_request_data.instructor = current_faculty_data
-                section_request_data.instructor_approval_status = update_semester_data['is_approved']
-                section_request_data.instructor_text = update_semester_data['text']
+            if section_request_data.section.instructor:
+                section_instructor = section_request_data.section.instructor.username
 
-            if current_faculty_data == department_chairman:
+                if current_faculty_data.username == section_instructor:
+                    section_request_data.instructor = current_faculty_data
+                    section_request_data.instructor_approval_status = update_semester_data['approval_status']
+                    section_request_data.instructor_text = update_semester_data['text']
+
+            else:
+                section_request_data.instructor_approval_status = APPROVED
+
+            if current_faculty_data.username == department_chairman:
                 section_request_data.chairman = current_faculty_data
-                section_request_data.chairman_approval_status = update_semester_data['is_approved']
+                section_request_data.chairman_approval_status = update_semester_data['approval_status']
                 section_request_data.chairman_text = update_semester_data['text']
 
-            # if section_request_data.advisor_approval_status == section_request_data.instructor_approval_status == section_request_data.chairman_approval_status == 'approved':
+            course_added = False
 
+            if section_request_data.advisor_approval_status == section_request_data.instructor_approval_status == section_request_data.chairman_approval_status == APPROVED:
+                previous_selected_sections = CoursesTaken.objects.filter(
+                    student=section_request_data.student,
+                    semester=section_request_data.semester,
+                    status=ADDED
+                ).all()
+
+                conflicting_sections = get_conflicting_sections_with_requested_section(
+                    previous_selected_sections=previous_selected_sections,
+                    selected_section=requested_section_data
+                )
+
+                for section_id in conflicting_sections['section_ids']:
+                    section_to_drop = CoursesTaken(
+                        student=section_request_data.student,
+                        semester=section_request_data.semester,
+                        section_id=section_id,
+                        status=ADDED
+                    )
+
+                    section_to_drop.dropped_at = current_time
+                    section_to_drop.status = DROPPED
+                    section_to_drop.updated_by = request.user
+                    section_to_drop.save()
+
+                course_selected = CoursesTaken(
+                    student=section_request_data.student,
+                    semester=section_request_data.semester,
+                    section=requested_section_data,
+                    status=ADDED
+                )
+                course_selected.save()
+                section_request_data.status = APPROVED
+                course_added = True
 
             section_request_data.save()
 
-            messages.success(request, 'Semester successfully updated!')
+            if course_added:
+                notification = BroadcastNotification(
+                    message='Your course has been added',
+                    broadcast_at=timezone.now() + timezone.timedelta(minutes=1),
+                    notification_to=section_request_data.student.username
+                )
+                notification.save()
+
+                messages.success(request, 'Course Added!')
+            else:
+                messages.success(request, 'Approval submitted!')
+
             return redirect('student-panel-section-request-list')
 
     else:
@@ -1127,6 +1200,10 @@ def insert_test_data(request):
 
         if re.match(student_id_regex, user.username):
             group = Group.objects.get(name='student')
+            group.user_set.add(user)
+
+        elif user.username in ['nusrat', 'tanvir']:
+            group = Group.objects.get(name='chairman')
             group.user_set.add(user)
 
         else:
@@ -1543,9 +1620,31 @@ def insert_test_data(request):
         }
     ]
 
-    for i in courses:
-        r = Course(**i)
-        r.save()
+    for s in semesters:
+        for i in courses:
+            # r = Course(**i)
+            # r.save()
+
+            semester_id = Semester.objects.get(pk=s['semester_id']).pk
+
+            formatted_data = {
+                'semester_id': semester_id,
+                'course_id': str(semester_id) + i['course_id'],
+                'course_code': i['course_code'],
+                'course_title': i['course_title'],
+                'department_id': i['department_id'],
+                'prerequisite_course_id': str(semester_id) + i['prerequisite_course_id'] if i['prerequisite_course_id'] else None,
+                'credit': i['credit'],
+                'created_by_id': i['created_by_id']
+            }
+
+            try:
+                r = Course(**formatted_data)
+                r.save()
+                print(formatted_data)
+
+            except:
+                print('fail=', formatted_data)
 
     faculties = [
         {
@@ -2079,7 +2178,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='M01W01W11').pk,
-            'course_id': Course.objects.get(pk='CSE103').pk,
+            'course_id': 'CSE103',
         },
         {
             'section_id': 'ENG1011',
@@ -2088,7 +2187,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S03T03').pk,
-            'course_id': Course.objects.get(pk='ENG101').pk,
+            'course_id': 'ENG101',
         },
         {
             'section_id': 'CSE1061',
@@ -2097,7 +2196,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S01T01').pk,
-            'course_id': Course.objects.get(pk='CSE106').pk,
+            'course_id': 'CSE106',
         },
         {
             'section_id': 'ENG1021',
@@ -2106,7 +2205,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S03T03').pk,
-            'course_id': Course.objects.get(pk='ENG102').pk,
+            'course_id': 'ENG102',
         },
         {
             'section_id': 'MAT1011',
@@ -2115,7 +2214,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S04T04').pk,
-            'course_id': Course.objects.get(pk='MAT101').pk,
+            'course_id': 'MAT101',
         },
         {
             'section_id': 'CSE1062',
@@ -2124,7 +2223,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S04T04').pk,
-            'course_id': Course.objects.get(pk='CSE106').pk,
+            'course_id': 'CSE106',
         },
         {
             'section_id': 'MAT1021',
@@ -2133,7 +2232,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S04T04').pk,
-            'course_id': Course.objects.get(pk='MAT102').pk,
+            'course_id': 'MAT102',
         },
         {
             'section_id': 'CSE1101',
@@ -2142,7 +2241,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S01R01T11').pk,
-            'course_id': Course.objects.get(pk='CSE110').pk,
+            'course_id': 'CSE110',
         },
         {
             'section_id': 'MAT1041',
@@ -2151,7 +2250,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='M01W01').pk,
-            'course_id': Course.objects.get(pk='MAT104').pk,
+            'course_id': 'MAT104',
         },
         {
             'section_id': 'CHE1091',
@@ -2160,7 +2259,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='M01W01W07').pk,
-            'course_id': Course.objects.get(pk='CHE109').pk,
+            'course_id': 'CHE109',
         },
         {
             'section_id': 'CSE2091',
@@ -2169,7 +2268,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S03R03T06').pk,
-            'course_id': Course.objects.get(pk='CSE209').pk,
+            'course_id': 'CSE209',
         },
         {
             'section_id': 'CSE2511',
@@ -2178,7 +2277,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S01T01R01').pk,
-            'course_id': Course.objects.get(pk='CSE251').pk,
+            'course_id': 'CSE251',
         },
         {
             'section_id': 'CSE2001',
@@ -2187,7 +2286,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='T01').pk,
-            'course_id': Course.objects.get(pk='CSE200').pk,
+            'course_id': 'CSE200',
         },
         {
             'section_id': 'MAT2051',
@@ -2196,7 +2295,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S03T03').pk,
-            'course_id': Course.objects.get(pk='MAT205').pk,
+            'course_id': 'MAT205',
         },
         {
             'section_id': 'GEN2261',
@@ -2205,7 +2304,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='T03R03').pk,
-            'course_id': Course.objects.get(pk='GEN226').pk,
+            'course_id': 'GEN226',
         },
         {
             'section_id': 'ECO1011',
@@ -2214,7 +2313,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S05R05').pk,
-            'course_id': Course.objects.get(pk='ECO101').pk,
+            'course_id': 'ECO101',
         },
         {
             'section_id': 'CSE2461',
@@ -2223,7 +2322,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='M01W01W09').pk,
-            'course_id': Course.objects.get(pk='CSE246').pk,
+            'course_id': 'CSE246',
         },
         {
             'section_id': 'CSE2071',
@@ -2232,7 +2331,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='M01W01W11').pk,
-            'course_id': Course.objects.get(pk='CSE207').pk,
+            'course_id': 'CSE207',
         },
         {
             'section_id': 'CSE4051',
@@ -2241,7 +2340,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S03T03R06').pk,
-            'course_id': Course.objects.get(pk='CSE405').pk,
+            'course_id': 'CSE405',
         },
         {
             'section_id': 'CSE4052',
@@ -2250,7 +2349,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='M01W01W09').pk,
-            'course_id': Course.objects.get(pk='CSE405').pk,
+            'course_id': 'CSE405',
         },
         {
             'section_id': 'CSE3021',
@@ -2259,7 +2358,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S01T01R11').pk,
-            'course_id': Course.objects.get(pk='CSE302').pk,
+            'course_id': 'CSE302',
         },
         {
             'section_id': 'CSE3251',
@@ -2268,7 +2367,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='M01W01W07').pk,
-            'course_id': Course.objects.get(pk='CSE325').pk,
+            'course_id': 'CSE325',
         },
         {
             'section_id': 'CSE3451',
@@ -2277,7 +2376,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S01R01T09').pk,
-            'course_id': Course.objects.get(pk='CSE345').pk,
+            'course_id': 'CSE345',
         },
         {
             'section_id': 'STA1021',
@@ -2286,7 +2385,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='M05W05').pk,
-            'course_id': Course.objects.get(pk='STA102').pk,
+            'course_id': 'STA102',
         },
         {
             'section_id': 'CSE3471',
@@ -2295,7 +2394,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S03T03R09').pk,
-            'course_id': Course.objects.get(pk='CSE347').pk,
+            'course_id': 'CSE347',
         },
         {
             'section_id': 'CSE3472',
@@ -2304,7 +2403,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='M03W03W09').pk,
-            'course_id': Course.objects.get(pk='CSE347').pk,
+            'course_id': 'CSE347',
         },
         {
             'section_id': 'CSE3601',
@@ -2313,7 +2412,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='M01W01').pk,
-            'course_id': Course.objects.get(pk='CSE360').pk,
+            'course_id': 'CSE360',
         },
         {
             'section_id': 'ENG1012',
@@ -2322,7 +2421,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='T05R05').pk,
-            'course_id': Course.objects.get(pk='ENG101').pk,
+            'course_id': 'ENG101',
         },
         {
             'section_id': 'ENG1022',
@@ -2331,7 +2430,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S05R05').pk,
-            'course_id': Course.objects.get(pk='ENG102').pk,
+            'course_id': 'ENG102',
         },
         {
             'section_id': 'GEN2031',
@@ -2340,7 +2439,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S05T05').pk,
-            'course_id': Course.objects.get(pk='GEN203').pk,
+            'course_id': 'GEN203',
         },
         {
             'section_id': 'GEN2032',
@@ -2349,7 +2448,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='M05W05').pk,
-            'course_id': Course.objects.get(pk='GEN203').pk,
+            'course_id': 'GEN203',
         },
         {
             'section_id': 'GEN2141',
@@ -2358,7 +2457,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='M01W01').pk,
-            'course_id': Course.objects.get(pk='GEN214').pk,
+            'course_id': 'GEN214',
         },
         {
             'section_id': 'GEN2142',
@@ -2367,7 +2466,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S01R01').pk,
-            'course_id': Course.objects.get(pk='GEN214').pk,
+            'course_id': 'GEN214',
         },
         {
             'section_id': 'GEN2101',
@@ -2376,7 +2475,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S03T03').pk,
-            'course_id': Course.objects.get(pk='GEN210').pk,
+            'course_id': 'GEN210',
         },
         {
             'section_id': 'GEN2102',
@@ -2385,7 +2484,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S04T04').pk,
-            'course_id': Course.objects.get(pk='GEN210').pk,
+            'course_id': 'GEN210',
         },
         {
             'section_id': 'BUS2311',
@@ -2394,7 +2493,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S02T02').pk,
-            'course_id': Course.objects.get(pk='BUS231').pk,
+            'course_id': 'BUS231',
         },
         {
             'section_id': 'PHY1091',
@@ -2403,7 +2502,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='M01W01W07').pk,
-            'course_id': Course.objects.get(pk='PHY109').pk,
+            'course_id': 'PHY109',
         },
         {
             'section_id': 'PHY2091',
@@ -2412,7 +2511,7 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='T01R01R09').pk,
-            'course_id': Course.objects.get(pk='PHY209').pk,
+            'course_id': 'PHY209',
         },
         {
             'section_id': 'PHY2092',
@@ -2421,13 +2520,27 @@ def insert_test_data(request):
             'total_students': 0,
             'instructor_id': None,
             'routine_id': WeekSlot.objects.get(pk='S01R01').pk,
-            'course_id': Course.objects.get(pk='PHY209').pk,
+            'course_id': 'PHY209',
         }
     ]
 
-    for i in sections:
-        r = Section(**i)
-        r.save()
+    for s in semesters:
+        for i in sections:
+            formatted_data = {
+                'section_id': i['section_id'],
+                'section_no': i['section_no'],
+                'section_capacity': i['section_capacity'],
+                'total_students': i['total_students'],
+                'instructor_id': i['instructor_id'],
+                'routine_id': i['routine_id'],
+                'course_id': str(s['semester_id']) + i['course_id']
+            }
+
+            r = Section(**formatted_data)
+            r.save()
+
+        # r = Section(**i)
+        # r.save()
 
     students = [
         {

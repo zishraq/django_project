@@ -9,6 +9,7 @@ from advising_portal.models import Student, Faculty, Course, Semester, Section, 
 
 
 # from bootstrap_modal_forms.mixins import PopRequestMixin, CreateUpdateAjaxMixin
+from advising_portal.utilities import APPROVED, REJECTED
 
 
 class SectionRequestForm(forms.Form):
@@ -89,16 +90,17 @@ class UpdateSectionForm(forms.ModelForm):
 
 
 class UpdateSectionRequestForm(forms.Form):
-    APPROVED = 'approved'
-    REJECTED = 'rejected'
-
     APPROVAL_STATUS = (
         (APPROVED, APPROVED),
         (REJECTED, REJECTED)
     )
 
-    is_approved = forms.ChoiceField(label='Status', choices=APPROVAL_STATUS, widget=forms.RadioSelect)
+    approval_status = forms.ChoiceField(label='Status', choices=APPROVAL_STATUS, widget=forms.RadioSelect)
     text = forms.CharField(label='Text', max_length=500, widget=forms.Textarea)
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateSectionRequestForm, self).__init__(*args, **kwargs)
+        self.fields['text'].required = False
 
 
 class StudentUpdateForm(forms.Form):

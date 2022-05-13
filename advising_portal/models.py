@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from simple_history.models import HistoricalRecords
 
-from advising_portal.utilities import ADDED, DROPPED
+from advising_portal.utilities import ADDED, DROPPED, PENDING, APPROVED, REJECTED
 
 
 class Department(models.Model):
@@ -24,29 +24,6 @@ class Department(models.Model):
         return self.department_name
 
 
-class Course(models.Model):
-    course_id = models.CharField(max_length=100, primary_key=True)
-    course_code = models.CharField(max_length=10)
-    course_title = models.CharField(max_length=50)
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True)
-    prerequisite_course = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
-    credit = models.FloatField()
-    created_at = models.DateTimeField(default=timezone.now)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    history = HistoricalRecords()
-
-    def __str__(self):
-        return self.course_code
-
-
-# class CoursePrerequisites(models.Model):
-#     class Meta:
-#         unique_together = (('course_code', 'prerequisite_course_code'),)
-#
-#     course_code = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_code')
-#     prerequisite_course_code = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='prerequisite_course_code')
-
-
 class Semester(models.Model):
     semester_id = models.AutoField(primary_key=True)
     semester_name = models.CharField(max_length=50, validators=[RegexValidator(r'(Spring|Summer|Fall)\-[0-9]{4}')])
@@ -59,6 +36,7 @@ class Semester(models.Model):
     advising_status = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     add_drop_status = models.BooleanField(default=False)
+    seat_request_status = models.BooleanField(default=False)
     history = HistoricalRecords()
 
     def __str__(self):
@@ -92,7 +70,46 @@ class Semester(models.Model):
             except Semester.DoesNotExist:
                 pass
 
+        if self.seat_request_status:
+            try:
+                temp = Semester.objects.get(add_drop_status=True)
+                if self != temp:
+                    temp.add_drop_status = False
+                    temp.save()
+            except Semester.DoesNotExist:
+                pass
+
         super(Semester, self).save(*args, **kwargs)
+
+
+class Course(models.Model):
+    course_id = models.CharField(max_length=100, primary_key=True)
+    course_code = models.CharField(max_length=10)
+    course_title = models.CharField(max_length=50)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, related_name='related_department')
+    prerequisite_course = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, related_name='related_prerequisite_course')
+    credit = models.FloatField()
+    created_at = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='related_created_by')
+    semester = models.ForeignKey(Semester, on_delete=models.SET_NULL, null=True, related_name='related_semester')
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return self.course_code
+
+
+# class CourseBySemester(models.Model):
+#     semester_course_id = models.CharField(max_length=100, primary_key=True)
+#     semester = models.ForeignKey(Semester, on_delete=models.SET_NULL, null=True, related_name='semester')
+#     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, related_name='semester')
+
+
+# class CoursePrerequisites(models.Model):
+#     class Meta:
+#         unique_together = (('course_code', 'prerequisite_course_code'),)
+#
+#     course_code = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_code')
+#     prerequisite_course_code = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='prerequisite_course_code')
 
 
 class Faculty(models.Model):
@@ -248,7 +265,7 @@ class Section(models.Model):
     total_students = models.PositiveIntegerField(default=0)
     instructor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
     routine = models.ForeignKey(WeekSlot, on_delete=models.SET_NULL, null=True)
-    course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True)
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, related_name='section_by_course', related_query_name='section_course')
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='section_creator')
     updated_at = models.DateTimeField(default=timezone.now)
@@ -304,14 +321,11 @@ class CoursesTaken(models.Model):
     added_at = models.DateTimeField(default=datetime.now())
     dropped_at = models.DateTimeField(default=None, null=True)
     status = models.CharField(max_length=10, choices=STATUS, default=ADDED)
-    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='adder')
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='updater')
 
 
 class SectionsRequested(models.Model):
-    PENDING = 'pending'
-    APPROVED = 'approved'
-    REJECTED = 'rejected'
-
     APPROVAL_STATUS = (
         (PENDING, PENDING),
         (APPROVED, APPROVED),
@@ -324,6 +338,7 @@ class SectionsRequested(models.Model):
     # semester = models.ForeignKey(StudentRecordsBySemester, on_delete=models.SET_NULL, null=True)
     section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True)
     reason = models.TextField()
+    status = models.CharField(max_length=10, choices=APPROVAL_STATUS, default=PENDING)
 
     advisor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True, related_name='advisor')
     advisor_approval_status = models.CharField(max_length=10, choices=APPROVAL_STATUS, default=PENDING)
@@ -337,5 +352,5 @@ class SectionsRequested(models.Model):
     instructor_approval_status = models.CharField(max_length=10, choices=APPROVAL_STATUS, default=PENDING)
     instructor_text = models.TextField()
 
-    # requested_at =
-    # updated_at =
+    requested_at = models.DateTimeField(default=datetime.now())
+    updated_at = models.DateTimeField(default=None, null=True)

@@ -1,9 +1,24 @@
 {% extends "advising_portal/base.html" %}
 {% load static %}
 {% block content %}
-    <div align="right">
-        <a href="{% url 'student-panel-course-create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-            <i class="fas fa-download fa-sm text-white-50"></i>Create Course</a>
+    <div class="row">
+        <div class="semesters-dropdown-menu col-8">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle w-50" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Semesters
+                </button>
+                <div class="dropdown-menu w-50" aria-labelledby="dropdownMenuButton">
+                    {% for semester in semesters %}
+                        <a class="dropdown-item" href="{% url 'student-panel-course-list' %}?semester_id={{ semester.semester_id }}">{{ semester.semester_name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="semesters-dropdown-menu col-4" align="right">
+            <a href="{% url 'student-panel-course-create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                <i class="fas fa-download fa-sm text-white-50"></i>Create Course</a>
+        </div>
     </div>
 
     <div class="row">

@@ -1,6 +1,10 @@
 student_id_regex = r'^\d{4}\-\d\-\d{2}\-\d{3}$'
 ADDED = 'added'
 DROPPED = 'dropped'
+PENDING = 'pending'
+APPROVED = 'approved'
+REJECTED = 'rejected'
+REQUEST_APPROVED = 'request_approved'
 
 
 def get_referer_parameter(request):
@@ -31,9 +35,14 @@ def get_conflicting_sections_with_requested_section(previous_selected_sections, 
     selected_course = selected_section.course
 
     conflicting_sections = {}
+    section_ids = []
 
     for previous_section in previous_selected_sections:
         if previous_section.section.course == selected_course or selected_section.does_conflict_with_section(previous_section.section):
+            section_ids.append(previous_section.section.section_id)
             conflicting_sections[previous_section.section.course.course_code] = previous_section.section.section_no
 
-    return conflicting_sections
+    return {
+        'section_ids': section_ids,
+        'conflicting_sections': conflicting_sections
+    }
