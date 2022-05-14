@@ -1,6 +1,7 @@
 import re
 from datetime import datetime
 from PIL import Image
+from django.core.files.storage import FileSystemStorage
 
 from django.core.validators import RegexValidator
 from django.db import models
@@ -9,6 +10,17 @@ from django.contrib.auth.models import User
 from simple_history.models import HistoricalRecords
 
 from advising_portal.utilities import ADDED, DROPPED, PENDING, APPROVED, REJECTED
+from django_project import settings
+
+
+image_storage = FileSystemStorage(
+    location=u'{0}/profile_pictures/'.format(settings.MEDIA_ROOT),
+    base_url=u'{0}profile_pictures/'.format(settings.MEDIA_URL),
+)
+
+
+def image_directory_path(instance, filename):
+    return u'{0}'.format(filename)
 
 
 class Department(models.Model):
@@ -114,11 +126,17 @@ class Course(models.Model):
 
 
 class Faculty(models.Model):
+    GENDERS = (
+        (PENDING, PENDING),
+        (APPROVED, APPROVED),
+        (REJECTED, REJECTED)
+    )
+
     faculty_id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=30)
     initials = models.CharField(max_length=10)
-    profile_picture = models.ImageField(default='male_default.svg', upload_to='profile_pictures')
-    gender = models.CharField(max_length=10, validators=[RegexValidator(r'(male|female|other)')])
+    profile_picture = models.ImageField(default='default.jpg', upload_to=image_directory_path, storage=image_storage)
+    gender = models.CharField(max_length=10, choices=GENDERS)
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
     history = HistoricalRecords()
 
@@ -136,11 +154,17 @@ class Faculty(models.Model):
 
 
 class Student(models.Model):
+    GENDERS = (
+        (PENDING, PENDING),
+        (APPROVED, APPROVED),
+        (REJECTED, REJECTED)
+    )
+
     student_id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=30)
     advisor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
-    profile_picture = models.ImageField(default='default.jpg', upload_to='profile_pictures')
-    gender = models.CharField(max_length=10, validators=[RegexValidator(r'(male|female|other)')])
+    profile_picture = models.ImageField(default='default.jpg', upload_to=image_directory_path, storage=image_storage)
+    gender = models.CharField(max_length=10, choices=GENDERS)
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
     history = HistoricalRecords()
 

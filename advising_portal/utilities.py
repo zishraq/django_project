@@ -5,6 +5,9 @@ PENDING = 'pending'
 APPROVED = 'approved'
 REJECTED = 'rejected'
 REQUEST_APPROVED = 'request_approved'
+MALE = 'male'
+FEMALE = 'female'
+OTHER = 'other'
 
 
 def get_referer_parameter(request):
