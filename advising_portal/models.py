@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from PIL import Image
 
 from django.core.validators import RegexValidator
 from django.db import models
@@ -116,7 +117,7 @@ class Faculty(models.Model):
     faculty_id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=30)
     initials = models.CharField(max_length=10)
-    profile_picture = models.ImageField(default='male_default.svg', upload_to='profile_pics')
+    profile_picture = models.ImageField(default='male_default.svg', upload_to='profile_pictures')
     gender = models.CharField(max_length=10, validators=[RegexValidator(r'(male|female|other)')])
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
     history = HistoricalRecords()
@@ -138,17 +139,26 @@ class Student(models.Model):
     student_id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=30)
     advisor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
-    profile_picture = models.ImageField(default='male_default.svg', upload_to='profile_pics')
+    profile_picture = models.ImageField(default='default.jpg', upload_to='profile_pictures')
     gender = models.CharField(max_length=10, validators=[RegexValidator(r'(male|female|other)')])
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
     history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
-        if self.gender == 'male':
-            self.profile_picture = 'male_default.svg'
+        # if self.gender == 'male':
+        #     self.profile_picture = 'male_default.svg'
+        #
+        # else:
+        #     self.profile_picture = 'female_default.svg'
 
-        else:
-            self.profile_picture = 'female_default.svg'
+        # self.profile_picture = 'default.jpg'
+
+        img = Image.open(self.profile_picture.path)
+
+        if img.height > 300 or img.width > 300:
+            output_size = (300, 300)
+            img.thumbnail(output_size)
+            img.save(self.profile_picture.path)
 
         super(Student, self).save(*args, **kwargs)
 

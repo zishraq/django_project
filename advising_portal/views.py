@@ -1641,7 +1641,6 @@ def insert_test_data(request):
             try:
                 r = Course(**formatted_data)
                 r.save()
-                print(formatted_data)
 
             except:
                 print('fail=', formatted_data)

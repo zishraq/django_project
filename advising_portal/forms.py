@@ -20,7 +20,7 @@ class SectionRequestForm(forms.Form):
 class CreateCourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ('course_code', 'course_title', 'department', 'prerequisite_course', 'credit')
+        fields = ('semester', 'course_code', 'course_title', 'department', 'prerequisite_course', 'credit')
 
     def __init__(self, *args, **kwargs):
         super(CreateCourseForm, self).__init__(*args, **kwargs)

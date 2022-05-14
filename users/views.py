@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
 from advising_portal.models import Student
-from users.forms import ProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm, UserUpdateFrom
+from users.forms import StudentProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm, UserUpdateFrom
 from users.models import OTPmodel
 from users.send_otp import send_otp, store_otp
 
@@ -230,22 +230,23 @@ def reset_password_view(request, otp_id):
 @login_required
 def profile_view(request):
     if request.method == 'POST':
-        u_form = UserUpdateFrom(request.POST, instance=request.user)
-        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.student)
+        # u_form = UserUpdateFrom(request.POST, instance=request.user)
+        p_form = StudentProfileUpdateForm(request.POST, request.FILES, instance=request.user.student)
 
-        if u_form.is_valid() and p_form.is_valid():
-            u_form.save()
+        # if u_form.is_valid() and p_form.is_valid():
+        if p_form.is_valid():
+            # u_form.save()
             p_form.save()
 
             messages.success(request, 'Your account has been updated!')
             return redirect('profile')
 
     else:
-        u_form = UserUpdateFrom(instance=request.user)
-        p_form = ProfileUpdateForm(instance=request.user.student)
+        # u_form = UserUpdateFrom(instance=request.user)
+        p_form = StudentProfileUpdateForm(instance=request.user.student)
 
     context = {
-        'u_form': u_form,
+        # 'u_form': u_form,
         'p_form': p_form
     }
 

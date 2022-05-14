@@ -19,17 +19,16 @@ class UserRegisterForm(UserCreationForm):
 
 
 class UserUpdateFrom(forms.ModelForm):
-    email = forms.EmailField()
-
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ['password']
 
 
-class ProfileUpdateForm(forms.ModelForm):
+class StudentProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ['name']
+        # readonly_fields = ('name', 'advisor', 'gender',)
+        fields = ['profile_picture']
 
 
 class ProfileActivationForm(forms.Form):
