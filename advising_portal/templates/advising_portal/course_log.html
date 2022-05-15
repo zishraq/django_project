@@ -1,0 +1,48 @@
+{% extends "advising_portal/base.html" %}
+{% load static %}
+{% block content %}
+
+    <div class="table-responsive card shadow custom-left-table-align">
+        <table id="myTable" class="table table-striped">
+            <tbody>
+            <tr>
+                <th class="col-md-1"><b>Course Code</b></th>
+                <th class="col-md-1"><b>Semester</b></th>
+                <th class="col-md-1"><b>Updated At</b></th>
+                <th class="col-md-1"><b>Updated By</b></th>
+                <th class="col-md-1"><b>Action Taken</b></th>
+            </tr>
+
+            <tr>
+                <td colspan="7" align="right">
+                    <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group custom-search-align">
+                            <input type="text" id="myInput" onkeyup="table_search(7)"
+                                   class="form-control bg-light border-0 small" placeholder="Search for..."
+                                   aria-label="Search" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+
+            {% for logs in course_log %}
+
+                <tr>
+                    <td class="col-md-1">{{ logs.course_code }}</td>
+                    <td class="col-md-1">{{ logs.semester }}</td>
+                    <td class="col-md-1">{{ logs.created_at }}</td>
+                    <td class="col-md-1">{{ logs.created_by }}</td>
+                    <td class="col-md-1">{{ logs.history_type }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock content %}
