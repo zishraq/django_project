@@ -1,5 +1,7 @@
+from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -8,6 +10,33 @@ from advising_portal.models import Student
 from users.forms import StudentProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm, UserUpdateFrom
 from users.models import OTPmodel
 from users.send_otp import send_otp, store_otp
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('student-panel-home')
+
+            else:
+                messages.error(request, 'Invalid username or password.')
+        else:
+            messages.error(request, "Invalid username or password.")
+
+    form = AuthenticationForm()
+    return render(
+        request=request,
+        template_name="users/login.html",
+        context={
+            'login_form': form
+        }
+    )
 
 
 def activate_student_profile_view(request):
@@ -61,7 +90,8 @@ def activate_student_profile_view(request):
         'form': form
     }
 
-    return render(request, 'users/activate.html', context)
+    # return render(request, 'users/activate.html', context)
+    return render(request, 'users/register.html', context)
 
 
 def forgot_password_view(request):
@@ -178,7 +208,8 @@ def set_password_view(request, otp_id):
         'form': form
     }
 
-    return render(request, 'users/activate.html', context)
+    # return render(request, 'users/activate.html', context)
+    return render(request, 'users/set_password.html', context)
 
 
 def reset_password_view(request, otp_id):

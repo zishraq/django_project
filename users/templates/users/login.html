@@ -27,22 +27,6 @@
 <body class="bg-gradient-primary">
 
 <div class="container">
-    <main class="container-fluid">
-        {% if messages %}
-            {% for message in messages %}
-                {% if message.tags == "success" %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% else %}
-                    <div class="alert alert-danger">
-                        {{ message }}
-                    </div>
-                {% endif %}
-             {% endfor %}
-        {% endif %}
-    </main>
-
     <!-- Outer Row -->
     <div class="row justify-content-center">
 
@@ -50,40 +34,39 @@
 
             <div class="card o-hidden border-0 shadow-lg my-5">
                 <div class="card-body p-0">
-                    <!-- Nested Row within Card Body -->
-{#                    <div>#}
-                        <div class="p-5">
-                            <div class="text-center">
-                                <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
-                            </div>
-                            <form class="user" method="POST">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <input name="username" class="form-control form-control-user" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Student ID">
-                                </div>
-                                <div class="form-group">
-                                    <input type="password" name="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password">
-                                </div>
-                                <button class="btn btn-primary btn-user btn-block" type="submit">
-                                    Login
-                                </button>
-                            </form>
-                            <hr>
-                            <div class="text-center">
-                                <a class="small" href="{% url 'forgot_password' %}">Forgot Password?</a>
-                            </div>
-                            <div class="text-center">
-                                <a class="small" href="{% url 'activate' %}">Activate</a>
-                            </div>
-
-                            {% if messages %}
-                                {% for message in messages %}
-                                    <p> {{ message }} </p>
-                                {% endfor %}
-                            {% endif %}
-
+                <!-- Nested Row within Card Body -->
+                    <div class="p-5">
+                        <div class="text-center">
+                            <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
                         </div>
-{#                    </div>#}
+                        <form class="user" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <input name="username" class="form-control form-control-user" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Student ID">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" name="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password">
+                            </div>
+                            <button class="btn btn-primary btn-user btn-block" type="submit">
+                                Login
+                            </button>
+                        </form>
+
+                        {% if messages %}
+                            {% for message in messages %}
+                                <p style="color: red; padding-top: 10px" align="center"> {{ message }} </p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <hr>
+                        <div class="text-center">
+                            <a class="small" href="{% url 'forgot_password' %}">Forgot Password?</a>
+                        </div>
+                        <div class="text-center">
+                            <a class="small" href="{% url 'activate' %}">Activate</a>
+                        </div>
+
+                    </div>
                 </div>
             </div>
 

@@ -1,23 +1,93 @@
-{% extends "advising_portal/base.html" %}
-{% load crispy_forms_tags %}
-{% block content %}
-    <div class="content-section">
-        <form method="POST">
-            {% csrf_token %}
-            <fieldset class="form-group">
-{#                <legend class="border-bottom mb-4">Join Today</legend>#}
-                <legend class="border-bottom mb-4">Register</legend>
-                {{ u_form|crispy }}
-                {{ s_form|crispy }}
-            </fieldset>
-            <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">Sign Up</button>
+{% load static %}
+{% load custom_tags %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>EWU Student Panel</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'advising_portal/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet"
+          type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="{% static 'advising_portal/css/basic.min.css' %}" rel="stylesheet">
+    <link href="{% static 'advising_portal/css/my_css.css' %}" rel="stylesheet">
+
+    <style>
+        .asteriskField {
+            display: none;
+        }
+    </style>
+
+</head>
+
+<body class="bg-gradient-primary">
+
+<div class="container">
+
+    <div class="row justify-content-center">
+
+        <div class="col-xl-6 col-lg-6 col-md-9">
+
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-0">
+
+                    <div class="p-5">
+                        <div class="text-center">
+                            <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
+                        </div>
+                        <form class="user" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <input name="student_id" type="text" class="form-control form-control-user"
+                                       id="exampleInputEmail"
+                                       placeholder="Student ID">
+                            </div>
+
+                            <button class="btn btn-primary btn-user btn-block" type="submit">
+                                Activate
+                            </button>
+
+                        </form>
+                        <hr>
+                        <div class="text-center">
+                            <a class="small" href="{% url 'forgot_password' %}">Forgot Password?</a>
+                        </div>
+                        <div class="text-center">
+                            <a class="small" href="#">Already have an account? Login!</a>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-        </form>
-        <div class="border-top pt-3">
-            <small class="text-muted">
-                Already Have An Account? <a class="ml-2" href="{% url 'login' %}">Sign In</a>
-            </small>
         </div>
     </div>
-{% endblock content %}
+
+</div>
+
+<!-- Bootstrap core JavaScript-->
+<script src="{% static 'advising_portal/vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'advising_portal/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="{% static 'advising_portal/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="{% static 'advising_portal/js/basic.min.js' %}"></script>
+
+<!-- My scripts for all pages-->
+<script src="{% static 'advising_portal/js/my_scripts.js' %}"></script>
+
+</body>
+
+</html>
