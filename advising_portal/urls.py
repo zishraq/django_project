@@ -17,26 +17,24 @@ urlpatterns = [
     path('advised-courses/', views.advised_course_list_view, name='student-panel-advised-courses'),
     path('grade-report/', views.grade_report_view, name='student-panel-grade-report'),
 
-    path('course-list/', views.course_list_view, name='student-panel-course-list'),
-    path('course-detail/<course_id>', views.course_detail_view, name='student-panel-course-detail'),
-    path('course-create/', views.course_create_view, name='student-panel-course-create'),
-    path('course-delete/<course_id>', views.course_delete_view, name='student-panel-course-delete'),
+    path('course-list/', views.course_list_view, name='faculty-panel-course-list'),
+    path('course-detail/<course_id>', views.course_detail_view, name='faculty-panel-course-detail'),
+    path('course-create/', views.course_create_view, name='faculty-panel-course-create'),
+    path('course-delete/<course_id>', views.course_delete_view, name='faculty-panel-course-delete'),
 
-    path('section-detail/<section_id>', views.section_detail_view, name='student-panel-section-detail'),
-    path('section-create/<course_code>', views.section_create_view, name='student-panel-section-create'),
-    path('section-delete/<section_id>', views.section_delete_view, name='student-panel-section-delete'),
+    path('section-detail/<section_id>', views.section_detail_view, name='faculty-panel-section-detail'),
+    path('section-create/<course_code>', views.section_create_view, name='faculty-panel-section-create'),
+    path('section-delete/<section_id>', views.section_delete_view, name='faculty-panel-section-delete'),
 
-    path('semester-list/', views.semester_list_view, name='student-panel-semester-list'),
-    path('semester-detail/<semester_id>', views.semester_detail_view, name='student-panel-semester-detail'),
-    path('semester-create/', views.semester_create, name='student-panel-semester-create'),
+    path('semester-list/', views.semester_list_view, name='faculty-panel-semester-list'),
+    path('semester-detail/<semester_id>', views.semester_detail_view, name='faculty-panel-semester-detail'),
+    path('semester-create/', views.semester_create, name='faculty-panel-semester-create'),
 
-    path('section-request-list/', views.section_request_list_view, name='student-panel-section-request-list'),
-    path('section-request-detial/<request_id>', views.section_request_detail_view, name='student-panel-section-request-detail'),
+    path('section-request-list/', views.section_request_list_view, name='faculty-panel-section-request-list'),
+    path('section-request-detial/<request_id>', views.section_request_detail_view, name='faculty-panel-section-request-detail'),
 
-    path('student-list/', views.student_list_view, name='student-panel-student-list'),
-    path('student-detail/<student_id>', views.student_detail_view, name='student-panel-student-detail'),
-    # path('student-list/', views.semester_list_view, name='student-panel-semester-list'),
-    # path('student-detial/<semester_id>', views.semester_detail_view, name='student-panel-semester-detail'),
+    path('student-list/', views.student_list_view, name='faculty-panel-student-list'),
+    path('student-detail/<student_id>', views.student_detail_view, name='faculty-panel-student-detail'),
     # path('student-create/', views.semester_create, name='student-panel-semester-create'),
 
     path('assigned-sections/', views.assigned_sections, name='student-panel-assigned-sections')

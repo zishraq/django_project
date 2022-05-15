@@ -13,7 +13,7 @@ from advising_portal.utilities import APPROVED, REJECTED
 
 
 class SectionRequestForm(forms.Form):
-    reason = forms.CharField(label='reason', max_length=500, widget=forms.Textarea)
+    reason = forms.CharField(label='Reason', max_length=500, widget=forms.Textarea)
     section = forms.CharField(label='section', widget=forms.HiddenInput())
 
 

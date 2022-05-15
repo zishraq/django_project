@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
     <div align="right">
-        <a href="{% url 'student-panel-semester-create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+        <a href="{% url 'faculty-panel-semester-create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
             <i class="fas fa-download fa-sm text-white-50"></i>Create semester</a>
     </div>
 
@@ -47,7 +47,7 @@
                     <td class="col-md-1">{{ semester.add_drop_status }}</td>
                     <td class="col-md-1">{{ semester.is_active }}</td>
                     <td class="col-md-1">
-                        <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'student-panel-semester-detail' semester.semester_id %}'">
+                        <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'faculty-panel-semester-detail' semester.semester_id %}'">
                             Detail
                         </button>
                     </td>

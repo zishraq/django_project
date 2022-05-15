@@ -22,7 +22,7 @@
                 </button>
                 <div class="dropdown-menu w-50" aria-labelledby="dropdownMenuButton">
                     {% for semester in semesters %}
-                        <a class="dropdown-item" href="{% url 'student-panel-student-detail' student_id %}?semester_id={{ semester.semester_id }}">{{ semester.semester_name }}</a>
+                        <a class="dropdown-item" href="{% url 'faculty-panel-student-detail' student_id %}?semester_id={{ semester.semester_id }}">{{ semester.semester_name }}</a>
                     {% endfor %}
                 </div>
             </div>

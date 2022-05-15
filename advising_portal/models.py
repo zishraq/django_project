@@ -52,6 +52,9 @@ class Semester(models.Model):
     seat_request_status = models.BooleanField(default=False)
     history = HistoricalRecords()
 
+    class Meta:
+        ordering = ['-semester_id']
+
     def __str__(self):
         return self.semester_name
 
