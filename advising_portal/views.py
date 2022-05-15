@@ -715,6 +715,12 @@ def course_create_view(request):
 
 @login_required
 @allowed_users(allowed_roles=['faculty', 'chairman'])
+def course_log_view(request):
+    return redirect('')
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def course_delete_view(request, course_id):
     course_data = Course.objects.get(course_id=course_id)
 
