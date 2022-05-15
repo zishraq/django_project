@@ -102,7 +102,7 @@ routine_slot = [
         'routine_id': 'M05W05'
     },
     {
-        'routine_id': 'M01W01W06'
+        'routine_id': 'M01W01W07'
     },
     {
         'routine_id': 'M01W01W09'

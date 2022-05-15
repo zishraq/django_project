@@ -10,21 +10,19 @@
         <table id="myTable" class="table table-striped">
             <tbody>
             <tr>
-                <th class="col-md-1"><b>Semester</b></th>
-                <th class="col-md-1"><b>Start Date</b></th>
-                <th class="col-md-1"><b>Finish Date</b></th>
-                <th class="col-md-1"><b>Advising Status</b></th>
-                <th class="col-md-1"><b>Add Drop Status</b></th>
-                <th class="col-md-1"><b>Active</b></th>
+                <th class="col-md-1"><b>Student ID</b></th>
+                <th class="col-md-1"><b>Student Name</b></th>
+                <th class="col-md-1"><b>Advisor</b></th>
+                <th class="col-md-1"><b>Gender</b></th>
                 <th class="col-md-1"><b>Details</b></th>
             </tr>
 
             <tr>
-                <td colspan="7" align="right">
+                <td colspan="5" align="right">
                     <form
                             class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group custom-search-align">
-                            <input type="text" id="myInput" onkeyup="table_search(7)"
+                            <input type="text" id="myInput" onkeyup="table_search(5)"
                                    class="form-control bg-light border-0 small" placeholder="Search for..."
                                    aria-label="Search" aria-describedby="basic-addon2">
                             <div class="input-group-append">
@@ -37,17 +35,15 @@
                 </td>
             </tr>
 
-            {% for semester in semesters %}
+            {% for student in students %}
 
                 <tr>
-                    <td class="col-md-1">{{ semester.semester_name }}</td>
-                    <td class="col-md-1">{{ semester.semester_starts_at }}</td>
-                    <td class="col-md-1">{{ semester.semester_ends_at }}</td>
-                    <td class="col-md-1">{{ semester.advising_status }}</td>
-                    <td class="col-md-1">{{ semester.add_drop_status }}</td>
-                    <td class="col-md-1">{{ semester.is_active }}</td>
+                    <td class="col-md-1">{{ student.student_id }}</td>
+                    <td class="col-md-1">{{ student.student_name }}</td>
+                    <td class="col-md-1">{{ student.advisor }}</td>
+                    <td class="col-md-1">{{ student.gender }}</td>
                     <td class="col-md-1">
-                        <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'faculty-panel-semester-detail' semester.semester_id %}'">
+                        <button class="btn btn-outline-danger" type="submit"onclick="location.href='{% url 'faculty-panel-student-detail' student.student_id %}'">
                             Detail
                         </button>
                     </td>

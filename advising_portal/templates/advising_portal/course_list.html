@@ -9,14 +9,14 @@
                 </button>
                 <div class="dropdown-menu w-50" aria-labelledby="dropdownMenuButton">
                     {% for semester in semesters %}
-                        <a class="dropdown-item" href="{% url 'student-panel-course-list' %}?semester_id={{ semester.semester_id }}">{{ semester.semester_name }}</a>
+                        <a class="dropdown-item" href="{% url 'faculty-panel-course-list' %}?semester_id={{ semester.semester_id }}">{{ semester.semester_name }}</a>
                     {% endfor %}
                 </div>
             </div>
         </div>
 
         <div class="semesters-dropdown-menu col-4" align="right">
-            <a href="{% url 'student-panel-course-create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <a href="{% url 'faculty-panel-course-create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
                 <i class="fas fa-download fa-sm text-white-50"></i>Create Course</a>
         </div>
     </div>
@@ -63,7 +63,7 @@
                             <td class="col-md-1">{{ course.prerequisite_course }}</td>
                             <td class="col-md-1">
         {#                        <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'student-panel-course-detail' course.course_id %}'">#}
-                                <button class="btn btn-outline-danger" type="submit" onclick="window.open('{% url 'student-panel-course-detail' course.course_id %}')">
+                                <button class="btn btn-outline-danger" type="submit" onclick="window.open('{% url 'faculty-panel-course-detail' course.course_id %}')">
                                     Detail
                                 </button>
                             </td>

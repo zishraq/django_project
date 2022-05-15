@@ -21,7 +21,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-outline-danger"
-                                onclick="location.href='{% url 'student-panel-course-delete' course_id %}'">Delete
+                                onclick="location.href='{% url 'faculty-panel-course-delete' course_id %}'">Delete
                         </button>
                         <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Cancel</button>
                     </div>
@@ -43,7 +43,7 @@
     </div>
 
     <div align="right">
-        <a href="{% url 'student-panel-section-create' course_code %}"
+        <a href="{% url 'faculty-panel-section-create' course_code %}"
            class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
             <i class="fas fa-download fa-sm text-white-50"></i>Add Section</a>
     </div>
@@ -88,7 +88,7 @@
                     <td class="col-md-1">{{ section.formatted_routine }}</td>
                     <td class="col-md-1">
                         <button class="btn btn-outline-danger" type="submit"
-                                onclick="location.href='{% url 'student-panel-section-detail' section.section_id %}'">
+                                onclick="location.href='{% url 'faculty-panel-section-detail' section.section_id %}'">
                             Update
                         </button>
                     </td>

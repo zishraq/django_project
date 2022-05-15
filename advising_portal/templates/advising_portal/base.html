@@ -81,14 +81,21 @@
 
         {% else %}
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'student-panel-course-list' %}">
+                <a class="nav-link" href="{% url 'faculty-panel-course-list' %}">
                     Courses
                 </a>
             </li>
             <hr class="sidebar-divider">
 
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'student-panel-semester-list' %}">
+                <a class="nav-link" href="{% url 'faculty-panel-student-list' %}">
+                    Student
+                </a>
+            </li>
+            <hr class="sidebar-divider">
+
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'faculty-panel-semester-list' %}">
                     Semesters
                 </a>
             </li>
@@ -102,7 +109,7 @@
             <hr class="sidebar-divider">
 
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'student-panel-section-request-list' %}">
+                <a class="nav-link" href="{% url 'faculty-panel-section-request-list' %}">
                     Seat Requests
                 </a>
             </li>

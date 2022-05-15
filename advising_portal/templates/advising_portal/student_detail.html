@@ -1,0 +1,75 @@
+{% extends "advising_portal/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4"><strong>Student Details</strong></legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Update</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="semesters-dropdown-menu col-8">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle w-50" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Semesters
+                </button>
+                <div class="dropdown-menu w-50" aria-labelledby="dropdownMenuButton">
+                    {% for semester in semesters %}
+                        <a class="dropdown-item" href="{% url 'faculty-panel-student-detail' student_id %}?semester_id={{ semester.semester_id }}">{{ semester.semester_name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-4" align="right">
+            <a href="{% url 'student-panel-portal' 'recommended' %}?student_id={{ student_id }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                <i class="fas fa-download fa-sm text-white-50"></i>Add Course</a>
+        </div>
+
+        <div class="col-12">
+
+            <div class="table-responsive card shadow right-table-align">
+                <table class="table table-striped">
+                    <tbody>
+                    <tr>
+                        <th class="col-md-1"><b>Course</b></th>
+                        <th class="col-md-2"><b>Section</b></th>
+                        <th class="col-md-3"><b>Timing</b></th>
+                        <th class="col-md-3"><b>Credits</b></th>
+                        {% if is_advising_semester %}
+                            <th class="col-md-3"><b>Drop</b></th>
+                        {% endif %}
+                    </tr>
+
+                    {% for course in selected_courses %}
+                        <tr>
+                            <td class="col-md-1">{{ course.course_code }}</td>
+                            <td class="col-md-1">{{ course.section_no }}</td>
+                            <td class="col-md-1"><small>{{ course.routine|linebreaks }}</small></td>
+                            {# <td class="col-md-1"><small><pre>{{ course.routine_id }}</pre></small></td>#}
+                            <td class="col-md-1">{{ course.credits }}</td>
+                            {% if is_advising_semester %}
+                                <td class="col-md-1">
+                                    <button class="btn btn-outline-danger" type="submit"
+                                            onclick="location.href='{% url 'student-panel-drop-course' course.section_id %}'">
+                                        Drop
+                                    </button>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
