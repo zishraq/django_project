@@ -13,7 +13,7 @@ from django.apps import apps
 from django.contrib.admin.models import LogEntry, ADDITION
 
 from advising_portal.forms import SectionRequestForm, CreateCourseForm, CreateSemesterForm, UpdateSectionForm, \
-    CreateSectionForm, UpdateSectionRequestForm
+    CreateSectionForm, UpdateSectionRequestForm, FacultyStudentUpdateForm
 from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, Routine, TimeSlot, WeekSlot, \
     SectionsRequested, Grade, Faculty
 from django.contrib.auth.decorators import login_required
@@ -35,9 +35,17 @@ def home(request):
 
 
 @login_required
-@allowed_users(allowed_roles=['student'])
+@allowed_users(allowed_roles=['student', 'faculty', 'chairman'])
 def advising_portal_list_view(request, section_filter):
-    student = Student.objects.get(username_id=request.user)
+    if request.user.groups.all()[0].name == 'chairman' or request.user.groups.all()[0].name == 'faculty':
+        student_id = request.GET.get('student_id', '')
+
+        student = Student.objects.get(
+            student_id=student_id
+        )
+    else:
+        student = Student.objects.get(username_id=request.user)
+
     user_id = request.user.id
 
     if section_filter not in ['recommended', 'retakable', 'f', 'd']:
@@ -124,7 +132,11 @@ def advising_portal_list_view(request, section_filter):
 
         view_section_data.append(formatted_data)
 
-    student_id = Student.objects.get(username_id=request.user).pk
+    if request.user.groups.all()[0].name == 'chairman' or request.user.groups.all()[0].name == 'faculty':
+        student_id = request.GET.get('student_id', '')
+    else:
+        student_id = Student.objects.get(username_id=request.user).pk
+
     current_semester_id = Semester.objects.get(advising_status=True).pk
 
     courses_taken = CoursesTaken.objects.filter(
@@ -157,14 +169,22 @@ def advising_portal_list_view(request, section_filter):
 
 
 @login_required
-@allowed_users(allowed_roles=['student'])
+@allowed_users(allowed_roles=['student', 'faculty', 'chairman'])
 def add_course_view(request, section_id):
     referer_parameter = get_referer_parameter(request)
 
-    current_semester = Semester.objects.get(advising_status=True)   # get current semester
-    student = Student.objects.get(username_id=request.user)   # get User's student info
-    selected_section = Section.objects.get(section_id=section_id)   # get selected section data
-    selected_course = selected_section.course   # get course data of the selected section
+    current_semester = Semester.objects.get(advising_status=True)  # get current semester
+    if request.user.groups.all()[0].name == 'chairman' or request.user.groups.all()[0].name == 'faculty':
+        student_id = request.GET.get('student_id', '')
+
+        student = Student.objects.get(
+            student_id=student_id
+        )
+    else:
+        student = Student.objects.get(username_id=request.user)  # get User's student info
+
+    selected_section = Section.objects.get(section_id=section_id)  # get selected section data
+    selected_course = selected_section.course  # get course data of the selected section
 
     # Check whether the section was already taken
     existence_check = CoursesTaken.objects.filter(
@@ -219,7 +239,8 @@ def add_course_view(request, section_id):
             status=ADDED
         )
         course_selected.save()
-        messages.success(request, f'Successfully added Section-{selected_section.section_no} of {selected_section.course.course_code}')
+        messages.success(request,
+                         f'Successfully added Section-{selected_section.section_no} of {selected_section.course.course_code}')
     else:
         messages.error(request, 'Section is full!')
 
@@ -269,8 +290,8 @@ def request_section_list_view(request):
     else:
         form = SectionRequestForm()
 
-    current_semester = Semester.objects.get(advising_status=True)   # get current semester
-    student = Student.objects.get(username_id=request.user)   # get User's student info
+    current_semester = Semester.objects.get(advising_status=True)  # get current semester
+    student = Student.objects.get(username_id=request.user)  # get User's student info
 
     previous_selected_sections = CoursesTaken.objects.filter(
         student_id=student.student_id,
@@ -346,13 +367,14 @@ def request_section_list_view(request):
 
 
 def request_section(request, section_id, reason):
-    current_semester = Semester.objects.get(advising_status=True)   # get current semester
-    student = Student.objects.get(username_id=request.user)   # get User's student info
-    requested_section = Section.objects.get(section_id=section_id)   # get selected section data
-    requested_course = requested_section.course   # get course data of the selected section
+    current_semester = Semester.objects.get(advising_status=True)  # get current semester
+    student = Student.objects.get(username_id=request.user)  # get User's student info
+    requested_section = Section.objects.get(section_id=section_id)  # get selected section data
+    requested_course = requested_section.course  # get course data of the selected section
 
-    requested_section_routine_id = requested_section.routine_id   # store routine id of the selected section
-    time_slots_of_requested_section = Routine.objects.filter(routine_slot_id=requested_section_routine_id)  # get time slots by routine id
+    requested_section_routine_id = requested_section.routine_id  # store routine id of the selected section
+    time_slots_of_requested_section = Routine.objects.filter(
+        routine_slot_id=requested_section_routine_id)  # get time slots by routine id
 
     # Check whether the section was already taken
     existence_check = SectionsRequested.objects.filter(
@@ -404,7 +426,8 @@ def request_section(request, section_id, reason):
         reason=reason
     )
     sections_requested.save()
-    messages.success(request, f'Successfully requested for Section-{requested_section.section_no} of {requested_section.course.course_code}')
+    messages.success(request,
+                     f'Successfully requested for Section-{requested_section.section_no} of {requested_section.course.course_code}')
     return redirect('student-panel-request-section-list-view')
 
 
@@ -421,7 +444,8 @@ def revoke_section_request_view(request, section_id):
         section_id=selected_section.section_id
     ).delete()
 
-    messages.success(request, f'Request removed for Section-{selected_section.section_no} of {selected_section.course.course_code}')
+    messages.success(request,
+                     f'Request removed for Section-{selected_section.section_no} of {selected_section.course.course_code}')
     return redirect('student-panel-request-section-list-view')
 
 
@@ -747,7 +771,8 @@ def section_detail_view(request, section_id):
 
             for section in instructors_sections:
                 if section_data.does_conflict_with_section(section):
-                    messages.error(request, f'Instructor assigned to Section-{section.section_no} of Course {section.course.course_code}!')
+                    messages.error(request,
+                                   f'Instructor assigned to Section-{section.section_no} of Course {section.course.course_code}!')
                     return redirect('student-panel-section-detail', section_id)
 
             form.save()
@@ -1034,7 +1059,6 @@ def section_request_detail_view(request, request_id):
                 return redirect('student-panel-section-request-list')
 
             if current_faculty_data.username == student_advisor:
-
                 section_request_data.advisor = current_faculty_data
                 section_request_data.advisor_approval_status = update_semester_data['approval_status']
                 section_request_data.advisor_text = update_semester_data['text']
@@ -1119,8 +1143,105 @@ def section_request_detail_view(request, request_id):
     return render(request, 'advising_portal/section_request_detail.html', context)
 
 
+@login_required
+@allowed_users(allowed_roles=['faculty', 'chairman'])
+def student_list_view(request):
+    user_id = request.user.id
+    students = Student.objects.all()
+    student_list = []
+
+    print(request.user.groups.all()[0].name)
+
+    if 'chairman' in request.user.groups.all()[0].name:
+        print('chairman')
+
+    for student in students:
+        formatted_data = {
+            'student_id': student.student_id,
+            'student_name': student.name,
+            'advisor': student.advisor.name,
+            'gender': student.gender
+        }
+        student_list.append(formatted_data)
+
+    context = {
+        'students': student_list,
+        'room_name': str(user_id)
+    }
+
+    return render(request, 'advising_portal/student_list.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty', 'chairman'])
+def student_detail_view(request, student_id):
+    user_id = request.user.id
+
+    student_data = Student.objects.get(
+        student_id=student_id
+    )
+
+    if request.method == 'POST':
+        form = FacultyStudentUpdateForm(request.POST, instance=student_data)
+
+        if form.is_valid():
+            update_student_data = form.cleaned_data
+            update_student_data['updated_at'] = timezone.now()
+            update_student_data['updated_by'] = request.user
+
+            updated_student = Student(**update_student_data)
+            updated_student.save()
+
+            messages.success(request, 'Student successfully updated!')
+            return redirect('student-panel-student-list')
+
+    else:
+        form = FacultyStudentUpdateForm(instance=student_data)
+
+    semester_id = request.GET.get('semester_id', '')
+
+    if not semester_id:
+        semester_id = Semester.objects.get(advising_status=True).pk
+
+    semester = Semester.objects.get(semester_id=semester_id)
+
+    semesters = list(Semester.objects.all().order_by('-semester_id'))
+
+    courses_taken = CoursesTaken.objects.filter(
+        student_id=student_id,
+        semester_id=semester.semester_id,
+        status=ADDED
+    ).all()
+
+    view_selected_courses_data = []
+
+    for course in courses_taken:
+        formatted_data = {
+            'course_code': course.section.course.course_code,
+            'section_no': course.section.section_no,
+            'section_id': course.section_id,
+            'credits': course.section.course.credit,
+            'routine': course.section.routine
+        }
+
+        view_selected_courses_data.append(formatted_data)
+
+    context = {
+        'form': form,
+        'student_id': student_id,
+        'selected_courses': view_selected_courses_data,
+        'portal_type': 'course_advising',
+        'semesters': semesters,
+        'is_advising_semester': semester.advising_status,
+        'room_name': str(user_id)
+    }
+
+    return render(request, 'advising_portal/student_detail.html', context)
+
+
 def insert_test_data(request):
-    from advising_portal.models import WeekSlot, TimeSlot, Routine, Department, Course, Faculty, Section, Student, Semester, Grade, CoursesTaken
+    from advising_portal.models import WeekSlot, TimeSlot, Routine, Department, Course, Faculty, Section, Student, \
+        Semester, Grade, CoursesTaken
     from django.contrib.auth.models import User, Group
     import datetime
     from django.utils import timezone
@@ -1195,6 +1316,8 @@ def insert_test_data(request):
     ]
 
     for u in users:
+        print(u)
+
         user = User.objects.create_user(**u)
         user.save()
 
@@ -1228,6 +1351,8 @@ def insert_test_data(request):
     ]
 
     for i in departments:
+        print(i)
+
         r = Department(**i)
         r.save()
 
@@ -1344,6 +1469,8 @@ def insert_test_data(request):
     ]
 
     for i in semesters:
+        print(i)
+
         r = Semester(**i)
         r.save()
 
@@ -1624,6 +1751,7 @@ def insert_test_data(request):
         for i in courses:
             # r = Course(**i)
             # r.save()
+            print(i)
 
             semester_id = Semester.objects.get(pk=s['semester_id']).pk
 
@@ -1633,7 +1761,8 @@ def insert_test_data(request):
                 'course_code': i['course_code'],
                 'course_title': i['course_title'],
                 'department_id': i['department_id'],
-                'prerequisite_course_id': str(semester_id) + i['prerequisite_course_id'] if i['prerequisite_course_id'] else None,
+                'prerequisite_course_id': str(semester_id) + i['prerequisite_course_id'] if i[
+                    'prerequisite_course_id'] else None,
                 'credit': i['credit'],
                 'created_by_id': i['created_by_id']
             }
@@ -1691,6 +1820,7 @@ def insert_test_data(request):
     ]
 
     for i in faculties:
+        print(i)
         r = Faculty(**i)
         r.save()
 
@@ -2028,6 +2158,7 @@ def insert_test_data(request):
     }
 
     for i in time_slots.values():
+        print(i)
         t = TimeSlot(**i)
         t.save()
 
@@ -2154,6 +2285,7 @@ def insert_test_data(request):
     c = 1
 
     for i in routine_slot:
+        print(i)
         r = WeekSlot(**i)
         r.save()
 
@@ -2525,6 +2657,8 @@ def insert_test_data(request):
 
     for s in semesters:
         for i in sections:
+            print(i)
+
             formatted_data = {
                 'section_id': i['section_id'],
                 'section_no': i['section_no'],
@@ -2593,6 +2727,8 @@ def insert_test_data(request):
     ]
 
     for i in students:
+        print(i)
+
         r = Student(**i)
         r.save()
 
@@ -2684,6 +2820,8 @@ def insert_test_data(request):
     ]
 
     for grade in grades:
+        print(grade)
+
         g = Grade(**grade)
         g.save()
 
@@ -2841,6 +2979,8 @@ def insert_test_data(request):
     ]
 
     for grade_report in grade_reports1:
+        print(grade_report)
+
         c = CoursesTaken(**grade_report)
         c.save()
 
@@ -3004,6 +3144,8 @@ def insert_test_data(request):
     ]
 
     for grade_report in grade_reports2:
+        print(grade_report)
+
         c = CoursesTaken(**grade_report)
         c.save()
 

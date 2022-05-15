@@ -1,0 +1,56 @@
+{% extends "advising_portal/base.html" %}
+{% load static %}
+{% block content %}
+    <div align="right">
+        <a href="{% url 'student-panel-semester-create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-download fa-sm text-white-50"></i>Create semester</a>
+    </div>
+
+    <div class="table-responsive card shadow custom-left-table-align">
+        <table id="myTable" class="table table-striped">
+            <tbody>
+            <tr>
+                <th class="col-md-1"><b>Student ID</b></th>
+                <th class="col-md-1"><b>Student Name</b></th>
+                <th class="col-md-1"><b>Advisor</b></th>
+                <th class="col-md-1"><b>Gender</b></th>
+                <th class="col-md-1"><b>Details</b></th>
+            </tr>
+
+            <tr>
+                <td colspan="5" align="right">
+                    <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group custom-search-align">
+                            <input type="text" id="myInput" onkeyup="table_search(5)"
+                                   class="form-control bg-light border-0 small" placeholder="Search for..."
+                                   aria-label="Search" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+
+            {% for student in students %}
+
+                <tr>
+                    <td class="col-md-1">{{ student.student_id }}</td>
+                    <td class="col-md-1">{{ student.student_name }}</td>
+                    <td class="col-md-1">{{ student.advisor }}</td>
+                    <td class="col-md-1">{{ student.gender }}</td>
+                    <td class="col-md-1">
+                        <button class="btn btn-outline-danger" type="submit"onclick="location.href='{% url 'student-panel-student-detail' student.student_id %}'">
+                            Detail
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock content %}

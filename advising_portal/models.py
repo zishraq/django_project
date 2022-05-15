@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from simple_history.models import HistoricalRecords
 
-from advising_portal.utilities import ADDED, DROPPED, PENDING, APPROVED, REJECTED
+from advising_portal.utilities import ADDED, DROPPED, PENDING, APPROVED, REJECTED, MALE, FEMALE, OTHER
 from django_project import settings
 
 
@@ -127,17 +127,21 @@ class Course(models.Model):
 
 class Faculty(models.Model):
     GENDERS = (
-        (PENDING, PENDING),
-        (APPROVED, APPROVED),
-        (REJECTED, REJECTED)
+        (MALE, MALE),
+        (FEMALE, FEMALE),
+        (OTHER, OTHER)
     )
 
     faculty_id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=30)
     initials = models.CharField(max_length=10)
     profile_picture = models.ImageField(default='default.jpg', upload_to=image_directory_path, storage=image_storage)
-    gender = models.CharField(max_length=10, choices=GENDERS)
+    gender = models.CharField(max_length=10, choices=GENDERS, default=MALE)
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='faculty_creator')
+    updated_at = models.DateTimeField(null=True)
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='faculty_updater')
     history = HistoricalRecords()
 
     def __str__(self):
@@ -155,17 +159,21 @@ class Faculty(models.Model):
 
 class Student(models.Model):
     GENDERS = (
-        (PENDING, PENDING),
-        (APPROVED, APPROVED),
-        (REJECTED, REJECTED)
+        (MALE, MALE),
+        (FEMALE, FEMALE),
+        (OTHER, OTHER)
     )
 
     student_id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=30)
     advisor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
     profile_picture = models.ImageField(default='default.jpg', upload_to=image_directory_path, storage=image_storage)
-    gender = models.CharField(max_length=10, choices=GENDERS)
+    gender = models.CharField(max_length=10, choices=GENDERS, default=MALE)
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='student_creator')
+    updated_at = models.DateTimeField(null=True)
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='student_updater')
     history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
