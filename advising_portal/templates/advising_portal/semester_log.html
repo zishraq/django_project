@@ -6,7 +6,6 @@
         <table id="myTable" class="table table-striped">
             <tbody>
             <tr>
-                <th class="col-md-1"><b>Course Code</b></th>
                 <th class="col-md-1"><b>Semester</b></th>
                 <th class="col-md-1"><b>Updated At</b></th>
                 <th class="col-md-1"><b>Updated By</b></th>
@@ -14,11 +13,11 @@
             </tr>
 
             <tr>
-                <td colspan="5" align="right">
+                <td colspan="4" align="right">
                     <form
                             class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group custom-search-align">
-                            <input type="text" id="myInput" onkeyup="table_search(5)"
+                            <input type="text" id="myInput" onkeyup="table_search(4)"
                                    class="form-control bg-light border-0 small" placeholder="Search for..."
                                    aria-label="Search" aria-describedby="basic-addon2">
                             <div class="input-group-append">
@@ -31,11 +30,10 @@
                 </td>
             </tr>
 
-            {% for logs in course_log %}
+            {% for logs in semester_log %}
 
                 <tr>
-                    <td class="col-md-1">{{ logs.course_code }}</td>
-                    <td class="col-md-1">{{ logs.semester }}</td>
+                    <td class="col-md-1">{{ logs.semester_name }}</td>
                     <td class="col-md-1">{{ logs.created_at }}</td>
                     <td class="col-md-1">{{ logs.created_by }}</td>
                     <td class="col-md-1">{{ logs.history_type }}</td>

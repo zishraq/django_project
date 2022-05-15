@@ -624,7 +624,8 @@ def course_list_view(request):
         'courses': course_list,
         'semester_name': semester.semester_name,
         'semesters': semesters,
-        'room_name': str(user_id)
+        'room_name': str(user_id),
+        'semester_id': semester_id
     }
 
     return render(request, 'advising_portal/course_list.html', context)
@@ -734,7 +735,7 @@ def course_log_view(request, course_id):
         formatted_data = {
             'course_id': data.course_id,
             'course_code': data.course_code,
-            'created_at': data.created_at,
+            'created_at': data.history_date,
             'created_by': data.created_by,
             'semester': data.semester
         }
@@ -750,6 +751,38 @@ def course_log_view(request, course_id):
     context = {'course_log': course_log}
 
     return render(request, 'advising_portal/course_log.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty', 'chairman'])
+def semester_log_view(request, semester_id):
+    HistoricalSemester = apps.get_model('advising_portal', 'HistoricalSemester')
+    semester_data = HistoricalSemester.objects.filter(
+        semester_id=semester_id
+    )
+
+    semester_log = []
+
+    for data in semester_data:
+        formatted_data = {
+            'semester_id': data.semester_id,
+            'semester_name': data.semester_name,
+            'created_at': data.updated_at,
+            'created_by': data.updated_by
+        }
+        if data.history_type == '+':
+            formatted_data['history_type'] = 'added'
+        elif data.history_type == '-':
+            formatted_data['history_type'] = 'deleted'
+        else:
+            formatted_data['history_type'] = 'updated'
+
+        semester_log.append(formatted_data)
+
+    context = {'semester_log': semester_log}
+
+    return render(request, 'advising_portal/semester_log.html', context)
+
 
 
 @login_required

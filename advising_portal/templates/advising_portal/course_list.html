@@ -21,6 +21,10 @@
         </div>
     </div>
 
+    <div align="right">
+        <a href="{% url 'student-panel-semester-log' semester_id %}">Semester Log</a>
+    </div>
+
     <div class="row">
         <div class="col-md-12 col-lg-12">
             <div class="table-responsive card shadow custom-left-table-align">
@@ -62,8 +66,8 @@
                             <td class="col-md-1">{{ course.department }}</td>
                             <td class="col-md-1">{{ course.prerequisite_course }}</td>
                             <td class="col-md-1">
-        {#                        <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'student-panel-course-detail' course.course_id %}'">#}
-                                <button class="btn btn-outline-danger" type="submit" onclick="window.open('{% url 'student-panel-course-detail' course.course_id %}')">
+                                <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'student-panel-course-detail' course.course_id %}'">
+{#                                <button class="btn btn-outline-danger" type="submit" onclick="window.open('{% url 'student-panel-course-detail' course.course_id %}')">#}
                                     Detail
                                 </button>
                             </td>
