@@ -354,7 +354,3 @@ sections = [
         'course_id': 'PHY209',
     }
 ]
-
-for i in sections:
-    r = Section(**i)
-    r.save()

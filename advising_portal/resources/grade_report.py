@@ -155,14 +155,17 @@ grade_reports1 = [
     }
 ]
 
-updated_grade_report1 = {}
+updated_grade_report1 = []
 
 
 for grade_report in grade_reports1:
-    updated_grade_report1['student'] = grade_report['student']
-    updated_grade_report1['semester_id'] = grade_report['semester_id']
-    updated_grade_report1['section_id'] = str(grade_report['semester_id']) + grade_report['section_id']
-    updated_grade_report1['grade'] = grade_report['grade']
+    formatted_data = {
+        'student': grade_report['student'],
+        'semester_id': grade_report['semester_id'],
+        'section_id': str(grade_report['semester_id']) + grade_report['section_id'],
+        'grade': grade_report['grade']
+    }
+    updated_grade_report1.append(formatted_data)
 
 
 grade_reports2 = [
@@ -324,10 +327,13 @@ grade_reports2 = [
     }
 ]
 
-updated_grade_report2 = {}
+updated_grade_report2 = []
 
 for grade_report in grade_reports2:
-    updated_grade_report2['student'] = grade_report['student']
-    updated_grade_report2['semester_id'] = grade_report['semester_id']
-    updated_grade_report2['section_id'] = str(grade_report['semester_id']) + grade_report['section_id']
-    updated_grade_report2['grade'] = grade_report['grade']
+    formatted_data = {
+        'student': grade_report['student'],
+        'semester_id': grade_report['semester_id'],
+        'section_id': str(grade_report['semester_id']) + grade_report['section_id'],
+        'grade': grade_report['grade']
+    }
+    updated_grade_report2.append(formatted_data)

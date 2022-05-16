@@ -22,7 +22,3 @@ departments = [
         'chairman_id': User.objects.get(username='tanvir').pk
     }
 ]
-
-for i in departments:
-    r = Department(**i)
-    r.save()

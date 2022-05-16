@@ -52,7 +52,3 @@ students = [
         'username_id': User.objects.get(username='admin').pk
     }
 ]
-
-for i in students:
-    r = Student(**i)
-    r.save()

@@ -945,8 +945,8 @@ def semester_detail_view(request, semester_id):
             update_semester_data['updated_at'] = timezone.now()
             update_semester_data['updated_by'] = request.user
 
-            updated_semester = Semester(**update_semester_data)
-            updated_semester.save()
+            semester_data.update(update_semester_data)
+            semester_data.save()
 
             messages.success(request, 'Semester successfully updated!')
             return redirect('faculty-panel-semester-list')
@@ -1283,26 +1283,14 @@ def insert_test_data(request):
     from advising_portal.models import WeekSlot, TimeSlot, Routine, Department, Course, Faculty, Section, Student, \
         Semester, Grade, CoursesTaken
     from django.contrib.auth.models import User, Group
-    from advising_portal.resources.department import departments
     from advising_portal.resources.groups import user_groups
-    from advising_portal.resources.semester import semesters
-    from advising_portal.resources.users import project_users
-    from advising_portal.resources.course import courses
-    from advising_portal.resources.faculty import faculties
-    from advising_portal.resources.grade_report import grade_reports1, grade_reports2
-    from advising_portal.resources.grades import grades
-    from advising_portal.resources.routine import routine_slot
-    from advising_portal.resources.section import sections
-    from advising_portal.resources.student import students
-    from advising_portal.resources.time_slot import time_slots
+    from advising_portal.resources.project_users import project_users
 
     for g in user_groups:
         group = Group.objects.create(**g)
         group.save()
 
     for u in project_users:
-        print(u)
-
         user = User.objects.create_user(**u)
         user.save()
 
@@ -1318,11 +1306,15 @@ def insert_test_data(request):
             group = Group.objects.get(name='faculty')
             group.user_set.add(user)
 
+    from advising_portal.resources.department import departments
+
     for i in departments:
         print(i)
 
         r = Department(**i)
         r.save()
+
+    from advising_portal.resources.semester import semesters
 
     for i in semesters:
         print(i)
@@ -1330,11 +1322,12 @@ def insert_test_data(request):
         r = Semester(**i)
         r.save()
 
+    from advising_portal.resources.course import courses
+
     for s in semesters:
         for i in courses:
             # r = Course(**i)
             # r.save()
-            print(i)
 
             semester_id = Semester.objects.get(pk=s['semester_id']).pk
 
@@ -1350,6 +1343,8 @@ def insert_test_data(request):
                 'created_by_id': i['created_by_id']
             }
 
+            print(formatted_data)
+
             try:
                 r = Course(**formatted_data)
                 r.save()
@@ -1357,15 +1352,21 @@ def insert_test_data(request):
             except:
                 print('fail=', formatted_data)
 
+    from advising_portal.resources.faculty import faculties
+
     for i in faculties:
         print(i)
         r = Faculty(**i)
         r.save()
 
+    from advising_portal.resources.time_slot import time_slots
+
     for i in time_slots.values():
         print(i)
         t = TimeSlot(**i)
         t.save()
+
+    from advising_portal.resources.routine import routine_slot
 
     for i in routine_slot:
         print(i)
@@ -1384,12 +1385,12 @@ def insert_test_data(request):
             rt = Routine(**routine_data)
             rt.save()
 
+    from advising_portal.resources.section import sections
+
     for s in semesters:
         for i in sections:
-            print(i)
-
             formatted_data = {
-                'section_id': i['section_id'],
+                'section_id': str(s['semester_id']) + i['section_id'],
                 'section_no': i['section_no'],
                 'section_capacity': i['section_capacity'],
                 'total_students': i['total_students'],
@@ -1398,11 +1399,15 @@ def insert_test_data(request):
                 'course_id': str(s['semester_id']) + i['course_id']
             }
 
+            print(formatted_data)
+
             r = Section(**formatted_data)
             r.save()
 
         # r = Section(**i)
         # r.save()
+
+    from advising_portal.resources.student import students
 
     for i in students:
         print(i)
@@ -1410,19 +1415,23 @@ def insert_test_data(request):
         r = Student(**i)
         r.save()
 
+    from advising_portal.resources.grades import grades
+
     for grade in grades:
         print(grade)
 
         g = Grade(**grade)
         g.save()
 
-    for grade_report in grade_reports1:
+    from advising_portal.resources.grade_report import updated_grade_report1, updated_grade_report2
+
+    for grade_report in updated_grade_report1:
         print(grade_report)
 
         c = CoursesTaken(**grade_report)
         c.save()
 
-    for grade_report in grade_reports2:
+    for grade_report in updated_grade_report2:
         print(grade_report)
 
         c = CoursesTaken(**grade_report)

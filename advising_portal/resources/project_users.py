@@ -52,7 +52,3 @@ project_users = [
         'password': '123456Seven'
     }
 ]
-
-for u in project_users:
-    user = User.objects.create_user(**u)
-    user.save()

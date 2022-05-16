@@ -9,7 +9,9 @@
     {#    </div>#}
 
     <div class="container-fluid">
-        <legend class="border-bottom mb-4"><strong>Advising of {{ student.student_id }}</strong></legend>
+        {% if user|has_group:"faculty" or user|has_group:"chairman" %}
+            <legend class="border-bottom mb-4"><strong>Advising of {{ student.student_id }}</strong></legend>
+        {% endif %}
 
         <div class="row">
             <div class="col-md-12 col-lg-7">

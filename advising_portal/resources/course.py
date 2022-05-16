@@ -274,7 +274,3 @@ courses = [
         'created_by_id': User.objects.get(username='admin').pk
     }
 ]
-
-for i in courses:
-    r = Course(**i)
-    r.save()
