@@ -15,10 +15,10 @@ project_users = [
         'username': '2019-2-60-015',
         'password': '123456Seven'
     },
-    {
-        'username': '2019-2-60-022',
-        'password': '123456Seven'
-    },
+    # {
+    #     'username': '2019-2-60-022',
+    #     'password': '123456Seven'
+    # },
     {
         'username': '2019-2-60-025',
         'password': '123456Seven'

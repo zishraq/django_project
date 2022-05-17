@@ -59,6 +59,13 @@
                             </button>
 
                         </form>
+
+                        {% if messages %}
+                            {% for message in messages %}
+                                <p style="color: red; padding-top: 10px" align="center"> {{ message }} </p>
+                            {% endfor %}
+                        {% endif %}
+
                         <hr>
                         <div class="text-center">
                             <a class="small" href="{% url 'forgot_password' %}">Forgot Password?</a>

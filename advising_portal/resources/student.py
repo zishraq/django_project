@@ -8,7 +8,7 @@ students = [
         'name': 'Zuhair Ishraq Zareef',
         'gender': 'male',
         'advisor_id': Faculty.objects.get(faculty_id='ZI').pk,
-        'username_id': User.objects.get(username='2019-2-60-022').pk
+        # 'username_id': User.objects.get(username='2019-2-60-022').pk
     },
     {
         'student_id': '2019-2-60-015',
@@ -30,12 +30,6 @@ students = [
         'gender': 'male',
         'advisor_id': Faculty.objects.get(faculty_id='ZI').pk,
         'username_id': User.objects.get(username='2018-2-60-127').pk
-    },
-    {
-        'student_id': '2020-1-60-226',
-        'name': 'Sofia Noor Rafa',
-        'gender': 'female',
-        'advisor_id': Faculty.objects.get(faculty_id='NM').pk,
     },
     {
         'student_id': '2020-1-65-001',
