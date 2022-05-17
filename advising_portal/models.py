@@ -188,14 +188,14 @@ class Student(models.Model):
 
         # self.profile_picture = 'default.jpg'
 
+        super(Student, self).save(*args, **kwargs)
+
         img = Image.open(self.profile_picture.path)
 
         if img.height > 300 or img.width > 300:
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.profile_picture.path)
-
-        super(Student, self).save(*args, **kwargs)
 
 
 class WeekSlot(models.Model):
