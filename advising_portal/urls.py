@@ -21,6 +21,7 @@ urlpatterns = [
     path('course-detail/<course_id>', views.course_detail_view, name='faculty-panel-course-detail'),
     path('course-create/', views.course_create_view, name='faculty-panel-course-create'),
     path('course-delete/<course_id>', views.course_delete_view, name='faculty-panel-course-delete'),
+    path('course-log/<course_id>', views.course_log_view, name='student-panel-course-log'),
 
     path('section-detail/<section_id>', views.section_detail_view, name='faculty-panel-section-detail'),
     path('section-create/<course_code>', views.section_create_view, name='faculty-panel-section-create'),
@@ -29,9 +30,11 @@ urlpatterns = [
     path('semester-list/', views.semester_list_view, name='faculty-panel-semester-list'),
     path('semester-detail/<semester_id>', views.semester_detail_view, name='faculty-panel-semester-detail'),
     path('semester-create/', views.semester_create, name='faculty-panel-semester-create'),
+    path('semester-delete/<semester_id>', views.semester_delete_view, name='student-panel-semester-delete'),
+    path('semester-log/<semester_id>', views.semester_log_view, name='student-panel-semester-log'),
 
     path('section-request-list/', views.section_request_list_view, name='faculty-panel-section-request-list'),
-    path('section-request-detial/<request_id>', views.section_request_detail_view, name='faculty-panel-section-request-detail'),
+    path('section-request-detail/<request_id>', views.section_request_detail_view, name='faculty-panel-section-request-detail'),
 
     path('student-list/', views.student_list_view, name='faculty-panel-student-list'),
     path('student-detail/<student_id>', views.student_detail_view, name='faculty-panel-student-detail'),

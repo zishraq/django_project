@@ -5,7 +5,7 @@
         <div class="semesters-dropdown-menu col-8">
             <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle w-50" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Semesters
+                    {{ semester_name }}
                 </button>
                 <div class="dropdown-menu w-50" aria-labelledby="dropdownMenuButton">
                     {% for semester in semesters %}
@@ -15,10 +15,14 @@
             </div>
         </div>
 
-        <div class="semesters-dropdown-menu col-4" align="right">
+        <div class="col-4" align="right">
             <a href="{% url 'faculty-panel-course-create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
                 <i class="fas fa-download fa-sm text-white-50"></i>Create Course</a>
         </div>
+    </div>
+
+    <div align="right">
+        <a href="{% url 'student-panel-semester-log' semester_id %}">Semester Log</a>
     </div>
 
     <div class="row">

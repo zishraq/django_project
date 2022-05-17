@@ -680,8 +680,10 @@ def course_list_view(request):
 
     context = {
         'courses': course_list,
+        'semester_name': semester.semester_name,
         'semesters': semesters,
-        'room_name': str(user_id)
+        'room_name': str(user_id),
+        'semester_id': semester_id
     }
 
     return render(request, 'advising_portal/course_list.html', context)
@@ -757,9 +759,9 @@ def course_create_view(request):
         if form.is_valid():
             create_course_data = form.cleaned_data
 
-            create_course_data['course_id'] = create_course_data['course_code']
-            create_course_data['created_at'] = timezone.now()
-
+            create_course_data['course_id'] = str(create_course_data['semester'].semester_id) + create_course_data[
+                'course_code']
+            create_course_data['created_by_id'] = user_id
             new_course = Course(**create_course_data)
             new_course.save()
 
@@ -779,6 +781,70 @@ def course_create_view(request):
 
 @login_required
 @allowed_users(allowed_roles=['faculty', 'chairman'])
+def course_log_view(request, course_id):
+    HistoricalCourse = apps.get_model('advising_portal', 'HistoricalCourse')
+    courses_data = HistoricalCourse.objects.filter(
+        course_id=course_id
+    )
+
+    course_log = []
+
+    for data in courses_data:
+        formatted_data = {
+            'course_id': data.course_id,
+            'course_code': data.course_code,
+            'created_at': data.history_date,
+            'created_by': data.created_by,
+            'semester': data.semester
+        }
+        if data.history_type == '+':
+            formatted_data['history_type'] = 'added'
+        elif data.history_type == '-':
+            formatted_data['history_type'] = 'deleted'
+        else:
+            formatted_data['history_type'] = 'updated'
+
+        course_log.append(formatted_data)
+
+    context = {'course_log': course_log}
+
+    return render(request, 'advising_portal/course_log.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty', 'chairman'])
+def semester_log_view(request, semester_id):
+    HistoricalSemester = apps.get_model('advising_portal', 'HistoricalSemester')
+    semester_data = HistoricalSemester.objects.filter(
+        semester_id=semester_id
+    )
+
+    semester_log = []
+
+    for data in semester_data:
+        formatted_data = {
+            'semester_id': data.semester_id,
+            'semester_name': data.semester_name,
+            'created_at': data.updated_at,
+            'created_by': data.updated_by
+        }
+        if data.history_type == '+':
+            formatted_data['history_type'] = 'added'
+        elif data.history_type == '-':
+            formatted_data['history_type'] = 'deleted'
+        else:
+            formatted_data['history_type'] = 'updated'
+
+        semester_log.append(formatted_data)
+
+    context = {'semester_log': semester_log}
+
+    return render(request, 'advising_portal/semester_log.html', context)
+
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def course_delete_view(request, course_id):
     course_data = Course.objects.get(course_id=course_id)
 
@@ -787,7 +853,21 @@ def course_delete_view(request, course_id):
     ).delete()
 
     messages.success(request, f'Deleted course {course_data.course_code}')
-    return redirect('faculty-panel-course-list')
+    return redirect('student-panel-course-list')
+
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty', 'chairman'])
+def semester_delete_view(request, semester_id):
+    course_data = Semester.objects.get(semester_id=semester_id)
+
+    Semester.objects.filter(
+        semester_id=semester_id
+    ).delete()
+
+    messages.success(request, f'Deleted Semester {course_data.semester_id}')
+    return redirect('faculty-panel-semester-list')
 
 
 @login_required
@@ -956,7 +1036,8 @@ def semester_detail_view(request, semester_id):
 
     context = {
         'form': form,
-        'room_name': str(user_id)
+        'room_name': str(user_id),
+        'semester_id': semester_id
     }
 
     return render(request, 'advising_portal/semester_detail.html', context)
