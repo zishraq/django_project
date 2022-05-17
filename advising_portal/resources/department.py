@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from advising_portal.models import Department
 
@@ -9,17 +10,15 @@ departments = [
     {
         'department_id': 'CSE',
         'department_name': 'Computer Science and Engineering',
-        'created_at': datetime.datetime.now(),
-        'created_by': User.objects.get(username='admin')
+        'created_at': timezone.now(),
+        'created_by_id': User.objects.get(username='admin').pk,
+        'chairman_id': User.objects.get(username='nusrat').pk
     },
     {
         'department_id': 'GEN',
         'department_name': 'General',
-        'created_at': datetime.datetime.now(),
-        'created_by': User.objects.get(username='admin')
+        'created_at': timezone.now(),
+        'created_by_id': User.objects.get(username='admin').pk,
+        'chairman_id': User.objects.get(username='tanvir').pk
     }
 ]
-
-for i in departments:
-    r = Department(**i)
-    r.save()

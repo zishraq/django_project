@@ -810,7 +810,6 @@ def semester_delete_view(request, semester_id):
 
     messages.success(request, f'Deleted Semester {course_data.semester_id}')
     return redirect('student-panel-semester-list')
-    # return redirect('student-panel-course-list')
 
 
 @login_required
