@@ -733,10 +733,6 @@ def course_detail_view(request, course_id):
 
         section_list.append(formatted_data)
 
-    HistoricalCourse = apps.get_model('advising_portal', 'HistoricalCourse')
-
-    course_history = HistoricalCourse.objects.all()
-
     context = {
         'form': form,
         'sections': section_list,
@@ -1021,12 +1017,7 @@ def semester_detail_view(request, semester_id):
         form = CreateSemesterForm(request.POST, instance=semester_data)
 
         if form.is_valid():
-            update_semester_data = form.cleaned_data
-            update_semester_data['updated_at'] = timezone.now()
-            update_semester_data['updated_by'] = request.user
-
-            semester_data.update(update_semester_data)
-            semester_data.save()
+            form.save()
 
             messages.success(request, 'Semester successfully updated!')
             return redirect('faculty-panel-semester-list')
