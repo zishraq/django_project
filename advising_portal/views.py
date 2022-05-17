@@ -798,6 +798,21 @@ def course_delete_view(request, course_id):
     return redirect('student-panel-course-list')
 
 
+
+@login_required
+@allowed_users(allowed_roles=['faculty', 'chairman'])
+def semester_delete_view(request, semester_id):
+    course_data = Semester.objects.get(semester_id=semester_id)
+
+    Semester.objects.filter(
+        semester_id=semester_id
+    ).delete()
+
+    messages.success(request, f'Deleted Semester {course_data.semester_id}')
+    return redirect('student-panel-semester-list')
+    # return redirect('student-panel-course-list')
+
+
 @login_required
 @allowed_users(allowed_roles=['faculty', 'chairman'])
 def section_detail_view(request, section_id):
@@ -964,7 +979,8 @@ def semester_detail_view(request, semester_id):
 
     context = {
         'form': form,
-        'room_name': str(user_id)
+        'room_name': str(user_id),
+        'semester_id': semester_id
     }
 
     return render(request, 'advising_portal/semester_detail.html', context)
