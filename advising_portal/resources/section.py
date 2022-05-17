@@ -1,4 +1,4 @@
-from advising_portal.models import Faculty, WeekSlot, Course, Section
+from advising_portal.models import WeekSlot, Course, Section
 
 
 sections = [

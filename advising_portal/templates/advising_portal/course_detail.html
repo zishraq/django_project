@@ -29,11 +29,17 @@
             </div>
         </div>
 
+        <br>
+
         <form method="POST">
             {% csrf_token %}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4"><strong>Course Details</strong></legend>
+                <legend class="border-bottom mb-4">
+                    <strong style="display: flex; justify-content: space-between">
+                    <span>Course Details</span><a class="small" href="{% url 'student-panel-course-log' course_id %}">Log</a>
+                    </strong></legend>
                 {{ form|crispy }}
+
             </fieldset>
             <div class="form-group">
                 <button class="btn btn-outline-info" type="submit">Update</button>

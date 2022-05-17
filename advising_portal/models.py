@@ -107,7 +107,7 @@ class Course(models.Model):
     credit = models.FloatField()
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='related_created_by')
-    semester = models.ForeignKey(Semester, on_delete=models.SET_NULL, null=True, related_name='related_semester')
+    semester = models.ForeignKey(Semester, on_delete=models.CASCADE, null=True, related_name='related_semester')
     history = HistoricalRecords()
 
     def __str__(self):
