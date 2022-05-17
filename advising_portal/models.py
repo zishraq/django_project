@@ -151,13 +151,14 @@ class Faculty(models.Model):
         return self.initials
 
     def save(self, *args, **kwargs):
-        if self.gender == 'male':
-            self.profile_picture = 'male_default.svg'
-
-        else:
-            self.profile_picture = 'female_default.svg'
-
         super(Faculty, self).save(*args, **kwargs)
+
+        img = Image.open(self.profile_picture.path)
+
+        if img.height > 300 or img.width > 300:
+            output_size = (300, 300)
+            img.thumbnail(output_size)
+            img.save(self.profile_picture.path)
 
 
 class Student(models.Model):

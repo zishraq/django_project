@@ -7,16 +7,28 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
 from advising_portal.models import Student
+from advising_portal.utilities import get_referer_url
 from users.forms import StudentProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm, UserUpdateFrom
 from users.models import OTPmodel
 from users.send_otp import send_otp, store_otp
 
 
 def login_view(request):
+    if not request.user.is_anonymous:
+        return redirect('student-panel-home')
+
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
 
+        print('----------')
+        print(request.user)
+        print('----------')
+
         if form.is_valid():
+            print('----------')
+            print(request.user)
+            print('----------')
+
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
@@ -28,9 +40,6 @@ def login_view(request):
 
                 return redirect('student-panel-home')
 
-            else:
-                messages.error(request, 'Invalid username or password.')
-                return redirect('login')
         else:
             messages.error(request, "Invalid username or password.")
             return redirect('login')
@@ -46,6 +55,9 @@ def login_view(request):
 
 
 def activate_student_profile_view(request):
+    if not request.user.is_anonymous:
+        return redirect('student-panel-home')
+
     current_time = timezone.now()
 
     if request.method == 'POST':
@@ -101,6 +113,9 @@ def activate_student_profile_view(request):
 
 
 def forgot_password_view(request):
+    if not request.user.is_anonymous:
+        return redirect('student-panel-home')
+
     current_time = timezone.now()
 
     if request.method == 'POST':
@@ -145,16 +160,19 @@ def forgot_password_view(request):
             return redirect('reset_password', otp_id=otp_id)
 
     else:
-        form = ProfileActivationForm()
+        form = ProfileActivationForm(None)
 
     context = {
         'form': form
     }
 
-    return render(request, 'users/forgot_password.html', context)
+    return render(request, 'users/forgot_password2.html', context)
 
 
 def set_password_view(request, otp_id):
+    if not request.user.is_anonymous:
+        return redirect('student-panel-home')
+
     current_time = timezone.now()
 
     if request.method == 'POST':
@@ -219,6 +237,9 @@ def set_password_view(request, otp_id):
 
 
 def reset_password_view(request, otp_id):
+    if not request.user.is_anonymous:
+        return redirect('student-panel-home')
+
     current_time = timezone.now()
 
     if request.method == 'POST':
@@ -255,13 +276,13 @@ def reset_password_view(request, otp_id):
             return redirect('login')
 
     else:
-        form = ProfilePasswordForm()
+        form = ProfilePasswordForm(None)
 
     context = {
         'form': form
     }
 
-    return render(request, 'users/forgot_password.html', context)
+    return render(request, 'users/reset_password.html', context)
 
 
 @login_required

@@ -27,7 +27,7 @@ class UserUpdateFrom(forms.ModelForm):
 class StudentProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Student
-        # readonly_fields = ('name', 'advisor', 'gender',)
+        readonly_fields = ('name', 'advisor', 'gender',)
         fields = ['profile_picture']
 
 

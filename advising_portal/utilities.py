@@ -21,6 +21,13 @@ def get_referer_parameter(request):
     return referer_parameter
 
 
+def get_referer_url(request):
+    referer = str(request.META.get('HTTP_REFERER'))
+    print(referer)
+
+    return referer
+
+
 def text_shorten(text: str, length):
     if length >= len(text):
         return text

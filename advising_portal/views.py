@@ -337,14 +337,18 @@ def request_section_list_view(request):
         status=ADDED
     ).all()
 
-    sections = Section.objects.exclude(
+    sections = Section.objects.filter(
+        course__semester=current_semester
+    )
+
+    sections = sections.exclude(
         section_id__in=CoursesTaken.objects.filter(
             student=student,
             semester_id__in=Semester.objects.filter(
                 advising_status=False
             ).values('semester_id').all(),
             status=ADDED
-        ).values('section_id').all()
+        ).values('section_id').all(),
     ).order_by('course__course_code')
 
     sections = list(sections)
