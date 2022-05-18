@@ -22,18 +22,12 @@ from django.contrib.auth.decorators import login_required
 
 from advising_portal.utilities import student_id_regex, ADDED, DROPPED, get_referer_parameter, \
     get_conflicting_sections_with_requested_section, text_shorten, APPROVED, REJECTED, PENDING
-from notification_system.models import BroadcastNotification
 from users.decorators import allowed_users
 
 
 @login_required
 def home(request):
-    user_id = request.user.id
-
-    context = {
-        'room_name': str(user_id)
-    }
-    return render(request, 'advising_portal/base.html', context)
+    return render(request, 'advising_portal/base.html')
 
 
 @login_required
@@ -47,6 +41,14 @@ def advising_portal_list_view(request, section_filter):
         )
     else:
         student = Student.objects.get(username_id=request.user)
+
+        advising_semester_check = Semester.objects.filter(
+            advising_status=True
+        ).exists()
+
+        if not advising_semester_check:
+            messages.error(request, 'Advising is currently off!')
+            return redirect('student-panel-home')
 
     user_id = request.user.id
 
@@ -324,6 +326,7 @@ def request_section_list_view(request):
             section_id = form.cleaned_data.get('section')
 
             request_section(request=request, section_id=section_id, reason=reason)
+            return redirect('student-panel-request-section-list-view')
 
     else:
         form = SectionRequestForm()
@@ -617,7 +620,7 @@ def advised_course_list_view(request):
     semester_id = request.GET.get('semester_id', '')
 
     if not semester_id:
-        semester_id = Semester.objects.get(advising_status=True).pk
+        semester_id = Semester.objects.last().pk
 
     semester = Semester.objects.get(semester_id=semester_id)
 
@@ -684,8 +687,10 @@ def course_list_view(request):
 
     context = {
         'courses': course_list,
+        'semester_name': semester.semester_name,
         'semesters': semesters,
-        'room_name': str(user_id)
+        'room_name': str(user_id),
+        'semester_id': semester_id
     }
 
     return render(request, 'advising_portal/course_list.html', context)
@@ -735,10 +740,6 @@ def course_detail_view(request, course_id):
 
         section_list.append(formatted_data)
 
-    HistoricalCourse = apps.get_model('advising_portal', 'HistoricalCourse')
-
-    course_history = HistoricalCourse.objects.all()
-
     context = {
         'form': form,
         'sections': section_list,
@@ -783,6 +784,70 @@ def course_create_view(request):
 
 @login_required
 @allowed_users(allowed_roles=['faculty', 'chairman'])
+def course_log_view(request, course_id):
+    HistoricalCourse = apps.get_model('advising_portal', 'HistoricalCourse')
+    courses_data = HistoricalCourse.objects.filter(
+        course_id=course_id
+    )
+
+    course_log = []
+
+    for data in courses_data:
+        formatted_data = {
+            'course_id': data.course_id,
+            'course_code': data.course_code,
+            'created_at': data.history_date,
+            'created_by': data.created_by,
+            'semester': data.semester
+        }
+        if data.history_type == '+':
+            formatted_data['history_type'] = 'added'
+        elif data.history_type == '-':
+            formatted_data['history_type'] = 'deleted'
+        else:
+            formatted_data['history_type'] = 'updated'
+
+        course_log.append(formatted_data)
+
+    context = {'course_log': course_log}
+
+    return render(request, 'advising_portal/course_log.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty', 'chairman'])
+def semester_log_view(request, semester_id):
+    HistoricalSemester = apps.get_model('advising_portal', 'HistoricalSemester')
+    semester_data = HistoricalSemester.objects.filter(
+        semester_id=semester_id
+    )
+
+    semester_log = []
+
+    for data in semester_data:
+        formatted_data = {
+            'semester_id': data.semester_id,
+            'semester_name': data.semester_name,
+            'created_at': data.updated_at,
+            'created_by': data.updated_by
+        }
+        if data.history_type == '+':
+            formatted_data['history_type'] = 'added'
+        elif data.history_type == '-':
+            formatted_data['history_type'] = 'deleted'
+        else:
+            formatted_data['history_type'] = 'updated'
+
+        semester_log.append(formatted_data)
+
+    context = {'semester_log': semester_log}
+
+    return render(request, 'advising_portal/semester_log.html', context)
+
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty', 'chairman'])
 def course_delete_view(request, course_id):
     course_data = Course.objects.get(course_id=course_id)
 
@@ -792,6 +857,19 @@ def course_delete_view(request, course_id):
 
     messages.success(request, f'Deleted course {course_data.course_code}')
     return redirect('faculty-panel-course-list')
+
+
+@login_required
+@allowed_users(allowed_roles=['faculty', 'chairman'])
+def semester_delete_view(request, semester_id):
+    course_data = Semester.objects.get(semester_id=semester_id)
+
+    Semester.objects.filter(
+        semester_id=semester_id
+    ).delete()
+
+    messages.success(request, f'Deleted Semester {course_data.semester_id}')
+    return redirect('faculty-panel-semester-list')
 
 
 @login_required
@@ -945,12 +1023,7 @@ def semester_detail_view(request, semester_id):
         form = CreateSemesterForm(request.POST, instance=semester_data)
 
         if form.is_valid():
-            update_semester_data = form.cleaned_data
-            update_semester_data['updated_at'] = timezone.now()
-            update_semester_data['updated_by'] = request.user
-
-            semester_data.update(update_semester_data)
-            semester_data.save()
+            form.save()
 
             messages.success(request, 'Semester successfully updated!')
             return redirect('faculty-panel-semester-list')
@@ -960,7 +1033,8 @@ def semester_detail_view(request, semester_id):
 
     context = {
         'form': form,
-        'room_name': str(user_id)
+        'room_name': str(user_id),
+        'semester_id': semester_id
     }
 
     return render(request, 'advising_portal/semester_detail.html', context)
@@ -1036,15 +1110,9 @@ def section_request_list_view(request):
     user_id = request.user.id
     user = request.user
 
-    if user.groups.filter(name='chairman'):
-        section_requests = SectionsRequested.objects.filter(
-            section__course__department__chairman=user
-        )
-
-    else:
-        section_requests = SectionsRequested.objects.filter(
-            Q(student__advisor__username_id=user_id) | Q(section__instructor__username=user_id)
-        )
+    section_requests = SectionsRequested.objects.filter(
+        Q(student__advisor__username_id=user_id)
+    )
 
     section_requests_list = []
 
@@ -1107,25 +1175,9 @@ def section_request_detail_view(request, request_id):
                 section_request_data.advisor_approval_status = update_semester_data['approval_status']
                 section_request_data.advisor_text = update_semester_data['text']
 
-            if section_request_data.section.instructor:
-                section_instructor = section_request_data.section.instructor.username
-
-                if current_faculty_data.username == section_instructor:
-                    section_request_data.instructor = current_faculty_data
-                    section_request_data.instructor_approval_status = update_semester_data['approval_status']
-                    section_request_data.instructor_text = update_semester_data['text']
-
-            else:
-                section_request_data.instructor_approval_status = APPROVED
-
-            if current_faculty_data.username == department_chairman:
-                section_request_data.chairman = current_faculty_data
-                section_request_data.chairman_approval_status = update_semester_data['approval_status']
-                section_request_data.chairman_text = update_semester_data['text']
-
             course_added = False
 
-            if section_request_data.advisor_approval_status == section_request_data.instructor_approval_status == section_request_data.chairman_approval_status == APPROVED:
+            if section_request_data.advisor_approval_status == APPROVED:
                 previous_selected_sections = CoursesTaken.objects.filter(
                     student=section_request_data.student,
                     semester=section_request_data.semester,
@@ -1163,13 +1215,6 @@ def section_request_detail_view(request, request_id):
             section_request_data.save()
 
             if course_added:
-                notification = BroadcastNotification(
-                    message='Your course has been added',
-                    broadcast_at=timezone.now() + timezone.timedelta(minutes=1),
-                    notification_to=section_request_data.student.username
-                )
-                notification.save()
-
                 messages.success(request, 'Course Added!')
             else:
                 messages.success(request, 'Approval submitted!')

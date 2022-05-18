@@ -140,6 +140,8 @@ class Faculty(models.Model):
     initials = models.CharField(max_length=10)
     profile_picture = models.ImageField(default='default.jpg', upload_to=image_directory_path, storage=image_storage)
     gender = models.CharField(max_length=10, choices=GENDERS, default=MALE)
+    date_of_birth = models.DateField(null=True)
+    address = models.CharField(max_length=30)
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='faculty_creator')
@@ -172,6 +174,8 @@ class Student(models.Model):
     name = models.CharField(max_length=30)
     advisor = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
     profile_picture = models.ImageField(default='default.jpg', upload_to=image_directory_path, storage=image_storage)
+    date_of_birth = models.DateField(null=True)
+    address = models.CharField(max_length=30)
     gender = models.CharField(max_length=10, choices=GENDERS, default=MALE)
     username = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(default=timezone.now)
@@ -181,14 +185,6 @@ class Student(models.Model):
     history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
-        # if self.gender == 'male':
-        #     self.profile_picture = 'male_default.svg'
-        #
-        # else:
-        #     self.profile_picture = 'female_default.svg'
-
-        # self.profile_picture = 'default.jpg'
-
         super(Student, self).save(*args, **kwargs)
 
         img = Image.open(self.profile_picture.path)

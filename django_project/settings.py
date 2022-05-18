@@ -34,9 +34,6 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'crispy_forms',
     'simple_history',
-    'channels',
-    'django_celery_results',
-    'django_celery_beat',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -47,7 +44,6 @@ INSTALLED_APPS = [
 
     'advising_portal.apps.AdvisingPortalConfig',
     'users.apps.UsersConfig',
-    'notification_system.apps.NotificationSystemConfig',
 ]
 
 MIDDLEWARE = [
@@ -75,15 +71,12 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-
-                'advising_portal.custom_context_processors.notifications'
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = 'django_project.wsgi.application'
-ASGI_APPLICATION = 'django_project.asgi.application'
 
 
 # Database
@@ -150,26 +143,3 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = 'student-panel-home'
 LOGIN_URL = 'login'
-
-# CELERY SETTINGS
-
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Asia/Dhaka'
-
-CELERY_RESULT_BACKEND = 'django-db'
-
-# CELERY BEAT
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-
-# channels
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)]
-        }
-    }
-}

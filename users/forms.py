@@ -27,8 +27,25 @@ class UserUpdateFrom(forms.ModelForm):
 class StudentProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Student
-        readonly_fields = ('name', 'advisor', 'gender',)
-        fields = ['profile_picture']
+        fields = ['profile_picture', 'name', 'advisor', 'gender', 'date_of_birth', 'address']
+
+    def __init__(self, *args, **kwargs):
+        super(StudentProfileUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs['readonly'] = True
+        self.fields['advisor'].widget.attrs['readonly'] = True
+        self.fields['gender'].widget.attrs['readonly'] = True
+
+
+class FacultyProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Faculty
+        readonly_fields = ('name', 'initials')
+        fields = ['profile_picture', 'date_of_birth', 'address']
+
+    def __init__(self, *args, **kwargs):
+        super(FacultyProfileUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['name'].required = False
+        self.fields['initials'].required = False
 
 
 class ProfileActivationForm(forms.Form):

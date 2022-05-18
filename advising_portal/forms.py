@@ -113,6 +113,7 @@ class StudentUpdateForm(forms.Form):
         super(StudentUpdateForm, self).__init__(*args, **kwargs)
         self.fields['name'].widget.attrs['readonly'] = True
         self.fields['advisor'].widget.attrs['readonly'] = True
+        self.fields['gender'].widget.attrs['readonly'] = True
 
 
 class FacultyStudentUpdateForm(forms.ModelForm):
@@ -123,4 +124,3 @@ class FacultyStudentUpdateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(FacultyStudentUpdateForm, self).__init__(*args, **kwargs)
         self.fields['gender'].widget.attrs['readonly'] = True
-

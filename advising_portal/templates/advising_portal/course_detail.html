@@ -1,39 +1,49 @@
 {% extends "advising_portal/base.html" %}
 {% load crispy_forms_tags %}
+{% load custom_tags %}
 {% block content %}
     <div class="content-section">
-        <div align="right">
-            <button class="btn btn-danger btn-circle" type="submit" data-toggle="modal"
-                    data-target="#custom-delete-modal-id"><i class="fas fa-trash"></i></button>
-        </div>
 
-        <div class="modal" tabindex="-1" id="custom-delete-modal-id">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Delete Course</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Are you sure you want to delete this course?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-outline-danger"
-                                onclick="location.href='{% url 'faculty-panel-course-delete' course_id %}'">Delete
-                        </button>
-                        <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Cancel</button>
-                    </div>
+        {% if user|has_group:"chairman" %}
+            <div align="right">
+        <button class="btn btn-danger btn-circle" type="submit" data-toggle="modal"
+                data-target="#custom-delete-modal-id"><i class="fas fa-trash"></i></button>
+    </div>
+
+            <div class="modal" tabindex="-1" id="custom-delete-modal-id">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Course</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this course?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-outline-danger"
+                            onclick="location.href='{% url 'faculty-panel-course-delete' course_id %}'">Delete
+                    </button>
+                    <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
+    </div>
+        {% endif %}
+
+        <br>
 
         <form method="POST">
             {% csrf_token %}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4"><strong>Course Details</strong></legend>
+                <legend class="border-bottom mb-4">
+                    <strong style="display: flex; justify-content: space-between">
+                    <span>Course Details</span><a class="small" href="{% url 'faculty-panel-course-log' course_id %}">Log</a>
+                    </strong></legend>
                 {{ form|crispy }}
+
             </fieldset>
             <div class="form-group">
                 <button class="btn btn-outline-info" type="submit">Update</button>

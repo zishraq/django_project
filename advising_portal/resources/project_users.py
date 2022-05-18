@@ -24,14 +24,6 @@ project_users = [
         'password': '123456Seven'
     },
     {
-        'username': '2018-2-60-127',
-        'password': '123456Seven'
-    },
-    {
-        'username': '2020-1-60-226',
-        'password': '123456Seven'
-    },
-    {
         'username': 'ishraq',
         'password': '123456Seven'
     },
@@ -41,14 +33,6 @@ project_users = [
     },
     {
         'username': 'tanvir',
-        'password': '123456Seven'
-    },
-    {
-        'username': 'rajib',
-        'password': '123456Seven'
-    },
-    {
-        'username': 'sadat',
         'password': '123456Seven'
     }
 ]

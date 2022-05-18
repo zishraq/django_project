@@ -8,7 +8,8 @@ from django.utils import timezone
 
 from advising_portal.models import Student
 from advising_portal.utilities import get_referer_url
-from users.forms import StudentProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm, UserUpdateFrom
+from users.forms import StudentProfileUpdateForm, ProfileActivationForm, ProfilePasswordForm, UserUpdateFrom, \
+    FacultyProfileUpdateForm
 from users.models import OTPmodel
 from users.send_otp import send_otp, store_otp
 
@@ -288,8 +289,10 @@ def reset_password_view(request, otp_id):
 @login_required
 def profile_view(request):
     if request.method == 'POST':
-        # u_form = UserUpdateFrom(request.POST, instance=request.user)
-        p_form = StudentProfileUpdateForm(request.POST, request.FILES, instance=request.user.student)
+        if request.user.groups.all()[0].name == 'chairman' or request.user.groups.all()[0].name == 'faculty':
+            p_form = FacultyProfileUpdateForm(request.POST, request.FILES, instance=request.user.faculty)
+        else:
+            p_form = StudentProfileUpdateForm(request.POST, request.FILES, instance=request.user.student)
 
         # if u_form.is_valid() and p_form.is_valid():
         if p_form.is_valid():
@@ -301,7 +304,10 @@ def profile_view(request):
 
     else:
         # u_form = UserUpdateFrom(instance=request.user)
-        p_form = StudentProfileUpdateForm(instance=request.user.student)
+        if request.user.groups.all()[0].name == 'chairman' or request.user.groups.all()[0].name == 'faculty':
+            p_form = FacultyProfileUpdateForm(instance=request.user.faculty)
+        else:
+            p_form = StudentProfileUpdateForm(instance=request.user.student)
 
     context = {
         # 'u_form': u_form,

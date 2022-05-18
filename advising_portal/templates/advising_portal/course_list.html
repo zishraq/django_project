@@ -1,24 +1,35 @@
 {% extends "advising_portal/base.html" %}
 {% load static %}
+{% load custom_tags %}
 {% block content %}
     <div class="row">
         <div class="semesters-dropdown-menu col-8">
             <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle w-50" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Semesters
+                <button class="btn btn-secondary dropdown-toggle w-50" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{ semester_name }}
                 </button>
                 <div class="dropdown-menu w-50" aria-labelledby="dropdownMenuButton">
                     {% for semester in semesters %}
-                        <a class="dropdown-item" href="{% url 'faculty-panel-course-list' %}?semester_id={{ semester.semester_id }}">{{ semester.semester_name }}</a>
+                        <a class="dropdown-item"
+                           href="{% url 'faculty-panel-course-list' %}?semester_id={{ semester.semester_id }}">{{ semester.semester_name }}</a>
                     {% endfor %}
                 </div>
             </div>
         </div>
 
-        <div class="semesters-dropdown-menu col-4" align="right">
-            <a href="{% url 'faculty-panel-course-create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                <i class="fas fa-download fa-sm text-white-50"></i>Create Course</a>
-        </div>
+        {% if user|has_group:"chairman" %}
+
+            <div class="col-4" align="right">
+                <a href="{% url 'faculty-panel-course-create' %}"
+                   class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                    <i class="fas fa-download fa-sm text-white-50"></i>Create Course</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div align="right">
+        <a href="{% url 'faculty-panel-semester-log' semester_id %}">Semester Log</a>
     </div>
 
     <div class="row">
@@ -62,8 +73,9 @@
                             <td class="col-md-1">{{ course.department }}</td>
                             <td class="col-md-1">{{ course.prerequisite_course }}</td>
                             <td class="col-md-1">
-        {#                        <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'student-panel-course-detail' course.course_id %}'">#}
-                                <button class="btn btn-outline-danger" type="submit" onclick="window.open('{% url 'faculty-panel-course-detail' course.course_id %}')">
+                                {#                        <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'student-panel-course-detail' course.course_id %}'">#}
+                                <button class="btn btn-outline-danger" type="submit"
+                                        onclick="window.open('{% url 'faculty-panel-course-detail' course.course_id %}')">
                                     Detail
                                 </button>
                             </td>
@@ -74,57 +86,57 @@
             </div>
         </div>
 
-{#        <div class="col-md-12 col-lg-4">#}
-{#            <div class="table-responsive card shadow custom-left-table-align">#}
-{#                <table id="myTable" class="table table-striped">#}
-{#                    <tbody>#}
-{#                    <tr>#}
-{#                        <th class="col-md-1"><b>Course Code</b></th>#}
-{#                        <th class="col-md-1"><b>Course Title</b></th>#}
-{#                        <th class="col-md-1"><b>Credits</b></th>#}
-{#                        <th class="col-md-1"><b>Department</b></th>#}
-{#                        <th class="col-md-1"><b>Pre-requisite</b></th>#}
-{#                        <th class="col-md-1"><b>Details</b></th>#}
-{#                    </tr>#}
-{##}
-{#                    <tr>#}
-{#                        <td colspan="6" align="right">#}
-{#                            <form#}
-{#                                    class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">#}
-{#                                <div class="input-group custom-search-align">#}
-{#                                    <input type="text" id="myInput" onkeyup="table_search(6)"#}
-{#                                           class="form-control bg-light border-0 small" placeholder="Search for..."#}
-{#                                           aria-label="Search" aria-describedby="basic-addon2">#}
-{#                                    <div class="input-group-append">#}
-{#                                        <button class="btn btn-primary" type="button">#}
-{#                                            <i class="fas fa-search fa-sm"></i>#}
-{#                                        </button>#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                            </form>#}
-{#                        </td>#}
-{#                    </tr>#}
-{##}
-{#                    {% for course in courses %}#}
-{##}
-{#                        <tr>#}
-{#                            <td class="col-md-1">{{ course.course_code }}</td>#}
-{#                            <td class="col-md-1">{{ course.course_title }}</td>#}
-{#                            <td class="col-md-1">{{ course.credit }}</td>#}
-{#                            <td class="col-md-1">{{ course.department }}</td>#}
-{#                            <td class="col-md-1">{{ course.prerequisite_course }}</td>#}
-{#                            <td class="col-md-1">#}
+        {#        <div class="col-md-12 col-lg-4">#}
+        {#            <div class="table-responsive card shadow custom-left-table-align">#}
+        {#                <table id="myTable" class="table table-striped">#}
+        {#                    <tbody>#}
+        {#                    <tr>#}
+        {#                        <th class="col-md-1"><b>Course Code</b></th>#}
+        {#                        <th class="col-md-1"><b>Course Title</b></th>#}
+        {#                        <th class="col-md-1"><b>Credits</b></th>#}
+        {#                        <th class="col-md-1"><b>Department</b></th>#}
+        {#                        <th class="col-md-1"><b>Pre-requisite</b></th>#}
+        {#                        <th class="col-md-1"><b>Details</b></th>#}
+        {#                    </tr>#}
+        {##}
+        {#                    <tr>#}
+        {#                        <td colspan="6" align="right">#}
+        {#                            <form#}
+        {#                                    class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">#}
+        {#                                <div class="input-group custom-search-align">#}
+        {#                                    <input type="text" id="myInput" onkeyup="table_search(6)"#}
+        {#                                           class="form-control bg-light border-0 small" placeholder="Search for..."#}
+        {#                                           aria-label="Search" aria-describedby="basic-addon2">#}
+        {#                                    <div class="input-group-append">#}
+        {#                                        <button class="btn btn-primary" type="button">#}
+        {#                                            <i class="fas fa-search fa-sm"></i>#}
+        {#                                        </button>#}
+        {#                                    </div>#}
+        {#                                </div>#}
+        {#                            </form>#}
+        {#                        </td>#}
+        {#                    </tr>#}
+        {##}
+        {#                    {% for course in courses %}#}
+        {##}
+        {#                        <tr>#}
+        {#                            <td class="col-md-1">{{ course.course_code }}</td>#}
+        {#                            <td class="col-md-1">{{ course.course_title }}</td>#}
+        {#                            <td class="col-md-1">{{ course.credit }}</td>#}
+        {#                            <td class="col-md-1">{{ course.department }}</td>#}
+        {#                            <td class="col-md-1">{{ course.prerequisite_course }}</td>#}
+        {#                            <td class="col-md-1">#}
         {#                        <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'student-panel-course-detail' course.course_id %}'">#}
-{#                                <button class="btn btn-outline-danger" type="submit" onclick="window.open('{% url 'student-panel-course-detail' course.course_id %}')">#}
-{#                                    Detail#}
-{#                                </button>#}
-{#                            </td>#}
-{#                        </tr>#}
-{#                    {% endfor %}#}
-{#                    </tbody>#}
-{#                </table>#}
-{#            </div>#}
-{#        </div>#}
+        {#                                <button class="btn btn-outline-danger" type="submit" onclick="window.open('{% url 'student-panel-course-detail' course.course_id %}')">#}
+        {#                                    Detail#}
+        {#                                </button>#}
+        {#                            </td>#}
+        {#                        </tr>#}
+        {#                    {% endfor %}#}
+        {#                    </tbody>#}
+        {#                </table>#}
+        {#            </div>#}
+        {#        </div>#}
     </div>
 
 {% endblock content %}
