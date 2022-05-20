@@ -21,15 +21,7 @@ def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
 
-        print('----------')
-        print(request.user)
-        print('----------')
-
         if form.is_valid():
-            print('----------')
-            print(request.user)
-            print('----------')
-
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)

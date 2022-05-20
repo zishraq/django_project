@@ -30,7 +30,7 @@ class CreateCourseForm(forms.ModelForm):
 class CreateSemesterForm(forms.ModelForm):
     class Meta:
         model = Semester
-        fields = ('semester_name', 'semester_starts_at', 'semester_ends_at', 'advising_status', 'is_active', 'add_drop_status')
+        fields = ('semester_name', 'semester_starts_at', 'semester_ends_at', 'advising_status', 'is_active', 'add_drop_status', 'seat_request_status')
         widgets = {
             'semester_starts_at': DateInput(attrs={'type': 'date'}),
             'semester_ends_at': DateInput(attrs={'type': 'date'})
@@ -107,7 +107,7 @@ class StudentUpdateForm(forms.Form):
     class Meta:
         model = Student
         # readonly_fields = ('name', 'advisor', 'gender',)
-        fields = ('name', 'advisor', 'profile_picture', 'gender')
+        fields = ('name', 'advisor', 'gender')
 
     def __init__(self, *args, **kwargs):
         super(StudentUpdateForm, self).__init__(*args, **kwargs)
@@ -115,12 +115,56 @@ class StudentUpdateForm(forms.Form):
         self.fields['advisor'].widget.attrs['readonly'] = True
         self.fields['gender'].widget.attrs['readonly'] = True
 
+    def clean_name(self):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            return instance.name
+        else:
+            return self.cleaned_data['name']
+
+    def clean_advisor(self):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            return instance.advisor
+        else:
+            return self.cleaned_data['advisor']
+
+    def clean_gender(self):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            return instance.gender
+        else:
+            return self.cleaned_data['gender']
+
 
 class FacultyStudentUpdateForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ('name', 'advisor', 'gender')
+        fields = ('name', 'advisor', 'profile_picture', 'gender')
 
     def __init__(self, *args, **kwargs):
         super(FacultyStudentUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs['readonly'] = True
+        self.fields['advisor'].widget.attrs['readonly'] = True
         self.fields['gender'].widget.attrs['readonly'] = True
+
+    def clean_name(self):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            return instance.name
+        else:
+            return self.cleaned_data['name']
+
+    def clean_advisor(self):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            return instance.advisor
+        else:
+            return self.cleaned_data['advisor']
+
+    def clean_gender(self):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            return instance.gender
+        else:
+            return self.cleaned_data['gender']

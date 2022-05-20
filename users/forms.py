@@ -35,17 +35,60 @@ class StudentProfileUpdateForm(forms.ModelForm):
         self.fields['advisor'].widget.attrs['readonly'] = True
         self.fields['gender'].widget.attrs['readonly'] = True
 
+    def clean_name(self):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            return instance.name
+        else:
+            return self.cleaned_data['name']
+
+    def clean_advisor(self):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            return instance.advisor
+        else:
+            return self.cleaned_data['advisor']
+
+    def clean_gender(self):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            return instance.gender
+        else:
+            return self.cleaned_data['gender']
+
 
 class FacultyProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Faculty
-        readonly_fields = ('name', 'initials')
-        fields = ['profile_picture', 'date_of_birth', 'address']
+        # readonly_fields = ()
+        fields = ['profile_picture', 'name', 'initials', 'gender', 'date_of_birth', 'address']
 
     def __init__(self, *args, **kwargs):
         super(FacultyProfileUpdateForm, self).__init__(*args, **kwargs)
-        self.fields['name'].required = False
+        self.fields['name'].widget.attrs['readonly'] = True
         self.fields['initials'].required = False
+        self.fields['gender'].required = False
+
+    def clean_name(self):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            return instance.name
+        else:
+            return self.cleaned_data['name']
+
+    def clean_initials(self):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            return instance.initials
+        else:
+            return self.cleaned_data['initials']
+
+    def clean_gender(self):
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            return instance.gender
+        else:
+            return self.cleaned_data['gender']
 
 
 class ProfileActivationForm(forms.Form):

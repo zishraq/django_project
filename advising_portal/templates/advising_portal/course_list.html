@@ -73,9 +73,9 @@
                             <td class="col-md-1">{{ course.department }}</td>
                             <td class="col-md-1">{{ course.prerequisite_course }}</td>
                             <td class="col-md-1">
-                                {#                        <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'student-panel-course-detail' course.course_id %}'">#}
-                                <button class="btn btn-outline-danger" type="submit"
-                                        onclick="window.open('{% url 'faculty-panel-course-detail' course.course_id %}')">
+                                <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'faculty-panel-course-detail' course.course_id %}'">
+{#                                <button class="btn btn-outline-danger" type="submit"#}
+{#                                        onclick="window.open('{% url 'faculty-panel-course-detail' course.course_id %}')">#}
                                     Detail
                                 </button>
                             </td>

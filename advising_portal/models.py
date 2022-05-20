@@ -60,6 +60,8 @@ class Semester(models.Model):
 
     def save(self, *args, **kwargs):
         if self.advising_status:
+            self.seat_request_status = False
+
             try:
                 temp = Semester.objects.get(advising_status=True)
                 if self != temp:
@@ -87,6 +89,8 @@ class Semester(models.Model):
                 pass
 
         if self.seat_request_status:
+            self.advising_status = False
+
             try:
                 temp = Semester.objects.get(add_drop_status=True)
                 if self != temp:
@@ -94,6 +98,13 @@ class Semester(models.Model):
                     temp.save()
             except Semester.DoesNotExist:
                 pass
+
+        advising_semester_check = Semester.objects.filter(
+            advising_status=True
+        ).exists()
+
+        if not advising_semester_check:
+            Semester.objects.last()
 
         super(Semester, self).save(*args, **kwargs)
 
@@ -109,6 +120,9 @@ class Course(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='related_created_by')
     semester = models.ForeignKey(Semester, on_delete=models.SET_NULL, null=True, related_name='related_semester')
     history = HistoricalRecords()
+
+    class Meta:
+        ordering = ['course_code']
 
     def __str__(self):
         return self.course_code
