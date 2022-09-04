@@ -19,14 +19,15 @@
 
             <tr>
                 <td colspan="5" align="right">
-                    <form
-                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <form  method="POST"
+                           class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        {% csrf_token %}
                         <div class="input-group custom-search-align">
-                            <input type="text" id="myInput" onkeyup="table_search(5)"
+                            <input name="search_query" type="text" id="myInput"
                                    class="form-control bg-light border-0 small" placeholder="Search for..."
                                    aria-label="Search" aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
+                                <button class="btn btn-primary" type="submit">
                                     <i class="fas fa-search fa-sm"></i>
                                 </button>
                             </div>
@@ -43,7 +44,7 @@
                     <td class="col-md-1">{{ student.advisor }}</td>
                     <td class="col-md-1">{{ student.gender }}</td>
                     <td class="col-md-1">
-                        <button class="btn btn-outline-danger" type="submit"onclick="location.href='{% url 'faculty-panel-student-detail' student.student_id %}'">
+                        <button class="btn btn-outline-danger" type="submit" onclick="location.href='{% url 'faculty-panel-student-detail' student.student_id %}'">
                             Detail
                         </button>
                     </td>

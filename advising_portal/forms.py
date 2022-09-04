@@ -168,3 +168,7 @@ class FacultyStudentUpdateForm(forms.ModelForm):
             return instance.gender
         else:
             return self.cleaned_data['gender']
+
+
+class FacultyStudentSearchForm(forms.Form):
+    search_query = forms.CharField(label='Search for...', max_length=30)

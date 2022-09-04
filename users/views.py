@@ -34,13 +34,13 @@ def login_view(request):
                 return redirect('student-panel-home')
 
         else:
-            messages.error(request, "Invalid username or password.")
+            messages.error(request, 'Invalid username or password.')
             return redirect('login')
 
     form = AuthenticationForm()
     return render(
         request=request,
-        template_name="users/login.html",
+        template_name='users/login.html',
         context={
             'login_form': form
         }
@@ -130,7 +130,7 @@ def forgot_password_view(request):
             ).exists()
 
             if not user_existence_check:
-                messages.error(request, "Account hasn't been activated yet")
+                messages.error(request, 'Account hasn\'t been activated yet')
                 return redirect('activate')
 
             otp_outputs = store_otp(student_id, current_time)

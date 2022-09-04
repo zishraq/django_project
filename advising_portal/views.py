@@ -15,7 +15,7 @@ from django.apps import apps
 from django.contrib.admin.models import LogEntry, ADDITION
 
 from advising_portal.forms import SectionRequestForm, CreateCourseForm, CreateSemesterForm, UpdateSectionForm, \
-    CreateSectionForm, UpdateSectionRequestForm, FacultyStudentUpdateForm
+    CreateSectionForm, UpdateSectionRequestForm, FacultyStudentUpdateForm, FacultyStudentSearchForm
 from advising_portal.models import Course, Section, CoursesTaken, Semester, Student, Routine, TimeSlot, WeekSlot, \
     SectionsRequested, Grade, Faculty
 from django.contrib.auth.decorators import login_required
@@ -848,7 +848,6 @@ def semester_log_view(request, semester_id):
     return render(request, 'advising_portal/semester_log.html', context)
 
 
-
 @login_required
 @allowed_users(allowed_roles=['faculty', 'chairman'])
 def course_delete_view(request, course_id):
@@ -1238,16 +1237,35 @@ def section_request_detail_view(request, request_id):
 @login_required
 @allowed_users(allowed_roles=['faculty', 'chairman'])
 def student_list_view(request):
-    user_id = request.user.id
-    students = Student.objects.all()
     student_list = []
 
-    print(request.user.groups.all()[0].name)
+    if request.method == 'POST':
+        form = FacultyStudentSearchForm(request.POST)
+        if form.is_valid():
+            search_query = form.cleaned_data['search_query']
 
-    if 'chairman' in request.user.groups.all()[0].name:
-        print('chairman')
+            students = Student.objects.filter(
+                Q(student_id=search_query) | Q(name__contains=search_query)
+            )
+
+        else:
+            students = Student.objects.all()
+
+    else:
+        form = FacultyStudentSearchForm()
+
+        students = Student.objects.all()
 
     for student in students:
+        if student.username:
+            user_groups = []
+
+            for group in list(student.username.groups.all()):
+                user_groups.append(group.name)
+
+            if 'faculty' in user_groups or 'chairman' in user_groups or 'admin' in user_groups:
+                continue
+
         formatted_data = {
             'student_id': student.student_id,
             'student_name': student.name,
@@ -1257,8 +1275,8 @@ def student_list_view(request):
         student_list.append(formatted_data)
 
     context = {
+        'form': form,
         'students': student_list,
-        'room_name': str(user_id)
     }
 
     return render(request, 'advising_portal/student_list.html', context)
