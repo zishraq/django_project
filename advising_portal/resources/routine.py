@@ -27,7 +27,13 @@ routine_slot = [
         'routine_id': 'S01T01R11'
     },
     {
+        'routine_id': 'S02T02S06'
+    },
+    {
         'routine_id': 'S03T03R06'
+    },
+    {
+        'routine_id': 'S03T03T06'
     },
     {
         'routine_id': 'S03T03R09'
