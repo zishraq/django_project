@@ -272,9 +272,41 @@ courses = [
         'prerequisite_course_id': "PHY109",
         'credit': 3,
         'created_by_id': User.objects.get(username='admin').pk
+    },
+    {
+        'course_id': 'CSE475',
+        'course_code': 'CSE475',
+        'course_title': 'Machine Learning',
+        'department_id': Department.objects.get(pk='CSE').pk,
+        'prerequisite_course_id': None,
+        'credit': 4,
+        'created_by_id': User.objects.get(username='admin').pk
+    },
+    {
+        'course_id': 'CSE477',
+        'course_code': 'CSE477',
+        'course_title': 'Data Mining',
+        'department_id': Department.objects.get(pk='CSE').pk,
+        'prerequisite_course_id': None,
+        'credit': 4,
+        'created_by_id': User.objects.get(username='admin').pk
+    },
+    {
+        'course_id': 'CSE487',
+        'course_code': 'CSE487',
+        'course_title': 'Computer and Cyber Security',
+        'department_id': Department.objects.get(pk='CSE').pk,
+        'prerequisite_course_id': None,
+        'credit': 3,
+        'created_by_id': User.objects.get(username='admin').pk
+    },
+    {
+        'course_id': 'CSE407',
+        'course_code': 'CSE407',
+        'course_title': 'Green Computing',
+        'department_id': Department.objects.get(pk='CSE').pk,
+        'prerequisite_course_id': None,
+        'credit': 3,
+        'created_by_id': User.objects.get(username='admin').pk
     }
 ]
-
-for i in courses:
-    r = Course(**i)
-    r.save()

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Department, Course, Faculty, Student, Section, Semester, CoursesTaken, TimeSlot, WeekSlot, Grade, Routine, SectionsRequested
+from advising_portal.models import Department, Course, Faculty, Student, Section, Semester, CoursesTaken, TimeSlot, WeekSlot, Grade, Routine, SectionsRequested
 
 admin.site.register(Department)
 admin.site.register(Course)

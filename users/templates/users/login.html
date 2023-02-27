@@ -15,34 +15,18 @@
     <title>Login</title>
 
     <!-- Custom fonts for this template-->
-    <link href="{% static 'advising_portal/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet"
+    <link href="{% static 'advising_portal/requirements/fontawesome-free/css/all.min.css' %}" rel="stylesheet"
           type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
     <!-- Custom styles for this template-->
-    <link href="{% static 'advising_portal/css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link href="{% static 'advising_portal/css/basic.min.css' %}" rel="stylesheet">
 
 </head>
 
 <body class="bg-gradient-primary">
 
 <div class="container">
-    <main class="container-fluid">
-        {% if messages %}
-            {% for message in messages %}
-                {% if message.tags == "success" %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% else %}
-                    <div class="alert alert-danger">
-                        {{ message }}
-                    </div>
-                {% endif %}
-             {% endfor %}
-        {% endif %}
-    </main>
-
     <!-- Outer Row -->
     <div class="row justify-content-center">
 
@@ -50,43 +34,39 @@
 
             <div class="card o-hidden border-0 shadow-lg my-5">
                 <div class="card-body p-0">
-                    <!-- Nested Row within Card Body -->
-{#                    <div>#}
-                        <div class="p-5">
-                            <div class="text-center">
-                                <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
-                            </div>
-                            <form class="user" method="POST">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <input name="username" class="form-control form-control-user"
-                                           id="exampleInputEmail" aria-describedby="emailHelp"
-                                           placeholder="Student ID">
-                                </div>
-                                <div class="form-group">
-                                    <input type="password" name="password" class="form-control form-control-user"
-                                           id="exampleInputPassword" placeholder="Password">
-                                </div>
-                                <button class="btn btn-primary btn-user btn-block" type="submit">
-                                    Login
-                                </button>
-                            </form>
-                            <hr>
-                            <div class="text-center">
-                                <a class="small" href="{% url 'forgot_password' %}">Forgot Password?</a>
-                            </div>
-                            <div class="text-center">
-                                <a class="small" href="{% url 'activate' %}">Activate</a>
-                            </div>
-
-                            {% if messages %}
-                                {% for message in messages %}
-                                    <p> {{ message }} </p>
-                                {% endfor %}
-                            {% endif %}
-
+                <!-- Nested Row within Card Body -->
+                    <div class="p-5">
+                        <div class="text-center">
+                            <h1 class="h4 text-gray-900 mb-4">Sign in to your Account!</h1>
                         </div>
-{#                    </div>#}
+                        <form class="user" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <input name="username" class="form-control form-control-user" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Student ID">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" name="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password">
+                            </div>
+                            <button class="btn btn-primary btn-user btn-block" type="submit">
+                                Login
+                            </button>
+                        </form>
+
+                        {% if messages %}
+                            {% for message in messages %}
+                                <p style="color: red; padding-top: 10px" align="center"> {{ message }} </p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <hr>
+                        <div class="text-center">
+                            <a class="small" href="{% url 'forgot_password' %}">Forgot Password?</a>
+                        </div>
+                        <div class="text-center">
+                            <a class="small" href="{% url 'activate' %}">Activate</a>
+                        </div>
+
+                    </div>
                 </div>
             </div>
 
@@ -97,14 +77,14 @@
 </div>
 
 <!-- Bootstrap core JavaScript-->
-<script src="{% static 'advising_portal/vendor/jquery/jquery.min.js' %}"></script>
-<script src="{% static 'advising_portal/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'advising_portal/requirements/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'advising_portal/requirements/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
 <!-- Core plugin JavaScript-->
-<script src="{% static 'advising_portal/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+<script src="{% static 'advising_portal/requirements/jquery-easing/jquery.easing.min.js' %}"></script>
 
 <!-- Custom scripts for all pages-->
-<script src="{% static 'advising_portal/js/sb-admin-2.min.js' %}"></script>
+<script src="{% static 'advising_portal/js/basic.min.js' %}"></script>
 
 </body>
 

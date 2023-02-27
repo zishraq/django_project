@@ -62,12 +62,27 @@
     font-weight: bold;
 }
 
-@media (min-device-width: 100px) and (max-device-width: 1280px) {
-    .custom-margin {
-        padding-top: 30px;
-    }
-}
+/*@media (min-device-width: 100px) and (max-device-width: 1280px) {*/
+/*    .custom-margin {*/
+/*        padding-top: 30px;*/
+/*    }*/
+/*}*/
 
 .semesters-dropdown-menu {
     padding-bottom: 30px;
+}
+
+.no-click {
+    pointer-events: none;
+}
+
+.account-img {
+  height: 125px;
+  width: 125px;
+  margin-right: 20px;
+  margin-bottom: 16px;
+}
+
+.account-heading {
+  font-size: 2.5rem;
 }

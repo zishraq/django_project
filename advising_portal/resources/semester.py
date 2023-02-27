@@ -116,7 +116,3 @@ semesters = [
         'is_active': True
     }
 ]
-
-for i in semesters:
-    r = Semester(**i)
-    r.save()

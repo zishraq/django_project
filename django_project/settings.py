@@ -32,16 +32,18 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'advising_portal.apps.AdvisingPortalConfig',
-    'users.apps.UsersConfig',
     'crispy_forms',
     'simple_history',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'advising_portal.apps.AdvisingPortalConfig',
+    'users.apps.UsersConfig',
 ]
 
 MIDDLEWARE = [
@@ -117,7 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Dhaka'
 
 USE_I18N = True
 

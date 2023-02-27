@@ -27,7 +27,13 @@ routine_slot = [
         'routine_id': 'S01T01R11'
     },
     {
+        'routine_id': 'S02T02S06'
+    },
+    {
         'routine_id': 'S03T03R06'
+    },
+    {
+        'routine_id': 'S03T03T06'
     },
     {
         'routine_id': 'S03T03R09'
@@ -102,7 +108,7 @@ routine_slot = [
         'routine_id': 'M05W05'
     },
     {
-        'routine_id': 'M01W01W06'
+        'routine_id': 'M01W01W07'
     },
     {
         'routine_id': 'M01W01W09'

@@ -5,3 +5,10 @@ pytz
 requests
 urllib3
 django-simple-history
+channels
+redis
+channels-redis
+celery
+django-celery-results
+django-celery-beat
+asyncio
